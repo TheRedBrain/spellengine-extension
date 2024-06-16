@@ -1,6 +1,6 @@
 # SpellEngine Extension
 
-This is an extension to the 'SpellEngine' mod. It adds support for mana and stamina provided by the mods 'Mana Attributes' and 'Stamina Attributes'.
+This is an extension to the [Spell Engine](https://modrinth.com/mod/spell-engine) mod by Daedelus. It adds support for mana and stamina provided by the mods [Mana Attributes](https://modrinth.com/mod/mana-attributes) and [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) and some additional options.
 
 ## Additions to spell.json
 Several aspects of spells can be controlled more directly.

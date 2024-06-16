@@ -29,7 +29,7 @@ repositories {
 		url = 'https://maven.ladysnake.org/releases'
 	}
 
-	// Spell Power, Spell Engine, Better Combat
+	// Spell Power, Spell Engine, Better Combat, Mana Attributes, Attributes Attributes
 	maven {
 		name = "Modrinth"
 		url = "https://api.modrinth.com/maven"
@@ -120,9 +120,10 @@ modrinth {
 	loaders = ['fabric']
 	dependencies = [
 			new ModDependency('P7dR8mSH', 'required'), // Fabric API
-			new ModDependency('1uXUV3Qn', 'required'), // Mana Attributes
+			new ModDependency('9s6osm5g', 'required'), // Cloth Config
 			new ModDependency('XvoWJaA2', 'required'), // SpellEngine
-			new ModDependency('QKOE26gD', 'required') // Stamina Attributes
+			new ModDependency('1uXUV3Qn', 'optional'), // Mana Attributes
+			new ModDependency('QKOE26gD', 'optional') // Stamina Attributes
 	]
 	changelog = "${update_changelog}"
 }

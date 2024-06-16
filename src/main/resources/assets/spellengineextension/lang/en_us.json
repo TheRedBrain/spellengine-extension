@@ -1,3 +1,14 @@
 {
-	"death.attack.blood_magic_casting": "%s used too much blood magic"
+	"death.attack.blood_magic_casting": "%s used too much blood magic",
+
+	"hud.cast_attempt_error.missing_health": "Requires more health",
+	"hud.cast_attempt_error.missing_mana": "Requires more mana",
+	"hud.cast_attempt_error.missing_stamina": "Requires more stamina",
+	"hud.cast_attempt_error.missing_status_effect": "Requires %s Effect",
+	"hud.cast_attempt_error.status_effect_amplifier_too_low": "Requires Higher Level of %s Effect",
+
+	"spell.tooltip.health": "Requires: %s Health",
+	"spell.tooltip.mana": "Requires: %s Mana",
+	"spell.tooltip.stamina": "Requires: %s Stamina",
+	"spell.tooltip.effect": "Requires: %s Effect"
 }

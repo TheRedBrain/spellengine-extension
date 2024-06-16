@@ -8,13 +8,15 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(SpellContainer.class)
 public class SpellContainerMixin implements DuckSpellContainerMixin {
     @Unique
-    private String proxyPool = null;
+    private String proxy_pool = "";
 
+    @Override
     public String betteradventuremode$getProxyPool() {
-        return proxyPool;
+        return proxy_pool;
     }
 
+    @Override
     public void betteradventuremode$setProxyPool(String proxyPool) {
-        this.proxyPool = proxyPool;
+        this.proxy_pool = proxyPool;
     }
 }

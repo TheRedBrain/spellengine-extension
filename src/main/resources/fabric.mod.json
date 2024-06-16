@@ -3,7 +3,7 @@
 	"id": "spellengineextension",
 	"version": "${version}",
 	"name": "SpellEngine Extension",
-	"description": "Extends the mod 'SpellEngine' with additional functionality.",
+	"description": "Extends the mod 'Spell Engine' with additional functionality.",
 	"authors": [
 		"TheRedBrain"
 	],
@@ -11,10 +11,14 @@
 		"sources": "https://github.com/TheRedBrain/spellengine-extension"
 	},
 	"license": "MIT",
+	"icon": "assets/spellengineextension/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"com.github.theredbrain.spellengineextension.SpellEngineExtension"
+		],
+		"client": [
+			"com.github.theredbrain.spellengineextension.SpellEngineExtensionClient"
 		]
 	},
 	"mixins": [
@@ -25,8 +29,11 @@
 		"minecraft": "1.20.1",
 		"java": ">=17",
 		"fabric-api": "*",
-		"spell_engine": ">=0.12.5",
-		"manaattributes": ">=1.0.0",
-		"staminaattributes": ">=1.0.0"
+		"cloth-config": ">=11.1.106",
+		"spell_engine": ">=0.12.5"
+	},
+	"suggests": {
+		"manaattributes": "*",
+		"staminaattributes": "*"
 	}
 }

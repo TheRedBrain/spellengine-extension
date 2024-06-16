@@ -1,8 +1,9 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals;
 
 import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
+import com.github.theredbrain.spellengineextension.SpellEngineExtension;
+import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCastAttemptMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionHealMixin;
@@ -27,6 +28,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -87,7 +89,8 @@ public abstract class SpellHelperMixin {
      */
     @Overwrite
     public static SpellCast.Attempt attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo) {
-        SpellCasterEntity caster = (SpellCasterEntity)player;
+
+        SpellCasterEntity caster = (SpellCasterEntity) player;
         Spell spell = SpellRegistry.getSpell(spellId);
         if (spell == null) {
             return SpellCast.Attempt.none();
@@ -100,28 +103,42 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.failMissingItem(new SpellCast.Attempt.MissingItemInfo(ammoResult.ammo().getItem()));
                 }
             }
-            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$checkHealthCost()) {
+            ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
+
+            if (spellEngineExtensionConfig.spell_cost_health_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkHealthCost()) {
                 float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
                 if (healthCost > 0 && healthCost > player.getHealth()) {
-                    return DuckSpellCastAttemptMixin.failCustom();
+                    player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_health"), true);
+                    return SpellCast.Attempt.none();
                 }
             }
-            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost()) {
+            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost()) {
                 float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
                 if (manaCost > 0 && manaCost > ((ManaUsingEntity) player).manaattributes$getMana()) {
-                    return DuckSpellCastAttemptMixin.failCustom();
+                    player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
+                    return SpellCast.Attempt.none();
                 }
             }
-            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost()) {
+            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost()) {
                 float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
                 if (staminaCost > 0 && staminaCost > ((StaminaUsingEntity) player).staminaattributes$getStamina()) {
-                    return DuckSpellCastAttemptMixin.failCustom();
+                    player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
+                    return SpellCast.Attempt.none();
                 }
             }
-            if (spell.cost.effect_id != null && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkEffectCost()) {
+            if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost.effect_id != null && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkEffectCost()) {
                 StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
-                if (effect != null && !player.hasStatusEffect(effect)) {
-                    return DuckSpellCastAttemptMixin.failCustom();
+                if (effect != null) {
+                    if (!player.hasStatusEffect(effect)) {
+                        player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_status_effect", Text.translatable(effect.getTranslationKey()).getString()), true);
+                        return SpellCast.Attempt.none();
+                    } else {
+                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                        if (statusEffectInstance != null && statusEffectInstance.getAmplifier() + 1 < ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount()) {
+                            player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.getTranslationKey()).getString()), true);
+                            return SpellCast.Attempt.none();
+                        }
+                    }
                 }
             }
             return SpellCast.Attempt.success();
@@ -233,26 +250,34 @@ public abstract class SpellHelperMixin {
                             SpellHelper.imposeCooldown(player, spellId, spell, progress);
                             player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
 
+                            var spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
+
                             // health cost
-                            float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
-                            if (healthCost > 0.0F) {
-                                player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
+                            if (spellEngineExtensionConfig.spell_cost_health_allowed) {
+                                float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
+                                if (healthCost > 0.0F) {
+                                    player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
+                                }
                             }
 
                             // mana cost
-                            float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
-                            if (manaCost > 0.0F) {
-                                ((ManaUsingEntity) player).manaattributes$addMana(-manaCost);
+                            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed) {
+                                float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
+                                if (manaCost > 0.0F) {
+                                    ((ManaUsingEntity) player).manaattributes$addMana(-manaCost);
+                                }
                             }
 
                             // stamina cost
-                            float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
-                            if (staminaCost > 0.0F) {
-                                ((StaminaUsingEntity) player).staminaattributes$addStamina(-staminaCost);
+                            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed) {
+                                float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
+                                if (staminaCost > 0.0F) {
+                                    ((StaminaUsingEntity) player).staminaattributes$addStamina(-staminaCost);
+                                }
                             }
 
                             // consume spell casting item
-                            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$consumeSelf() && !player.isCreative()) {
+                            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$consumeSelf()) {
                                 player.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
                                 if (!player.isCreative()) {
                                     itemStack.decrement(1);
@@ -312,10 +337,10 @@ public abstract class SpellHelperMixin {
     @Overwrite
     private static boolean performImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, Spell.Impact impact, SpellHelper.ImpactContext context, Collection<ServerPlayerEntity> trackers) {
         if (target instanceof EnderDragonPart) {
-            target = ((EnderDragonPart)target).owner;
+            target = ((EnderDragonPart) target).owner;
         }
 
-        if (!((Entity)target).isAttackable()) {
+        if (!((Entity) target).isAttackable()) {
             return false;
         } else {
             boolean success = false;
@@ -323,15 +348,15 @@ public abstract class SpellHelperMixin {
             Spell spell = spellInfo.spell();
 
             try {
-                double particleMultiplier = (double)(1.0F * context.total());
+                double particleMultiplier = (double) (1.0F * context.total());
                 SpellPower.Result power = context.power();
                 SpellSchool school = impact.school != null ? impact.school : spell.school;
                 if (power == null || power.school() != school) {
                     power = SpellPower.getSpellPower(school, caster);
                 }
 
-                if (power.baseValue() < (double)impact.action.min_power) {
-                    power = new SpellPower.Result(power.school(), (double)impact.action.min_power, power.criticalChance(), power.criticalDamage());
+                if (power.baseValue() < (double) impact.action.min_power) {
+                    power = new SpellPower.Result(power.school(), (double) impact.action.min_power, power.criticalChance(), power.criticalDamage());
                 }
 
                 if (impact.action.apply_to_caster) {
@@ -339,11 +364,11 @@ public abstract class SpellHelperMixin {
                 }
 
                 TargetHelper.Intent intent = SpellHelper.intent(impact.action);
-                if (!TargetHelper.actionAllowed(context.targetingMode(), intent, caster, (Entity)target)) {
+                if (!TargetHelper.actionAllowed(context.targetingMode(), intent, caster, (Entity) target)) {
                     return false;
                 }
 
-                if (intent == TargetHelper.Intent.HARMFUL && context.targetingMode() == TargetHelper.TargetingMode.AREA && ((EntityImmunity)target).isImmuneTo(EntityImmunity.Type.AREA_EFFECT)) {
+                if (intent == TargetHelper.Intent.HARMFUL && context.targetingMode() == TargetHelper.TargetingMode.AREA && ((EntityImmunity) target).isImmuneTo(EntityImmunity.Type.AREA_EFFECT)) {
                     return false;
                 }
 
@@ -354,21 +379,21 @@ public abstract class SpellHelperMixin {
                         Spell.Impact.Action.Damage damageData = impact.action.damage;
                         float knockbackMultiplier = Math.max(0.0F, damageData.knockback * context.total());
                         SpellPower.Vulnerability vulnerability = SpellPower.Vulnerability.none;
-                        int timeUntilRegen = ((Entity)target).timeUntilRegen;
+                        int timeUntilRegen = ((Entity) target).timeUntilRegen;
                         if (target instanceof LivingEntity) {
-                            LivingEntity livingEntity = (LivingEntity)target;
-                            ((ConfigurableKnockback)livingEntity).pushKnockbackMultiplier_SpellEngine(context.hasOffset() ? 0.0F : knockbackMultiplier);
+                            LivingEntity livingEntity = (LivingEntity) target;
+                            ((ConfigurableKnockback) livingEntity).pushKnockbackMultiplier_SpellEngine(context.hasOffset() ? 0.0F : knockbackMultiplier);
                             isKnockbackPushed = true;
                             if (damageData.bypass_iframes && SpellEngineMod.config.bypass_iframes) {
-                                ((Entity)target).timeUntilRegen = 0;
+                                ((Entity) target).timeUntilRegen = 0;
                             }
 
                             vulnerability = SpellPower.getVulnerability(livingEntity, school);
                         }
 
                         double amount = power.randomValue(vulnerability);
-                        amount *= (double)damageData.spell_power_coefficient;
-                        amount *= (double)context.total();
+                        amount *= (double) damageData.spell_power_coefficient;
+                        amount *= (double) context.total();
                         if (context.isChanneled()) {
                             amount *= SpellPower.getHaste(caster);
                         }
@@ -379,8 +404,8 @@ public abstract class SpellHelperMixin {
                             amount = directDamageAmount;
                         }
 
-                        particleMultiplier = power.criticalDamage() + (double)vulnerability.criticalDamageBonus();
-                        caster.onAttacking((Entity)target);
+                        particleMultiplier = power.criticalDamage() + (double) vulnerability.criticalDamageBonus();
+                        caster.onAttacking((Entity) target);
 
                         // damage type override
                         DamageSource damageSource = null;
@@ -389,23 +414,23 @@ public abstract class SpellHelperMixin {
                             Identifier damageTypeOverrideId = Identifier.tryParse(damageTypeOverride);
                             if (damageTypeOverrideId != null) {
                                 RegistryKey<DamageType> key = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, damageTypeOverrideId);
-                                Registry<DamageType> registry = ((DamageSourcesAccessor)caster.getDamageSources()).getRegistry();
-                                damageSource =  new DamageSource(registry.entryOf(key), caster);
+                                Registry<DamageType> registry = ((DamageSourcesAccessor) caster.getDamageSources()).getRegistry();
+                                damageSource = new DamageSource(registry.entryOf(key), caster);
                             }
                         }
                         if (damageSource == null) {
-                            damageSource =  SpellDamageSource.create(school, caster);
+                            damageSource = SpellDamageSource.create(school, caster);
                         }
-                        ((Entity)target).damage(damageSource, (float)amount);
+                        ((Entity) target).damage(damageSource, (float) amount);
 
                         if (target instanceof LivingEntity) {
-                            LivingEntity livingEntity = (LivingEntity)target;
-                            ((ConfigurableKnockback)livingEntity).popKnockbackMultiplier_SpellEngine();
+                            LivingEntity livingEntity = (LivingEntity) target;
+                            ((ConfigurableKnockback) livingEntity).popKnockbackMultiplier_SpellEngine();
                             isKnockbackPushed = false;
-                            ((Entity)target).timeUntilRegen = timeUntilRegen;
+                            ((Entity) target).timeUntilRegen = timeUntilRegen;
                             if (context.hasOffset()) {
                                 Vec3d direction = context.knockbackDirection(livingEntity.getPos()).negate();
-                                livingEntity.takeKnockback((double)(0.4F * knockbackMultiplier), direction.x, direction.z);
+                                livingEntity.takeKnockback((double) (0.4F * knockbackMultiplier), direction.x, direction.z);
                             }
                         }
 
@@ -413,12 +438,12 @@ public abstract class SpellHelperMixin {
                         break;
                     case HEAL:
                         if (target instanceof LivingEntity) {
-                            livingTarget = (LivingEntity)target;
+                            livingTarget = (LivingEntity) target;
                             Spell.Impact.Action.Heal healData = impact.action.heal;
                             particleMultiplier = power.criticalDamage();
                             double healAmount = power.randomValue();
-                            healAmount *= (double)healData.spell_power_coefficient;
-                            healAmount *= (double)context.total();
+                            healAmount *= (double) healData.spell_power_coefficient;
+                            healAmount *= (double) context.total();
 
                             // direct heal
                             double directHealAmount = ((DuckSpellImpactActionHealMixin) healData).betteradventuremode$getDirectHeal();
@@ -429,22 +454,22 @@ public abstract class SpellHelperMixin {
                             if (context.isChanneled()) {
                                 healAmount *= SpellPower.getHaste(caster);
                             }
-                            livingTarget.heal((float)healAmount);
+                            livingTarget.heal((float) healAmount);
                             success = true;
                         }
                         break;
                     case STATUS_EFFECT:
                         Spell.Impact.Action.StatusEffect data = impact.action.status_effect;
                         if (target instanceof LivingEntity) {
-                            livingTarget = (LivingEntity)target;
+                            livingTarget = (LivingEntity) target;
                             Identifier id = new Identifier(data.effect_id);
-                            StatusEffect effect = (StatusEffect)Registries.STATUS_EFFECT.get(id);
+                            StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(id);
                             if (!SpellHelper.underApplyLimit(power, livingTarget, school, data.apply_limit)) {
                                 return false;
                             }
 
                             int duration = Math.round(data.duration * 20.0F);
-                            int amplifier = data.amplifier + (int)((double)data.amplifier_power_multiplier * power.nonCriticalValue());
+                            int amplifier = data.amplifier + (int) ((double) data.amplifier_power_multiplier * power.nonCriticalValue());
                             boolean showParticles = data.show_particles;
                             switch (data.apply_mode) {
                                 case ADD:
@@ -465,9 +490,9 @@ public abstract class SpellHelperMixin {
                         break;
                     case FIRE:
                         Spell.Impact.Action.Fire fireData = impact.action.fire;
-                        ((Entity)target).setOnFireFor(fireData.duration);
-                        if (((Entity)target).getFireTicks() > 0) {
-                            ((Entity)target).setFireTicks(((Entity)target).getFireTicks() + fireData.tick_offset);
+                        ((Entity) target).setOnFireFor(fireData.duration);
+                        if (((Entity) target).getFireTicks() > 0) {
+                            ((Entity) target).setFireTicks(((Entity) target).getFireTicks() + fireData.tick_offset);
                         }
                         break;
                     case SPAWN:
@@ -480,22 +505,22 @@ public abstract class SpellHelperMixin {
 
                         Iterator var28 = spawns.iterator();
 
-                        while(true) {
+                        while (true) {
                             if (!var28.hasNext()) {
                                 break label141;
                             }
 
-                            Spell.Impact.Action.Spawn spawnData = (Spell.Impact.Action.Spawn)var28.next();
+                            Spell.Impact.Action.Spawn spawnData = (Spell.Impact.Action.Spawn) var28.next();
                             Identifier id = new Identifier(spawnData.entity_type_id);
-                            EntityType<?> type = (EntityType)Registries.ENTITY_TYPE.get(id);
+                            EntityType<?> type = (EntityType) Registries.ENTITY_TYPE.get(id);
                             Entity entity = type.create(world);
-                            SpellHelper.applyEntityPlacement(entity, caster, ((Entity)target).getPos(), spawnData.placement);
+                            SpellHelper.applyEntityPlacement(entity, caster, ((Entity) target).getPos(), spawnData.placement);
                             if (entity instanceof SpellSpawnedEntity) {
-                                SpellSpawnedEntity spellSpawnedEntity = (SpellSpawnedEntity)entity;
+                                SpellSpawnedEntity spellSpawnedEntity = (SpellSpawnedEntity) entity;
                                 spellSpawnedEntity.onCreatedFromSpell(caster, spellInfo.id(), spawnData);
                             }
 
-                            ((WorldScheduler)world).schedule(spawnData.delay_ticks, () -> {
+                            ((WorldScheduler) world).schedule(spawnData.delay_ticks, () -> {
                                 world.spawnEntity(entity);
                             });
                             success = true;
@@ -503,21 +528,21 @@ public abstract class SpellHelperMixin {
                     case TELEPORT:
                         Spell.Impact.Action.Teleport teleportData = impact.action.teleport;
                         if (target instanceof LivingEntity) {
-                            livingTarget = (LivingEntity)target;
+                            livingTarget = (LivingEntity) target;
                             switch (teleportData.mode) {
                                 case FORWARD:
                                     Spell.Impact.Action.Teleport.Forward forward = teleportData.forward;
-                                    Vec3d look = ((Entity)target).getRotationVector();
-                                    Vec3d startingPosition = ((Entity)target).getPos();
+                                    Vec3d look = ((Entity) target).getRotationVector();
+                                    Vec3d startingPosition = ((Entity) target).getPos();
                                     Vec3d destination = TargetHelper.findTeleportDestination(livingTarget, look, forward.distance, teleportData.required_clearance_block_y);
-                                    Vec3d groundJustBelow = TargetHelper.findSolidBlockBelow(livingTarget, destination, ((Entity)target).getWorld(), -1.5F);
+                                    Vec3d groundJustBelow = TargetHelper.findSolidBlockBelow(livingTarget, destination, ((Entity) target).getWorld(), -1.5F);
                                     if (groundJustBelow != null) {
                                         destination = groundJustBelow;
                                     }
 
                                     if (destination != null) {
                                         ParticleHelper.sendBatches(livingTarget, teleportData.depart_particles, false);
-                                        world.emitGameEvent(GameEvent.TELEPORT, startingPosition, GameEvent.Emitter.of((Entity)target));
+                                        world.emitGameEvent(GameEvent.TELEPORT, startingPosition, GameEvent.Emitter.of((Entity) target));
                                         livingTarget.teleport(destination.x, destination.y, destination.z);
                                         success = true;
                                     }
@@ -527,18 +552,18 @@ public abstract class SpellHelperMixin {
 
                 if (success) {
                     if (impact.particles != null) {
-                        ParticleHelper.sendBatches((Entity)target, impact.particles, (float)particleMultiplier, trackers);
+                        ParticleHelper.sendBatches((Entity) target, impact.particles, (float) particleMultiplier, trackers);
                     }
 
                     if (impact.sound != null) {
-                        SoundHelper.playSound(world, (Entity)target, impact.sound);
+                        SoundHelper.playSound(world, (Entity) target, impact.sound);
                     }
                 }
             } catch (Exception var25) {
                 System.err.println("Failed to perform impact effect");
                 System.err.println(var25.getMessage());
                 if (isKnockbackPushed) {
-                    ((ConfigurableKnockback)target).popKnockbackMultiplier_SpellEngine();
+                    ((ConfigurableKnockback) target).popKnockbackMultiplier_SpellEngine();
                 }
             }
 
