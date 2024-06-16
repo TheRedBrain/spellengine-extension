@@ -5,8 +5,12 @@ import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -28,7 +32,7 @@ public class SpellTooltipMixin {
 
     @Inject(method = "spellInfo", at = @At("TAIL"),
             locals = LocalCapture.CAPTURE_FAILSOFT)
-    private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, CallbackInfoReturnable<List<Text>> cir, ArrayList lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
+    private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, CallbackInfoReturnable<List<Text>> cir, ArrayList<Text> lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, SpellTooltip.DescriptionMutator mutator, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
 
@@ -56,18 +60,24 @@ public class SpellTooltipMixin {
             }
         }
 
-//        if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null) {
-//            StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
-//            if (effect != null) {
-//                StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
-//                if (statusEffectInstance != null && statusEffectInstance.getAmplifier() + 1 < ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount()) {
-//                }
-//                boolean hasRequiredEffectAndLevel = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkEffectCost() || staminaCost <= 0 || staminaCost < ((StaminaUsingEntity) player).staminaattributes$getStamina();
-//                lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
-//            }
-//        }
-//        .append(ScreenTexts.SPACE).append(Text.translatable("enchantment.level." + requiredEffectAmplifier))
-//                .append(ScreenTexts.SPACE).append(Text.translatable("enchantment.level." + (statusEffectInstance.getAmplifier() + 1)))
-
+        if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null) {
+            StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
+            if (effect != null) {
+                int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                if (statusEffectInstance != null) {
+                    int currentAmplifier = statusEffectInstance.getAmplifier();
+                    boolean hasRequiredEffectAndLevel = player.hasStatusEffect(effect) && currentAmplifier + 1 < decrementEffectAmount;
+                    lines.add(
+                            Text.literal(" ")
+                                    .append(Text.translatable("spell.tooltip.effect"))
+                                    .append(effect.getName())
+                                    .append(ScreenTexts.SPACE)
+                                    .append(Text.translatable("enchantment.level." + decrementEffectAmount))
+                                    .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
+                    );
+                }
+            }
+        }
     }
 }

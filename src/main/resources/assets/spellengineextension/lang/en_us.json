@@ -10,5 +10,5 @@
 	"spell.tooltip.health": "Requires: %s Health",
 	"spell.tooltip.mana": "Requires: %s Mana",
 	"spell.tooltip.stamina": "Requires: %s Stamina",
-	"spell.tooltip.effect": "Requires: %s Effect"
+	"spell.tooltip.effect": "Requires: "
 }

@@ -14,8 +14,6 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
     private boolean check_stamina_cost = false;
     @Unique
-    private boolean check_effect_cost = false;
-    @Unique
     private boolean consume_self = false;
     @Unique
     private int decrement_effect_amount = -1;
@@ -39,11 +37,6 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public boolean betteradventuremode$checkStaminaCost() {
         return this.check_stamina_cost;
-    }
-
-    @Override
-    public boolean betteradventuremode$checkEffectCost() {
-        return this.check_effect_cost;
     }
 
     @Override

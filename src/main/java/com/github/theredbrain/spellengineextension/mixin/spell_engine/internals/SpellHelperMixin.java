@@ -27,6 +27,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -126,7 +127,7 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.none();
                 }
             }
-            if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost.effect_id != null && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkEffectCost()) {
+            if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost.effect_id != null) {
                 StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
                 if (effect != null) {
                     if (!player.hasStatusEffect(effect)) {
@@ -307,14 +308,15 @@ public abstract class SpellHelperMixin {
                             if (spell.cost.effect_id != null) {
                                 StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
                                 if (effect != null) {
-                                    if (((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount() < 0) {
+                                    int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                                    if (decrementEffectAmount < 0) {
                                         player.removeStatusEffect(effect);
-                                    } else if (((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount() > 0) {
+                                    } else if (decrementEffectAmount > 0) {
                                         int newAmplifier = -1;
                                         StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
                                         if (statusEffectInstance != null) {
                                             int oldAmplifier = statusEffectInstance.getAmplifier();
-                                            newAmplifier = oldAmplifier - 1;
+                                            newAmplifier = oldAmplifier - decrementEffectAmount;
                                         }
                                         player.removeStatusEffect(effect);
                                         if (newAmplifier >= 0) {
@@ -373,7 +375,8 @@ public abstract class SpellHelperMixin {
                 }
 
                 LivingEntity livingTarget;
-                label141:
+                Vec3d direction;
+                label181:
                 switch (impact.action.type) {
                     case DAMAGE:
                         Spell.Impact.Action.Damage damageData = impact.action.damage;
@@ -429,7 +432,7 @@ public abstract class SpellHelperMixin {
                             isKnockbackPushed = false;
                             ((Entity) target).timeUntilRegen = timeUntilRegen;
                             if (context.hasOffset()) {
-                                Vec3d direction = context.knockbackDirection(livingEntity.getPos()).negate();
+                                direction = context.knockbackDirection(livingEntity.getPos()).negate();
                                 livingEntity.takeKnockback((double) (0.4F * knockbackMultiplier), direction.x, direction.z);
                             }
                         }
@@ -503,14 +506,14 @@ public abstract class SpellHelperMixin {
                             spawns = List.of(impact.action.spawn);
                         }
 
-                        Iterator var28 = spawns.iterator();
+                        Iterator var33 = spawns.iterator();
 
                         while (true) {
-                            if (!var28.hasNext()) {
-                                break label141;
+                            if (!var33.hasNext()) {
+                                break label181;
                             }
 
-                            Spell.Impact.Action.Spawn spawnData = (Spell.Impact.Action.Spawn) var28.next();
+                            Spell.Impact.Action.Spawn spawnData = (Spell.Impact.Action.Spawn) var33.next();
                             Identifier id = new Identifier(spawnData.entity_type_id);
                             EntityType<?> type = (EntityType) Registries.ENTITY_TYPE.get(id);
                             Entity entity = type.create(world);
@@ -529,23 +532,67 @@ public abstract class SpellHelperMixin {
                         Spell.Impact.Action.Teleport teleportData = impact.action.teleport;
                         if (target instanceof LivingEntity) {
                             livingTarget = (LivingEntity) target;
+                            LivingEntity teleportedEntity = null;
+                            Vec3d destination = null;
+                            Vec3d startingPosition = null;
+                            Float applyRotation = null;
+                            Vec3d groundJustBelow;
                             switch (teleportData.mode) {
                                 case FORWARD:
+                                    teleportedEntity = livingTarget;
                                     Spell.Impact.Action.Teleport.Forward forward = teleportData.forward;
-                                    Vec3d look = ((Entity) target).getRotationVector();
-                                    Vec3d startingPosition = ((Entity) target).getPos();
-                                    Vec3d destination = TargetHelper.findTeleportDestination(livingTarget, look, forward.distance, teleportData.required_clearance_block_y);
-                                    Vec3d groundJustBelow = TargetHelper.findSolidBlockBelow(livingTarget, destination, ((Entity) target).getWorld(), -1.5F);
+                                    direction = ((Entity) target).getRotationVector();
+                                    startingPosition = ((Entity) target).getPos();
+                                    destination = TargetHelper.findTeleportDestination(teleportedEntity, direction, forward.distance, teleportData.required_clearance_block_y);
+                                    groundJustBelow = TargetHelper.findSolidBlockBelow(teleportedEntity, destination, ((Entity) target).getWorld(), -1.5F);
+                                    if (groundJustBelow != null) {
+                                        destination = groundJustBelow;
+                                    }
+                                    break;
+                                case BEHIND_TARGET:
+                                    if (livingTarget == caster) {
+                                        return false;
+                                    }
+
+                                    Vec3d look = ((Entity)target).getRotationVector();
+                                    float distance = 1.0F;
+                                    if (teleportData.behind_target != null) {
+                                        distance = teleportData.behind_target.distance;
+                                    }
+
+                                    teleportedEntity = caster;
+                                    startingPosition = caster.getPos();
+                                    destination = ((Entity)target).getPos().add(look.multiply((double)(-distance)));
+                                    groundJustBelow = TargetHelper.findSolidBlockBelow(teleportedEntity, destination, ((Entity)target).getWorld(), -1.5F);
                                     if (groundJustBelow != null) {
                                         destination = groundJustBelow;
                                     }
 
-                                    if (destination != null) {
-                                        ParticleHelper.sendBatches(livingTarget, teleportData.depart_particles, false);
-                                        world.emitGameEvent(GameEvent.TELEPORT, startingPosition, GameEvent.Emitter.of((Entity) target));
-                                        livingTarget.teleport(destination.x, destination.y, destination.z);
-                                        success = true;
+                                    double x = look.x;
+                                    double z = look.z;
+                                    float yaw = (float)Math.toDegrees(Math.atan2(-x, z));
+                                    yaw = yaw < 0.0F ? yaw + 360.0F : yaw;
+                                    applyRotation = yaw;
+                            }
+
+                            if (destination != null && startingPosition != null && teleportedEntity != null) {
+                                label178: {
+                                    ParticleHelper.sendBatches(teleportedEntity, teleportData.depart_particles, false);
+                                    world.emitGameEvent(GameEvent.TELEPORT, startingPosition, GameEvent.Emitter.of(teleportedEntity));
+                                    if (applyRotation != null && teleportedEntity instanceof ServerPlayerEntity) {
+                                        ServerPlayerEntity serverPlayer = (ServerPlayerEntity)teleportedEntity;
+                                        if (world instanceof ServerWorld) {
+                                            ServerWorld serverWorld = (ServerWorld)world;
+                                            serverPlayer.teleport(serverWorld, destination.x, destination.y, destination.z, applyRotation, serverPlayer.getPitch());
+                                            break label178;
+                                        }
                                     }
+
+                                    teleportedEntity.teleport(destination.x, destination.y, destination.z);
+                                }
+
+                                success = true;
+                                ParticleHelper.sendBatches(teleportedEntity, teleportData.arrive_particles, false);
                             }
                         }
                 }

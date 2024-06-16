@@ -30,7 +30,7 @@
 		"java": ">=17",
 		"fabric-api": "*",
 		"cloth-config": ">=11.1.106",
-		"spell_engine": ">=0.12.5"
+		"spell_engine": ">=0.15.0"
 	},
 	"suggests": {
 		"manaattributes": "*",
