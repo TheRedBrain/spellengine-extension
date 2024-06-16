@@ -42,6 +42,7 @@ public class SpellEngineExtension implements ModInitializer {
 		});
 	}
 
+	@Deprecated(forRemoval = true)
     public static void setSpellContainerProxyPool(Identifier spellContainerIdentifier, String proxyPool) {
         SpellContainer spellContainer = SpellRegistry.book_containers.get(spellContainerIdentifier);
         ((DuckSpellContainerMixin)spellContainer).betteradventuremode$setProxyPool(proxyPool);
