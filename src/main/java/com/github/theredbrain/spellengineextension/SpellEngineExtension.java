@@ -1,8 +1,10 @@
 package com.github.theredbrain.spellengineextension;
 
+import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfigWrapper;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellContainerMixin;
+import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.google.gson.Gson;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -12,6 +14,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.SpellContainer;
@@ -27,6 +30,34 @@ public class SpellEngineExtension implements ModInitializer {
 
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
+
+	public static float getCurrentMana(LivingEntity livingEntity) {
+		float currentMana = 0.0F;
+		if (isManaAttributesLoaded) {
+			currentMana = ((ManaUsingEntity) livingEntity).manaattributes$getMana();
+		}
+		return currentMana;
+	}
+
+	public static float getCurrentStamina(LivingEntity livingEntity) {
+		float currentStamina = 0.0F;
+		if (isStaminaAttributesLoaded) {
+			currentStamina = ((StaminaUsingEntity) livingEntity).staminaattributes$getStamina();
+		}
+		return currentStamina;
+	}
+
+	public static void addMana(LivingEntity livingEntity, float amount) {
+		if (isManaAttributesLoaded) {
+			((ManaUsingEntity) livingEntity).manaattributes$addMana(amount);
+		}
+	}
+
+	public static void addStamina(LivingEntity livingEntity, float amount) {
+		if (isStaminaAttributesLoaded) {
+			((StaminaUsingEntity) livingEntity).staminaattributes$addStamina(amount);
+		}
+	}
 
 	@Override
 	public void onInitialize() {

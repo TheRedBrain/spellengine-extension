@@ -1,13 +1,11 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals;
 
-import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionHealMixin;
-import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.Function;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -115,14 +113,16 @@ public abstract class SpellHelperMixin {
             }
             if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost()) {
                 float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
-                if (manaCost > 0 && manaCost > ((ManaUsingEntity) player).manaattributes$getMana()) {
+                float currentMana = SpellEngineExtension.getCurrentMana(player);
+                if (manaCost > 0 && manaCost > currentMana) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
                     return SpellCast.Attempt.none();
                 }
             }
             if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost()) {
                 float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
-                if (staminaCost > 0 && staminaCost > ((StaminaUsingEntity) player).staminaattributes$getStamina()) {
+                float currentStamina = SpellEngineExtension.getCurrentStamina(player);
+                if (staminaCost > 0 && staminaCost > currentStamina) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
                     return SpellCast.Attempt.none();
                 }
@@ -268,7 +268,7 @@ public abstract class SpellHelperMixin {
                             if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed) {
                                 float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
                                 if (manaCost > 0.0F) {
-                                    ((ManaUsingEntity) player).manaattributes$addMana(-manaCost);
+                                    SpellEngineExtension.addMana(player, -manaCost);
                                 }
                             }
 
@@ -276,7 +276,7 @@ public abstract class SpellHelperMixin {
                             if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed) {
                                 float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
                                 if (staminaCost > 0.0F) {
-                                    ((StaminaUsingEntity) player).staminaattributes$addStamina(-staminaCost);
+                                    SpellEngineExtension.addStamina(player, -staminaCost);
                                 }
                             }
 

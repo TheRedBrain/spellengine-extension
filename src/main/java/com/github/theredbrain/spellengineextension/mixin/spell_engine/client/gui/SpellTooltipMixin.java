@@ -1,10 +1,8 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
-import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
-import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -47,7 +45,8 @@ public class SpellTooltipMixin {
         if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && spell.cost != null) {
             float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
             if (manaCost != 0.0F) {
-                boolean hasEnoughMana = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost() || manaCost <= 0 || manaCost < ((ManaUsingEntity) player).manaattributes$getMana();
+                float currentMana = SpellEngineExtension.getCurrentMana(player);
+                boolean hasEnoughMana = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost() || manaCost <= 0 || manaCost < currentMana;
                 lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.mana", manaCost).formatted(hasEnoughMana ? Formatting.GREEN : Formatting.RED)));
             }
         }
@@ -55,7 +54,8 @@ public class SpellTooltipMixin {
         if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && spell.cost != null) {
             float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
             if (staminaCost != 0.0F) {
-                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost() || staminaCost <= 0 || staminaCost < ((StaminaUsingEntity) player).staminaattributes$getStamina();
+                float currentStamina = SpellEngineExtension.getCurrentStamina(player);
+                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost() || staminaCost <= 0 || staminaCost < currentStamina;
                 lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
             }
         }
