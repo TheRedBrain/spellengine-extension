@@ -135,9 +135,12 @@ public abstract class SpellHelperMixin {
                         return SpellCast.Attempt.none();
                     } else {
                         StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
-                        if (statusEffectInstance != null && statusEffectInstance.getAmplifier() + 1 < ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount()) {
-                            player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.getTranslationKey()).getString()), true);
-                            return SpellCast.Attempt.none();
+                        if (statusEffectInstance != null) {
+                            int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                            if (decrementEffectAmount > 0 && statusEffectInstance.getAmplifier() + 1 < decrementEffectAmount) {
+                                player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.getTranslationKey()).getString()), true);
+                                return SpellCast.Attempt.none();
+                            }
                         }
                     }
                 }

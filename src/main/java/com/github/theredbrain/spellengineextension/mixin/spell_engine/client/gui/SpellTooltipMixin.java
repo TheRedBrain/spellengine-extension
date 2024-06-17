@@ -32,7 +32,7 @@ public class SpellTooltipMixin {
 
     @Inject(method = "spellInfo", at = @At("TAIL"),
             locals = LocalCapture.CAPTURE_FAILSOFT)
-    private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, CallbackInfoReturnable<List<Text>> cir, ArrayList<Text> lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, SpellTooltip.DescriptionMutator mutator, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
+    private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, CallbackInfoReturnable<List<Text>> cir, ArrayList lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, SpellTooltip.DescriptionMutator mutator, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
 
@@ -60,23 +60,25 @@ public class SpellTooltipMixin {
             }
         }
 
-        if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null) {
+        if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null && spell.cost.effect_id != null && !spell.cost.effect_id.isEmpty()) {
             StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
             if (effect != null) {
                 int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
                 StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                int currentAmplifier = -1;
                 if (statusEffectInstance != null) {
-                    int currentAmplifier = statusEffectInstance.getAmplifier();
-                    boolean hasRequiredEffectAndLevel = player.hasStatusEffect(effect) && currentAmplifier + 1 < decrementEffectAmount;
-                    lines.add(
-                            Text.literal(" ")
-                                    .append(Text.translatable("spell.tooltip.effect"))
-                                    .append(effect.getName())
-                                    .append(ScreenTexts.SPACE)
-                                    .append(Text.translatable("enchantment.level." + decrementEffectAmount))
-                                    .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
-                    );
+                    currentAmplifier = statusEffectInstance.getAmplifier();
                 }
+                boolean hasRequiredEffectAndLevel = player.hasStatusEffect(effect) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0);
+                lines.add(
+                        Text.literal(" ")
+                                .append(Text.translatable("spell.tooltip.effect.1"))
+                                .append(effect.getName().copy())
+                                .append(ScreenTexts.SPACE)
+                                .append(decrementEffectAmount > 1 ? Text.translatable("enchantment.level." + (decrementEffectAmount - 1)).append(ScreenTexts.SPACE) : Text.empty())
+                                .append(Text.translatable("spell.tooltip.effect.2"))
+                                .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
+                );
             }
         }
     }
