@@ -16,6 +16,8 @@ public class ServerConfig implements ConfigData {
     public boolean spell_cost_stamina_allowed = true;
     @Comment("Spells should require and optionally remove status effects. Set `false` to remove effect cost from all spells.")
     public boolean spell_cost_effects_allowed = true;
+    @Comment("Disables the client side auto swap feature for all connected clients.")
+    public boolean disable_auto_swap = true;
     public ServerConfig() {
 
     }
