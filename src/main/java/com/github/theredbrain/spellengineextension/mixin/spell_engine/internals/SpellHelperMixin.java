@@ -2,6 +2,7 @@ package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
+import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
@@ -13,7 +14,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonPart;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.effect.StatusEffect;
@@ -106,23 +106,32 @@ public abstract class SpellHelperMixin {
             }
             ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
 
-            if (spellEngineExtensionConfig.spell_cost_health_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkHealthCost()) {
-                float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
+            if (spellEngineExtensionConfig.spell_cost_health_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
+                float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost() * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier() / 100.0F;
+                if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
+                    healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier() / 100.0F;
+                }
                 if (healthCost > 0 && healthCost > player.getHealth()) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_health"), true);
                     return SpellCast.Attempt.none();
                 }
             }
-            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost()) {
-                float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
+            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
+                float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
+                if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
+                    manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier() / 100.0F;
+                }
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
                 if (manaCost > 0 && manaCost > currentMana) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
                     return SpellCast.Attempt.none();
                 }
             }
-            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost()) {
-                float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
+            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
+                float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
+                if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
+                    staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier() / 100.0F;
+                }
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
                 if (staminaCost > 0 && staminaCost > currentStamina) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
@@ -138,7 +147,7 @@ public abstract class SpellHelperMixin {
                     } else {
                         StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
                         if (statusEffectInstance != null) {
-                            int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                            int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
                             if (decrementEffectAmount > 0 && statusEffectInstance.getAmplifier() + 1 < decrementEffectAmount) {
                                 player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
                                 return SpellCast.Attempt.none();
@@ -260,7 +269,7 @@ public abstract class SpellHelperMixin {
 
                             // health cost
                             if (spellEngineExtensionConfig.spell_cost_health_allowed) {
-                                float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
+                                float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
                                 if (healthCost > 0.0F) {
                                     player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
                                 }
@@ -268,7 +277,7 @@ public abstract class SpellHelperMixin {
 
                             // mana cost
                             if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed) {
-                                float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
+                                float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
                                 if (manaCost > 0.0F) {
                                     SpellEngineExtension.addMana(player, -manaCost);
                                 }
@@ -276,14 +285,14 @@ public abstract class SpellHelperMixin {
 
                             // stamina cost
                             if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed) {
-                                float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
+                                float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
                                 if (staminaCost > 0.0F) {
                                     SpellEngineExtension.addStamina(player, -staminaCost);
                                 }
                             }
 
                             // consume spell casting item
-                            if (((DuckSpellCostMixin) spell.cost).betteradventuremode$consumeSelf()) {
+                            if (((DuckSpellCostMixin) spell.cost).spellengineextension$consumeSelf()) {
                                 player.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
                                 if (!player.isCreative()) {
                                     itemStack.decrement(1);
@@ -310,7 +319,7 @@ public abstract class SpellHelperMixin {
                             if (spell.cost.effect_id != null) {
                                 Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
                                 if (effect.isPresent()) {
-                                    int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                                    int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
                                     if (decrementEffectAmount < 0) {
                                         player.removeStatusEffect(effect.get());
                                     } else if (decrementEffectAmount > 0) {
