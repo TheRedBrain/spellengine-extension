@@ -4,13 +4,11 @@
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
 		"entity.damage.DamageSourcesMixin",
-		"spell_engine.api.spell.SpellContainerMixin",
 		"spell_engine.api.spell.SpellCostMixin",
 		"spell_engine.api.spell.SpellImpactActionDamageMixin",
 		"spell_engine.api.spell.SpellImpactActionHealMixin",
 		"spell_engine.client.gui.SpellTooltipMixin",
 		"spell_engine.client.input.AutoSwapHelperMixin",
-		"spell_engine.internals.SpellContainerHelperMixin",
 		"spell_engine.internals.SpellHelperMixin"
 	],
 	"injectors": {

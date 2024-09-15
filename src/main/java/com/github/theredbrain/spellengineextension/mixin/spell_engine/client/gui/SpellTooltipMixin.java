@@ -8,6 +8,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Mixin(SpellTooltip.class)
 public class SpellTooltipMixin {
@@ -61,19 +63,20 @@ public class SpellTooltipMixin {
         }
 
         if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null && spell.cost.effect_id != null && !spell.cost.effect_id.isEmpty()) {
-            StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
-            if (effect != null) {
+            Optional<RegistryEntry.Reference<StatusEffect>> optionalStatusEffectReference = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
+            if (optionalStatusEffectReference.isPresent()) {
+                RegistryEntry.Reference<StatusEffect> statusEffectReference = optionalStatusEffectReference.get();
                 int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
-                StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                StatusEffectInstance statusEffectInstance = player.getStatusEffect(statusEffectReference);
                 int currentAmplifier = -1;
                 if (statusEffectInstance != null) {
                     currentAmplifier = statusEffectInstance.getAmplifier();
                 }
-                boolean hasRequiredEffectAndLevel = player.hasStatusEffect(effect) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0);
+                boolean hasRequiredEffectAndLevel = player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0);
                 lines.add(
                         Text.literal(" ")
                                 .append(Text.translatable("spell.tooltip.effect.1"))
-                                .append(effect.getName().copy())
+                                .append(statusEffectReference.value().getName().copy())
                                 .append(ScreenTexts.SPACE)
                                 .append(decrementEffectAmount > 1 ? Text.translatable("enchantment.level." + (decrementEffectAmount - 1)).append(ScreenTexts.SPACE) : Text.empty())
                                 .append(Text.translatable("spell.tooltip.effect.2"))

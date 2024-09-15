@@ -24,6 +24,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.stat.Stats;
@@ -35,6 +36,7 @@ import net.minecraft.world.event.GameEvent;
 import net.spell_engine.SpellEngineMod;
 import net.spell_engine.api.effect.EntityImmunity;
 import net.spell_engine.api.entity.SpellSpawnedEntity;
+import net.spell_engine.api.event.CombatEvents;
 import net.spell_engine.api.spell.CustomSpellHandler;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.api.spell.SpellInfo;
@@ -128,17 +130,17 @@ public abstract class SpellHelperMixin {
                 }
             }
             if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost.effect_id != null) {
-                StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
-                if (effect != null) {
-                    if (!player.hasStatusEffect(effect)) {
-                        player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_status_effect", Text.translatable(effect.getTranslationKey()).getString()), true);
+                Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
+                if (effect.isPresent()) {
+                    if (!player.hasStatusEffect(effect.get())) {
+                        player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_status_effect", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
                         return SpellCast.Attempt.none();
                     } else {
-                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
                         if (statusEffectInstance != null) {
                             int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
                             if (decrementEffectAmount > 0 && statusEffectInstance.getAmplifier() + 1 < decrementEffectAmount) {
-                                player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.getTranslationKey()).getString()), true);
+                                player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
                                 return SpellCast.Attempt.none();
                             }
                         }
@@ -203,7 +205,7 @@ public abstract class SpellHelperMixin {
                                     case AREA:
                                         Vec3d center = player.getPos().add(0.0, (double) (player.getHeight() / 2.0F), 0.0);
                                         Spell.Release.Target.Area area = spell.release.target.area;
-                                        applyAreaImpact(world, player, targets, spell.range, area, spellInfo, context.position(center), true);
+                                        applyAreaImpact(world, player, targets, spell.range * player.getScale(), area, spellInfo, context.position(center), true);
                                         break;
                                     case BEAM:
                                         beamImpact(world, player, targets, spellInfo, context);
@@ -289,10 +291,7 @@ public abstract class SpellHelperMixin {
                             }
 
                             if (SpellEngineMod.config.spell_cost_durability_allowed && spell.cost.durability > 0) {
-                                itemStack.damage(spell.cost.durability, player, (playerObj) -> {
-                                    playerObj.sendEquipmentBreakStatus(EquipmentSlot.MAINHAND);
-                                    playerObj.sendEquipmentBreakStatus(EquipmentSlot.OFFHAND);
-                                });
+                                itemStack.damage(spell.cost.durability, player, EquipmentSlot.MAINHAND);
                             }
 
                             if (ammoResult.ammo() != null && spell.cost.consume_item) {
@@ -309,24 +308,31 @@ public abstract class SpellHelperMixin {
                             }
 
                             if (spell.cost.effect_id != null) {
-                                StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
-                                if (effect != null) {
+                                Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
+                                if (effect.isPresent()) {
                                     int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
                                     if (decrementEffectAmount < 0) {
-                                        player.removeStatusEffect(effect);
+                                        player.removeStatusEffect(effect.get());
                                     } else if (decrementEffectAmount > 0) {
                                         int newAmplifier = -1;
-                                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
+                                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
                                         if (statusEffectInstance != null) {
                                             int oldAmplifier = statusEffectInstance.getAmplifier();
                                             newAmplifier = oldAmplifier - decrementEffectAmount;
                                         }
-                                        player.removeStatusEffect(effect);
+                                        player.removeStatusEffect(effect.get());
                                         if (newAmplifier >= 0) {
-                                            player.addStatusEffect(new StatusEffectInstance(effect, statusEffectInstance.getDuration(), newAmplifier, statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon()));
+                                            player.addStatusEffect(new StatusEffectInstance(effect.get(), statusEffectInstance.getDuration(), newAmplifier, statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon()));
                                         }
                                     }
                                 }
+                            }
+
+                            if (CombatEvents.SPELL_CAST.isListened()) {
+                                CombatEvents.SpellCast.Args args = new CombatEvents.SpellCast.Args(player, spellInfo, targets, action, progress);
+                                CombatEvents.SPELL_CAST.invoke((listener) -> {
+                                    listener.onSpellCast(args);
+                                });
                             }
                         }
                     }
@@ -341,10 +347,6 @@ public abstract class SpellHelperMixin {
      */
     @Overwrite
     private static boolean performImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, Spell.Impact impact, SpellHelper.ImpactContext context, Collection<ServerPlayerEntity> trackers) {
-        if (target instanceof EnderDragonPart) {
-            target = ((EnderDragonPart) target).owner;
-        }
-
         if (!((Entity) target).isAttackable()) {
             return false;
         } else {
@@ -379,7 +381,7 @@ public abstract class SpellHelperMixin {
 
                 LivingEntity livingTarget;
                 Vec3d direction;
-                label181:
+                label184:
                 switch (impact.action.type) {
                     case DAMAGE:
                         Spell.Impact.Action.Damage damageData = impact.action.damage;
@@ -401,7 +403,7 @@ public abstract class SpellHelperMixin {
                         amount *= (double) damageData.spell_power_coefficient;
                         amount *= (double) context.total();
                         if (context.isChanneled()) {
-                            amount *= SpellPower.getHaste(caster);
+                            amount *= (double)SpellPower.getHaste(caster, school);
                         }
 
                         // direct damage
@@ -416,7 +418,7 @@ public abstract class SpellHelperMixin {
                         // damage type override
                         DamageSource damageSource = null;
                         String damageTypeOverride = ((DuckSpellImpactActionDamageMixin) damageData).betteradventuremode$getDamageTypeOverride();
-                        if (!damageTypeOverride.equals("") && Identifier.isValid(damageTypeOverride)) {
+                        if (!damageTypeOverride.isEmpty()) {
                             Identifier damageTypeOverrideId = Identifier.tryParse(damageTypeOverride);
                             if (damageTypeOverrideId != null) {
                                 RegistryKey<DamageType> key = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, damageTypeOverrideId);
@@ -458,7 +460,7 @@ public abstract class SpellHelperMixin {
                             }
 
                             if (context.isChanneled()) {
-                                healAmount *= SpellPower.getHaste(caster);
+                                healAmount *= (double)SpellPower.getHaste(caster, school);
                             }
                             livingTarget.heal((float) healAmount);
                             success = true;
@@ -468,8 +470,13 @@ public abstract class SpellHelperMixin {
                         Spell.Impact.Action.StatusEffect data = impact.action.status_effect;
                         if (target instanceof LivingEntity) {
                             livingTarget = (LivingEntity) target;
-                            Identifier id = new Identifier(data.effect_id);
-                            StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(id);
+                            Identifier id = Identifier.of(data.effect_id);
+                            Optional<RegistryEntry.Reference<StatusEffect>> effectQuery = Registries.STATUS_EFFECT.getEntry(id);
+                            if (effectQuery.isEmpty()) {
+                                return false;
+                            }
+
+                            RegistryEntry.Reference<StatusEffect> effect = (RegistryEntry.Reference) effectQuery.get();
                             if (!SpellHelper.underApplyLimit(power, livingTarget, school, data.apply_limit)) {
                                 return false;
                             }
@@ -513,11 +520,11 @@ public abstract class SpellHelperMixin {
 
                         while (true) {
                             if (!var33.hasNext()) {
-                                break label181;
+                                break label184;
                             }
 
                             Spell.Impact.Action.Spawn spawnData = (Spell.Impact.Action.Spawn) var33.next();
-                            Identifier id = new Identifier(spawnData.entity_type_id);
+                            Identifier id = Identifier.of(spawnData.entity_type_id);
                             EntityType<?> type = (EntityType) Registries.ENTITY_TYPE.get(id);
                             Entity entity = type.create(world);
                             SpellHelper.applyEntityPlacement(entity, caster, ((Entity) target).getPos(), spawnData.placement);
@@ -591,7 +598,7 @@ public abstract class SpellHelperMixin {
                                         }
                                     }
 
-                                    teleportedEntity.teleport(destination.x, destination.y, destination.z);
+                                    teleportedEntity.teleport(destination.x, destination.y, destination.z, false);
                                 }
 
                                 success = true;
@@ -609,9 +616,9 @@ public abstract class SpellHelperMixin {
                         SoundHelper.playSound(world, (Entity) target, impact.sound);
                     }
                 }
-            } catch (Exception var25) {
-                System.err.println("Failed to perform impact effect");
-                System.err.println(var25.getMessage());
+            } catch (Exception var29) {
+				System.err.println("Failed to perform impact effect");
+                System.err.println(var29.getMessage());
                 if (isKnockbackPushed) {
                     ((ConfigurableKnockback) target).popKnockbackMultiplier_SpellEngine();
                 }
