@@ -107,9 +107,9 @@ public abstract class SpellHelperMixin {
             ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
 
             if (spellEngineExtensionConfig.spell_cost_health_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
-                float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost() * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier() / 100.0F;
+                float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
-                    healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier() / 100.0F;
+                    healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier();
                 }
                 if (healthCost > 0 && healthCost > player.getHealth()) {
                     player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_health"), true);
@@ -119,7 +119,7 @@ public abstract class SpellHelperMixin {
             if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
                 float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
-                    manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier() / 100.0F;
+                    manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier();
                 }
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
                 if (manaCost > 0 && manaCost > currentMana) {
@@ -130,7 +130,7 @@ public abstract class SpellHelperMixin {
             if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
                 float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
-                    staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier() / 100.0F;
+                    staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier();
                 }
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
                 if (staminaCost > 0 && staminaCost > currentStamina) {
@@ -270,6 +270,9 @@ public abstract class SpellHelperMixin {
                             // health cost
                             if (spellEngineExtensionConfig.spell_cost_health_allowed) {
                                 float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
+                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
+                                    healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier();
+                                }
                                 if (healthCost > 0.0F) {
                                     player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
                                 }
@@ -278,6 +281,9 @@ public abstract class SpellHelperMixin {
                             // mana cost
                             if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed) {
                                 float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
+                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
+                                    manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier();
+                                }
                                 if (manaCost > 0.0F) {
                                     SpellEngineExtension.addMana(player, -manaCost);
                                 }
@@ -286,6 +292,9 @@ public abstract class SpellHelperMixin {
                             // stamina cost
                             if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed) {
                                 float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
+                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
+                                    staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier();
+                                }
                                 if (staminaCost > 0.0F) {
                                     SpellEngineExtension.addStamina(player, -staminaCost);
                                 }
