@@ -1,3 +1,7 @@
+# 2.1.0
+
+- now supports latest Spell Engine version
+
 # 2.0.0
 
 - update to 1.21.1

@@ -165,7 +165,7 @@ public abstract class SpellHelperMixin {
      * @reason integrate health cost, mana cost, stamina cost, reducing amplifier of status effect cost instead of removing them, self consuming of casting item
      */
     @Overwrite
-    public static void performSpell(World world, PlayerEntity player, Identifier spellId, List<Entity> targets, SpellCast.Action action, float progress) {
+    public static void performSpell(World world, PlayerEntity player, Identifier spellId, TargetHelper.SpellTargetResult targetResult, SpellCast.Action action, float progress) {
         if (!player.isSpectator()) {
             Spell spell = SpellRegistry.getSpell(spellId);
             if (spell != null) {
@@ -173,7 +173,9 @@ public abstract class SpellHelperMixin {
                 ItemStack itemStack = player.getMainHandStack();
                 SpellCast.Attempt attempt = SpellHelper.attemptCasting(player, itemStack, spellId);
                 if (attempt.isSuccess()) {
-                    float castingSpeed = ((SpellCasterEntity) player).getCurrentCastingSpeed();
+                    List<Entity> targets = targetResult.entities();
+                    Vec3d targetLocation = targetResult.location();
+                    float castingSpeed = ((SpellCasterEntity)player).getCurrentCastingSpeed();
                     progress = Math.max(Math.min(progress, 1.0F), 0.0F);
                     float channelMultiplier = 1.0F;
                     boolean shouldPerformImpact = true;
@@ -241,11 +243,12 @@ public abstract class SpellHelperMixin {
                                         break;
                                     case METEOR:
                                         optionalTarget = targets.stream().findFirst();
-                                        if (optionalTarget.isPresent()) {
-                                            SpellHelper.fallProjectile(world, player, (Entity) optionalTarget.get(), spellInfo, context);
-                                        } else {
+                                        if (optionalTarget.isPresent() && targetLocation == null) {
                                             released = false;
+                                            break;
                                         }
+
+                                        SpellHelper.fallProjectile(world, player, (Entity) optionalTarget.orElse((Object) null), targetLocation, spellInfo, context);
                                         break;
                                     case SELF:
                                         directImpact(world, player, player, spellInfo, context);
