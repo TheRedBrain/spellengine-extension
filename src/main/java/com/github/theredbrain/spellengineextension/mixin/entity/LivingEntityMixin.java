@@ -62,6 +62,16 @@ public abstract class LivingEntityMixin extends Entity implements DuckLivingEnti
 	}
 
 	@Override
+	public float spellengineextension$getExtraLaunchDelay() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_LAUNCH_DELAY);
+	}
+
+	@Override
+	public float spellengineextension$getExtraVelocity() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_VELOCITY);
+	}
+
+	@Override
 	public float spellengineextension$getExtraRicochet() {
 		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_RICOCHET);
 	}

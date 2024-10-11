@@ -34,6 +34,8 @@ public class SpellEngineExtension implements ModInitializer {
 	public static RegistryEntry<EntityAttribute> STAMINA_SPELL_COST_MULTIPLIER;
 
 	public static RegistryEntry<EntityAttribute> EXTRA_LAUNCH_COUNT;
+	public static RegistryEntry<EntityAttribute> EXTRA_LAUNCH_DELAY;
+	public static RegistryEntry<EntityAttribute> EXTRA_VELOCITY;
 
 	public static RegistryEntry<EntityAttribute> EXTRA_RICOCHET;
 	public static RegistryEntry<EntityAttribute> EXTRA_RICOCHET_RANGE;

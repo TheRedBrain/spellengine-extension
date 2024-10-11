@@ -1,4 +1,17 @@
 {
+	"attribute.name.generic.health_spell_cost_multiplier": "Health Spell Cost Multiplier",
+	"attribute.name.generic.mana_spell_cost_multiplier": "Mana Spell Cost Multiplier",
+	"attribute.name.generic.stamina_spell_cost_multiplier": "Stamina Spell Cost Multiplier",
+	"attribute.name.generic.extra_launch_count": "Extra Launch Count",
+	"attribute.name.generic.extra_launch_delay": "Extra Launch Delay",
+	"attribute.name.generic.extra_velocity": "Extra Velocity",
+	"attribute.name.generic.extra_ricochet": "Extra Ricochet",
+	"attribute.name.generic.extra_ricochet_range": "Extra Ricochet Range",
+	"attribute.name.generic.extra_bounce": "Extra Bounce",
+	"attribute.name.generic.extra_pierce": "Extra Pierce",
+	"attribute.name.generic.extra_chain_reaction_size": "Extra Chain Reaction Size",
+	"attribute.name.generic.extra_chain_reaction_triggers": "Extra Chain Reaction Triggers",
+
 	"death.attack.blood_magic_casting": "%s used too much blood magic",
 
 	"hud.cast_attempt_error.missing_health": "Requires more health",
