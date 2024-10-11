@@ -32,6 +32,8 @@ public abstract class LivingEntityMixin extends Entity implements DuckLivingEnti
 				.add(SpellEngineExtension.MANA_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.STAMINA_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.EXTRA_LAUNCH_COUNT)
+				.add(SpellEngineExtension.EXTRA_LAUNCH_DELAY)
+				.add(SpellEngineExtension.EXTRA_VELOCITY)
 				.add(SpellEngineExtension.EXTRA_RICOCHET)
 				.add(SpellEngineExtension.EXTRA_RICOCHET_RANGE)
 				.add(SpellEngineExtension.EXTRA_BOUNCE)
