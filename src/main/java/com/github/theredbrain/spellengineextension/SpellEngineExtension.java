@@ -33,6 +33,15 @@ public class SpellEngineExtension implements ModInitializer {
 	public static RegistryEntry<EntityAttribute> MANA_SPELL_COST_MULTIPLIER;
 	public static RegistryEntry<EntityAttribute> STAMINA_SPELL_COST_MULTIPLIER;
 
+	public static RegistryEntry<EntityAttribute> EXTRA_LAUNCH_COUNT;
+
+	public static RegistryEntry<EntityAttribute> EXTRA_RICOCHET;
+	public static RegistryEntry<EntityAttribute> EXTRA_RICOCHET_RANGE;
+	public static RegistryEntry<EntityAttribute> EXTRA_BOUNCE;
+	public static RegistryEntry<EntityAttribute> EXTRA_PIERCE;
+	public static RegistryEntry<EntityAttribute> EXTRA_CHAIN_REACTION_SIZE;
+	public static RegistryEntry<EntityAttribute> EXTRA_CHAIN_REACTION_TRIGGERS;
+
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 

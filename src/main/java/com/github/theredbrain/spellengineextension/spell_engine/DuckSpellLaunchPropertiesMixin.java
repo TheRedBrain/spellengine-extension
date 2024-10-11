@@ -1,0 +1,11 @@
+package com.github.theredbrain.spellengineextension.spell_engine;
+
+public interface DuckSpellLaunchPropertiesMixin {
+	boolean spellengineextension$respectExtraLaunchCountAttribute();
+	boolean spellengineextension$respectExtraLaunchDelayAttribute();
+	boolean spellengineextension$respectExtraVelocityAttribute();
+
+	void spellengineextension$setRespectExtraLaunchCountAttribute(boolean respect_extra_launch_count_attribute);
+	void spellengineextension$setRespectExtraLaunchDelayAttribute(boolean respect_extra_launch_delay_attribute);
+	void spellengineextension$setRespectExtraVelocityAttribute(boolean respect_extra_velocity_attribute);
+}

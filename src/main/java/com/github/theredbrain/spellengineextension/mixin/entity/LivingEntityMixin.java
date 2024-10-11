@@ -31,6 +31,13 @@ public abstract class LivingEntityMixin extends Entity implements DuckLivingEnti
 				.add(SpellEngineExtension.HEALTH_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.MANA_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.STAMINA_SPELL_COST_MULTIPLIER)
+				.add(SpellEngineExtension.EXTRA_LAUNCH_COUNT)
+				.add(SpellEngineExtension.EXTRA_RICOCHET)
+				.add(SpellEngineExtension.EXTRA_RICOCHET_RANGE)
+				.add(SpellEngineExtension.EXTRA_BOUNCE)
+				.add(SpellEngineExtension.EXTRA_PIERCE)
+				.add(SpellEngineExtension.EXTRA_CHAIN_REACTION_SIZE)
+				.add(SpellEngineExtension.EXTRA_CHAIN_REACTION_TRIGGERS)
 		;
 	}
 
@@ -47,5 +54,40 @@ public abstract class LivingEntityMixin extends Entity implements DuckLivingEnti
 	@Override
 	public float spellengineextension$getStaminaSpellCostMultiplier() {
 		return (float) this.getAttributeValue(SpellEngineExtension.STAMINA_SPELL_COST_MULTIPLIER);
+	}
+
+	@Override
+	public float spellengineextension$getExtraLaunchCount() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_LAUNCH_COUNT);
+	}
+
+	@Override
+	public float spellengineextension$getExtraRicochet() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_RICOCHET);
+	}
+
+	@Override
+	public float spellengineextension$getExtraRicochetRange() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_RICOCHET_RANGE);
+	}
+
+	@Override
+	public float spellengineextension$getExtraBounce() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_BOUNCE);
+	}
+
+	@Override
+	public float spellengineextension$getExtraPierce() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_PIERCE);
+	}
+
+	@Override
+	public float spellengineextension$getExtraChainReactionSize() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_CHAIN_REACTION_SIZE);
+	}
+
+	@Override
+	public float spellengineextension$getExtraChainReactionTriggers() {
+		return (float) this.getAttributeValue(SpellEngineExtension.EXTRA_CHAIN_REACTION_TRIGGERS);
 	}
 }

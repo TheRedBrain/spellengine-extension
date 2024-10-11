@@ -9,6 +9,8 @@
 		"spell_engine.api.spell.SpellCostMixin",
 		"spell_engine.api.spell.SpellImpactActionDamageMixin",
 		"spell_engine.api.spell.SpellImpactActionHealMixin",
+		"spell_engine.api.spell.SpellLaunchPropertiesMixin",
+		"spell_engine.api.spell.SpellProjectileDataPerksMixin",
 		"spell_engine.client.gui.SpellTooltipMixin",
 		"spell_engine.client.input.AutoSwapHelperMixin",
 		"spell_engine.internals.SpellHelperMixin"

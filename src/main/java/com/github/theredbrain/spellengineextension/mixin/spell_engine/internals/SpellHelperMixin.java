@@ -7,6 +7,8 @@ import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourc
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionHealMixin;
+import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
+import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellProjectileDataPerksMixin;
 import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.Function;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -39,8 +41,10 @@ import net.spell_engine.api.entity.SpellSpawnedEntity;
 import net.spell_engine.api.event.CombatEvents;
 import net.spell_engine.api.spell.CustomSpellHandler;
 import net.spell_engine.api.spell.Spell;
+import net.spell_engine.api.spell.SpellEvents;
 import net.spell_engine.api.spell.SpellInfo;
 import net.spell_engine.entity.ConfigurableKnockback;
+import net.spell_engine.entity.SpellProjectile;
 import net.spell_engine.internals.SpellCastSyncHelper;
 import net.spell_engine.internals.SpellHelper;
 import net.spell_engine.internals.SpellRegistry;
@@ -56,6 +60,7 @@ import net.spell_power.api.SpellDamageSource;
 import net.spell_power.api.SpellPower;
 import net.spell_power.api.SpellSchool;
 import net.spell_power.mixin.DamageSourcesAccessor;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -67,6 +72,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Mixin(SpellHelper.class)
+@SuppressWarnings("UnreachableCode")
 public abstract class SpellHelperMixin {
 
     @Shadow
@@ -81,6 +87,10 @@ public abstract class SpellHelperMixin {
 
     @Shadow
     private static void directImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, SpellHelper.ImpactContext context) {
+        throw new AssertionError();
+    }
+
+    @Shadow(remap = false) private static boolean launchSequenceEligible(int index, int rule) {
         throw new AssertionError();
     }
 
@@ -357,6 +367,208 @@ public abstract class SpellHelperMixin {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * @author TheRedBrain
+     * @reason integrate perks and launch properties entity attributes
+     */
+    @Overwrite
+    public static void shootProjectile(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, SpellHelper.ImpactContext context, int sequenceIndex) {
+        if (!world.isClient) {
+            Spell spell = spellInfo.spell();
+            Vec3d launchPoint = SpellHelper.launchPoint(caster);
+            Spell.Release.Target.ShootProjectile data = spell.release.target.projectile;
+            Spell.ProjectileData projectileData = data.projectile;
+            ServerConfig serverConfig = SpellEngineExtension.serverConfig;
+            Spell.ProjectileData.Perks mutablePerks = projectileData.perks.copy();
+
+            if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
+                mutablePerks.ricochet += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochet());
+            }
+
+            if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
+                mutablePerks.ricochet_range += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochetRange());
+            }
+
+            if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
+                mutablePerks.bounce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraBounce());
+            }
+
+            if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
+                mutablePerks.pierce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraPierce());
+            }
+
+            if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+                mutablePerks.chain_reaction_size += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionSize());
+            }
+
+            if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+                mutablePerks.chain_reaction_triggers += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionTriggers());
+            }
+
+            SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FLY, spellInfo.id(), target, context, mutablePerks);
+            Spell.LaunchProperties mutableLaunchProperties = data.launch_properties.copy();
+
+            if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
+                mutableLaunchProperties.extra_launch_count += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchCount());
+            }
+
+            if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
+                mutableLaunchProperties.extra_launch_delay += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchDelay());
+            }
+
+            if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
+                mutableLaunchProperties.velocity += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraVelocity());
+            }
+
+            if (SpellEvents.PROJECTILE_SHOOT.isListened()) {
+                SpellEvents.PROJECTILE_SHOOT.invoke((listener) -> {
+                    listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellInfo, context, sequenceIndex));
+                });
+            }
+
+            float velocity = mutableLaunchProperties.velocity;
+
+            float divergence = projectileData.divergence;
+
+            if (data.inherit_shooter_velocity) {
+                projectile.setVelocity(caster, caster.getPitch(), caster.getYaw(), 0.0F, velocity, divergence);
+            } else {
+                Vec3d look = caster.getRotationVector().normalize();
+                projectile.setVelocity(look.x, look.y, look.z, velocity, divergence);
+            }
+
+            projectile.range = spell.range;
+            projectile.setPitch(caster.getPitch());
+            projectile.setYaw(caster.getYaw());
+            world.spawnEntity(projectile);
+            SoundHelper.playSound(world, projectile, mutableLaunchProperties.sound);
+            if (sequenceIndex == 0 && mutableLaunchProperties.extra_launch_count > 0) {
+                for(int i = 0; i < mutableLaunchProperties.extra_launch_count; ++i) {
+                    int ticks = (i + 1) * mutableLaunchProperties.extra_launch_delay;
+                    int nextSequenceIndex = i + 1;
+                    ((WorldScheduler)world).schedule(ticks, () -> {
+                        if (caster != null && caster.isAlive()) {
+                            shootProjectile(world, caster, target, spellInfo, context, nextSequenceIndex);
+                        }
+                    });
+                }
+            }
+
+        }
+    }
+
+    /**
+     * @author TheRedBrain
+     * @reason integrate perks and launch properties entity attributes
+     */
+    @Overwrite
+    public static boolean fallProjectile(World world, LivingEntity caster, Entity target, @Nullable Vec3d targetLocation, SpellInfo spellInfo, SpellHelper.ImpactContext context, int sequenceIndex) {
+        if (world.isClient) {
+            return false;
+        } else {
+            Vec3d targetPosition = target != null ? target.getPos() : targetLocation;
+            if (targetPosition == null) {
+                return false;
+            } else {
+                Spell spell = spellInfo.spell();
+                Spell.Release.Target.Meteor meteor = spell.release.target.meteor;
+                if (meteor.requires_entity && target == null) {
+                    return false;
+                } else {
+                    float height = meteor.launch_height;
+                    Vec3d launchPoint = targetPosition.add(0.0, (double)height, 0.0);
+                    Spell.Release.Target.Meteor data = spell.release.target.meteor;
+                    Spell.ProjectileData projectileData = data.projectile;
+                    Spell.LaunchProperties mutableLaunchProperties = data.launch_properties.copy();
+                    ServerConfig serverConfig = SpellEngineExtension.serverConfig;
+
+                    if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
+                        mutableLaunchProperties.extra_launch_count += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchCount());
+                    }
+
+                    if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
+                        mutableLaunchProperties.extra_launch_delay += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchDelay());
+                    }
+
+                    if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
+                        mutableLaunchProperties.velocity += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraVelocity());
+                    }
+
+                    Spell.ProjectileData.Perks mutablePerks = projectileData.perks.copy();
+
+                    if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
+                        mutablePerks.ricochet += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochet());
+                    }
+
+                    if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
+                        mutablePerks.ricochet_range += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochetRange());
+                    }
+
+                    if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
+                        mutablePerks.bounce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraBounce());
+                    }
+
+                    if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
+                        mutablePerks.pierce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraPierce());
+                    }
+
+                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+                        mutablePerks.chain_reaction_size += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionSize());
+                    }
+
+                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+                        mutablePerks.chain_reaction_triggers += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionTriggers());
+                    }
+
+                    SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FALL, spellInfo.id(), target, context, mutablePerks);
+                    if (SpellEvents.PROJECTILE_FALL.isListened()) {
+                        SpellEvents.PROJECTILE_FALL.invoke((listener) -> {
+                            listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellInfo, context, sequenceIndex));
+                        });
+                    }
+
+                    projectile.setYaw(0.0F);
+                    projectile.setPitch(90.0F);
+                    if (launchSequenceEligible(sequenceIndex, meteor.divergence_requires_sequence)) {
+                        projectile.setVelocity(0.0, -1.0, 0.0, mutableLaunchProperties.velocity, 0.5F, projectileData.divergence);
+                    } else {
+                        projectile.setVelocity(new Vec3d(0.0, (double)(-mutableLaunchProperties.velocity), 0.0));
+                    }
+
+                    if (launchSequenceEligible(sequenceIndex, meteor.follow_target_requires_sequence)) {
+                        projectile.setFollowedTarget(target);
+                    } else {
+                        projectile.setFollowedTarget((Entity)null);
+                    }
+
+                    if (meteor.launch_radius > 0.0F && launchSequenceEligible(sequenceIndex, meteor.offset_requires_sequence)) {
+                        double randomAngle = Math.toRadians((double)(world.random.nextFloat() * 360.0F));
+                        Vec3d offset = (new Vec3d((double)meteor.launch_radius, 0.0, 0.0)).rotateY((float)randomAngle);
+                        projectile.setPosition(projectile.getPos().add(offset));
+                    }
+
+                    projectile.prevYaw = projectile.getYaw();
+                    projectile.prevPitch = projectile.getPitch();
+                    projectile.range = height;
+                    world.spawnEntity(projectile);
+                    if (sequenceIndex == 0 && mutableLaunchProperties.extra_launch_count > 0) {
+                        for(int i = 0; i < mutableLaunchProperties.extra_launch_count; ++i) {
+                            int ticks = (i + 1) * mutableLaunchProperties.extra_launch_delay;
+                            int nextSequenceIndex = i + 1;
+                            ((WorldScheduler)world).schedule(ticks, () -> {
+                                if (caster != null && caster.isAlive()) {
+                                    fallProjectile(world, caster, target, targetLocation, spellInfo, context, nextSequenceIndex);
+                                }
+                            });
+                        }
+                    }
+
+                    return true;
                 }
             }
         }
