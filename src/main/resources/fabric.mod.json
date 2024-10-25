@@ -33,6 +33,7 @@
 	},
 	"suggests": {
 		"manaattributes": "*",
-		"staminaattributes": "*"
+		"staminaattributes": "*",
+		"ranged_weapon_api": "*"
 	}
 }

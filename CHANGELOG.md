@@ -1,3 +1,10 @@
+# 2.2.0
+
+- added 3 new spell schools ("Generic Melee", "Generic Ranged", "Generic Magic")
+- added 9 new entity attributes ("generic.magic_damage", "generic.extra_launch_delay", "generic.extra_velocity", "generic.extra_ricochet", "generic.extra_ricochet_range", "generic.extra_bounce", "generic.extra_pierce", "generic.extra_chain_reaction_size", "generic.extra_chain_reaction_triggers")
+
+Details about the new content can be found in the readme.
+
 # 2.1.0
 
 - now supports latest Spell Engine version

@@ -3,19 +3,21 @@ package com.github.theredbrain.spellengineextension;
 import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfigWrapper;
+import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
 import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.google.gson.Gson;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
+import net.fabric_extras.ranged_weapon.api.EntityAttributes_RangedWeapon;
 import net.fabricmc.api.ModInitializer;
-
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -28,6 +30,8 @@ public class SpellEngineExtension implements ModInitializer {
 	public static final String MOD_ID = "spellengineextension";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static ServerConfig serverConfig;
+
+	public static RegistryEntry<EntityAttribute> GENERIC_MAGIC_DAMAGE;
 
 	public static RegistryEntry<EntityAttribute> HEALTH_SPELL_COST_MULTIPLIER;
 	public static RegistryEntry<EntityAttribute> MANA_SPELL_COST_MULTIPLIER;
@@ -46,6 +50,7 @@ public class SpellEngineExtension implements ModInitializer {
 
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
+	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
 
 	public static float getCurrentMana(LivingEntity livingEntity) {
 		float currentMana = 0.0F;
@@ -75,17 +80,35 @@ public class SpellEngineExtension implements ModInitializer {
 		}
 	}
 
+	public static RegistryEntry<EntityAttribute> getRangedAttackDamageAttribute() {
+		if (isRangedWeaponAPILoaded) {
+			return EntityAttributes_RangedWeapon.DAMAGE.entry;
+		} else {
+			return EntityAttributes.GENERIC_ATTACK_DAMAGE;
+		}
+	}
+
+	public static RegistryEntry<EntityAttribute> getRangedAttackSpeedAttribute() {
+		if (isRangedWeaponAPILoaded) {
+			return EntityAttributes_RangedWeapon.HASTE.entry;
+		} else {
+			return EntityAttributes.GENERIC_ATTACK_SPEED;
+		}
+	}
+
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Spell Engine was extended!");
 
 		AutoConfig.register(ServerConfigWrapper.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
-		serverConfig = ((ServerConfigWrapper)AutoConfig.getConfigHolder(ServerConfigWrapper.class).getConfig()).server;
+		serverConfig = ((ServerConfigWrapper) AutoConfig.getConfigHolder(ServerConfigWrapper.class).getConfig()).server;
 
 		PayloadTypeRegistry.playS2C().register(ServerConfigSyncPacket.PACKET_ID, ServerConfigSyncPacket.PACKET_CODEC);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			ServerPlayNetworking.send(handler.player, new ServerConfigSyncPacket(serverConfig));
 		});
+
+		SpellSchoolRegistry.init();
 	}
 
 	public record ServerConfigSyncPacket(ServerConfig serverConfig) implements CustomPayload {

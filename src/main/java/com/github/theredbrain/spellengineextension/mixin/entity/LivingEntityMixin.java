@@ -28,6 +28,7 @@ public abstract class LivingEntityMixin extends Entity implements DuckLivingEnti
 	@Inject(method = "createLivingAttributes", at = @At("RETURN"))
 	private static void spellengineextension$createLivingAttributes(CallbackInfoReturnable<DefaultAttributeContainer.Builder> cir) {
 		cir.getReturnValue()
+				.add(SpellEngineExtension.GENERIC_MAGIC_DAMAGE)
 				.add(SpellEngineExtension.HEALTH_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.MANA_SPELL_COST_MULTIPLIER)
 				.add(SpellEngineExtension.STAMINA_SPELL_COST_MULTIPLIER)

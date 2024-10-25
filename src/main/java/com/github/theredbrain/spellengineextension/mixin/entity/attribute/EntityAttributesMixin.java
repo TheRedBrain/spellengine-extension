@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(EntityAttributes.class)
 public class EntityAttributesMixin {
 	static {
+		SpellEngineExtension.GENERIC_MAGIC_DAMAGE = Registry.registerReference(Registries.ATTRIBUTE, SpellEngineExtension.identifier("generic.magic_damage"), new ClampedEntityAttribute("attribute.name.generic.magic_damage", 0.0F, 0.0F, 1024.0F).setTracked(true));
 		SpellEngineExtension.HEALTH_SPELL_COST_MULTIPLIER = Registry.registerReference(Registries.ATTRIBUTE, SpellEngineExtension.identifier("generic.health_spell_cost_multiplier"), new ClampedEntityAttribute("attribute.name.generic.health_spell_cost_multiplier", 1.0, -1024.0, 1024.0).setTracked(true));
 		SpellEngineExtension.MANA_SPELL_COST_MULTIPLIER = Registry.registerReference(Registries.ATTRIBUTE, SpellEngineExtension.identifier("generic.mana_spell_cost_multiplier"), new ClampedEntityAttribute("attribute.name.generic.mana_spell_cost_multiplier", 1.0, -1024.0, 1024.0).setTracked(true));
 		SpellEngineExtension.STAMINA_SPELL_COST_MULTIPLIER = Registry.registerReference(Registries.ATTRIBUTE, SpellEngineExtension.identifier("generic.stamina_spell_cost_multiplier"), new ClampedEntityAttribute("attribute.name.generic.stamina_spell_cost_multiplier", 1.0, -1024.0, 1024.0).setTracked(true));

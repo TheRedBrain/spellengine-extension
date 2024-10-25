@@ -34,12 +34,33 @@ This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stam
 
 This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-attributes) is installed.
 
+## Spell schools
+
+These spell schools can be used in the spell.json.
+
+- "GENERIC_MELEE" uses "minecraft:generic.attack_damage" and "minecraft:generic.attack_speed" as their power and haste attributes respectively. Uses the "minecraft:generic" damage type.
+- "GENERIC_RANGED" uses "ranged_weapon:damage" and "ranged_weapon:haste" as their power and haste attributes respectively. When the "Ranged Weapon API" mod is not installed, "minecraft:generic.attack_damage" and "minecraft:generic.attack_speed" are used instead. Uses the "minecraft:arrow" damage type.
+- "GENERIC_MAGIC" uses "spellengineextension:generic.magic_damage" and "spell_power:generic.haste" as their power and haste attributes respectively. Uses the "minecraft:magic" damage type.
+
+They have no "crit_chance" or "crit_damage" traits and also no entity attribute or status effect defined, to keep them as simple and generic as possible.
+
 ## Entity Attributes
-"generic.health_spell_cost_multiplier" multiplies the health cost of spells. Default value is 1.0.
 
-"generic.mana_spell_cost_multiplier" multiplies the mana cost of spells. Default value is 1.0.
+- "generic.magic_damage" the damage done by magic attacks. Default value is 0.0.
+- "generic.health_spell_cost_multiplier" multiplies the health cost of spells. Default value is 1.0.
+- "generic.mana_spell_cost_multiplier" multiplies the mana cost of spells. Default value is 1.0.
+- "generic.stamina_spell_cost_multiplier" multiplies the stamina cost of spells. Default value is 1.0.
 
-"generic.stamina_spell_cost_multiplier" multiplies the stamina cost of spells. Default value is 1.0.
+The following attributes add to the respective values defined in the spell.json. This can be disabled for each spell individually or globally in the server config.
+- "generic.extra_launch_count"
+- "generic.extra_launch_delay"
+- "generic.extra_velocity"
+- "generic.extra_ricochet"
+- "generic.extra_ricochet_range"
+- "generic.extra_bounce"
+- "generic.extra_pierce"
+- "generic.extra_chain_reaction_size"
+- "generic.extra_chain_reaction_triggers"
 
 ## Proxy Pools (1.20.1 only)
 

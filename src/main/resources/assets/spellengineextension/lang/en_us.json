@@ -1,4 +1,5 @@
 {
+	"attribute.name.generic.magic_damage": "Magic Damage",
 	"attribute.name.generic.health_spell_cost_multiplier": "Health Spell Cost Multiplier",
 	"attribute.name.generic.mana_spell_cost_multiplier": "Mana Spell Cost Multiplier",
 	"attribute.name.generic.stamina_spell_cost_multiplier": "Stamina Spell Cost Multiplier",
