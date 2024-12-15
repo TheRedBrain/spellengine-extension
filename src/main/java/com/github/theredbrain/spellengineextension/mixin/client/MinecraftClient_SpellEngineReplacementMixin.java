@@ -137,7 +137,7 @@ public class MinecraftClient_SpellEngineReplacementMixin {
 
 	@Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
 	private void doItemUse_HEAD_autoSwap(CallbackInfo ci) {
-		if (((SpellCasterClient)player).isCastingSpell() && SpellEngineExtension.serverConfig.allow_item_use_while_casting) {
+		if (((SpellCasterClient)player).isCastingSpell() && SpellEngineExtension.SERVER_CONFIG.allow_item_use_while_casting.get()) {
 			ci.cancel();
 			return;
 		}
