@@ -46,16 +46,16 @@ public class ArrowHelperMixin {
 			if (weapon instanceof RangedWeaponItem rangedWeapon) {
 				Spell.LaunchProperties launchProperties = shoot_arrow.launch_properties.copy();
 
-				ServerConfig serverConfig = SpellEngineExtension.serverConfig;
-				if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
+				ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
+				if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
 					launchProperties.extra_launch_count += (int) (((DuckLivingEntityMixin)shooter).spellengineextension$getExtraLaunchCount());
 				}
 
-				if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
+				if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
 					launchProperties.extra_launch_delay += (int) (((DuckLivingEntityMixin)shooter).spellengineextension$getExtraLaunchDelay());
 				}
 
-				if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraVelocityAttribute()) {
+				if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$respectExtraVelocityAttribute()) {
 					launchProperties.velocity += (int) (((DuckLivingEntityMixin)shooter).spellengineextension$getExtraVelocity());
 				}
 

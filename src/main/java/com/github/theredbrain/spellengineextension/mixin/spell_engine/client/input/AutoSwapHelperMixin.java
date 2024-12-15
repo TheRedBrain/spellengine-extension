@@ -12,7 +12,7 @@ public class AutoSwapHelperMixin {
 
 	@Inject(method = "autoSwapForAttack", at = @At("HEAD"), cancellable = true)
 	private static void autoSwapForAttack(CallbackInfoReturnable<Boolean> cir) {
-		if (SpellEngineExtension.serverConfig.disable_auto_swap) {
+		if (SpellEngineExtension.SERVER_CONFIG.disable_auto_swap.get()) {
 			cir.setReturnValue(false);
 			cir.cancel();
 		}
@@ -20,7 +20,7 @@ public class AutoSwapHelperMixin {
 
 	@Inject(method = "autoSwapForSpells", at = @At("HEAD"), cancellable = true)
 	private static void autoSwapForSpells(CallbackInfoReturnable<Boolean> cir) {
-		if (SpellEngineExtension.serverConfig.disable_auto_swap) {
+		if (SpellEngineExtension.SERVER_CONFIG.disable_auto_swap.get()) {
 			cir.setReturnValue(false);
 			cir.cancel();
 		}

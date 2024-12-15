@@ -114,9 +114,9 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.failMissingItem(new SpellCast.Attempt.MissingItemInfo(ammoResult.ammo().getItem()));
                 }
             }
-            ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
+            ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
-            if (spellEngineExtensionConfig.spell_cost_health_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
+            if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
                 float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
                     healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier();
@@ -126,7 +126,7 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.none();
                 }
             }
-            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
+            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
                 float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
                     manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier();
@@ -137,7 +137,7 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.none();
                 }
             }
-            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
+            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
                 float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
                     staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier();
@@ -148,7 +148,7 @@ public abstract class SpellHelperMixin {
                     return SpellCast.Attempt.none();
                 }
             }
-            if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost.effect_id != null) {
+            if (spellEngineExtensionConfig.spell_cost_effects_allowed.get() && spell.cost.effect_id != null) {
                 Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
                 if (effect.isPresent()) {
                     if (!player.hasStatusEffect(effect.get())) {
@@ -278,10 +278,10 @@ public abstract class SpellHelperMixin {
                             SpellHelper.imposeCooldown(player, spellId, spell, progress);
                             player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
 
-                            var spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
+                            var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
                             // health cost
-                            if (spellEngineExtensionConfig.spell_cost_health_allowed) {
+                            if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
                                 float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
                                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
                                     healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier();
@@ -292,7 +292,7 @@ public abstract class SpellHelperMixin {
                             }
 
                             // mana cost
-                            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed) {
+                            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
                                 float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
                                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
                                     manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier();
@@ -303,7 +303,7 @@ public abstract class SpellHelperMixin {
                             }
 
                             // stamina cost
-                            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed) {
+                            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
                                 float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
                                 if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
                                     staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier();
@@ -383,47 +383,51 @@ public abstract class SpellHelperMixin {
             Vec3d launchPoint = SpellHelper.launchPoint(caster);
             Spell.Release.Target.ShootProjectile data = spell.release.target.projectile;
             Spell.ProjectileData projectileData = data.projectile;
-            ServerConfig serverConfig = SpellEngineExtension.serverConfig;
             Spell.ProjectileData.Perks mutablePerks = projectileData.perks.copy();
 
-            if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
+            // region modifying mutable perks
+            ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
+            if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
                 mutablePerks.ricochet += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochet());
             }
 
-            if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
+            if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
                 mutablePerks.ricochet_range += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochetRange());
             }
 
-            if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
+            if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
                 mutablePerks.bounce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraBounce());
             }
 
-            if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
+            if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
                 mutablePerks.pierce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraPierce());
             }
 
-            if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+            if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
                 mutablePerks.chain_reaction_size += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionSize());
             }
 
-            if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+            if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
                 mutablePerks.chain_reaction_triggers += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionTriggers());
             }
+            // endregion modifying mutable perks
 
             SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FLY, spellInfo.id(), target, context, mutablePerks);
             Spell.LaunchProperties mutableLaunchProperties = data.launch_properties.copy();
 
-            if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
+            // region modifying mutable launch properties
+            if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
                 mutableLaunchProperties.extra_launch_count += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchCount());
             }
 
-            if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
+            if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
                 mutableLaunchProperties.extra_launch_delay += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchDelay());
             }
 
-            if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
+            if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
                 mutableLaunchProperties.velocity += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraVelocity());
             }
+            // endregion modifying mutable launch properties
 
             if (SpellEvents.PROJECTILE_SHOOT.isListened()) {
                 SpellEvents.PROJECTILE_SHOOT.invoke((listener) -> {
@@ -485,45 +489,49 @@ public abstract class SpellHelperMixin {
                     Spell.Release.Target.Meteor data = spell.release.target.meteor;
                     Spell.ProjectileData projectileData = data.projectile;
                     Spell.LaunchProperties mutableLaunchProperties = data.launch_properties.copy();
-                    ServerConfig serverConfig = SpellEngineExtension.serverConfig;
 
-                    if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
+                    // region modifying mutable launch properties
+                    ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
+                    if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
                         mutableLaunchProperties.extra_launch_count += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchCount());
                     }
 
-                    if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
+                    if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraLaunchDelayAttribute()) {
                         mutableLaunchProperties.extra_launch_delay += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraLaunchDelay());
                     }
 
-                    if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
+                    if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin)mutableLaunchProperties).spellengineextension$respectExtraVelocityAttribute()) {
                         mutableLaunchProperties.velocity += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraVelocity());
                     }
+                    // endregion modifying mutable launch properties
 
                     Spell.ProjectileData.Perks mutablePerks = projectileData.perks.copy();
 
-                    if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
+                    // region modifying mutable perks
+                    if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetAttribute()) {
                         mutablePerks.ricochet += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochet());
                     }
 
-                    if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
+                    if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraRicochetRangeAttribute()) {
                         mutablePerks.ricochet_range += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraRicochetRange());
                     }
 
-                    if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
+                    if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraBounceAttribute()) {
                         mutablePerks.bounce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraBounce());
                     }
 
-                    if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
+                    if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraPierceAttribute()) {
                         mutablePerks.pierce += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraPierce());
                     }
 
-                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionSizeAttribute()) {
                         mutablePerks.chain_reaction_size += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionSize());
                     }
 
-                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+                    if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin)mutablePerks).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
                         mutablePerks.chain_reaction_triggers += (int) (((DuckLivingEntityMixin)caster).spellengineextension$getExtraChainReactionTriggers());
                     }
+                    // endregion modifying mutable perks
 
                     SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FALL, spellInfo.id(), target, context, mutablePerks);
                     if (SpellEvents.PROJECTILE_FALL.isListened()) {

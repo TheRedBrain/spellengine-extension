@@ -34,9 +34,9 @@ public class SpellTooltipMixin {
             locals = LocalCapture.CAPTURE_FAILSOFT)
     private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, CallbackInfoReturnable<List<Text>> cir, ArrayList lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, SpellTooltip.DescriptionMutator mutator, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
 
-        ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
+        ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
-        if (spellEngineExtensionConfig.spell_cost_health_allowed && spell.cost != null) {
+        if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && spell.cost != null) {
             float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
             if (healthCost != 0.0F) {
                 boolean hasEnoughHealth = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost() || healthCost <= 0 || healthCost < player.getHealth();
@@ -44,7 +44,7 @@ public class SpellTooltipMixin {
             }
         }
 
-        if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && spell.cost != null) {
+        if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && spell.cost != null) {
             float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
             if (manaCost != 0.0F) {
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
@@ -53,7 +53,7 @@ public class SpellTooltipMixin {
             }
         }
 
-        if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && spell.cost != null) {
+        if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && spell.cost != null) {
             float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
             if (staminaCost != 0.0F) {
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
@@ -62,7 +62,7 @@ public class SpellTooltipMixin {
             }
         }
 
-        if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null && spell.cost.effect_id != null && !spell.cost.effect_id.isEmpty()) {
+        if (spellEngineExtensionConfig.spell_cost_effects_allowed.get() && spell.cost != null && spell.cost.effect_id != null && !spell.cost.effect_id.isEmpty()) {
             Optional<RegistryEntry.Reference<StatusEffect>> optionalStatusEffectReference = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
             if (optionalStatusEffectReference.isPresent()) {
                 RegistryEntry.Reference<StatusEffect> statusEffectReference = optionalStatusEffectReference.get();

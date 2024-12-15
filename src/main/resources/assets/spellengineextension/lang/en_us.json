@@ -25,5 +25,49 @@
 	"spell.tooltip.mana": "Requires: %s Mana",
 	"spell.tooltip.stamina": "Requires: %s Stamina",
 	"spell.tooltip.effect.1": "Requires: ",
-	"spell.tooltip.effect.2": "Effect"
+	"spell.tooltip.effect.2": "Effect",
+
+	"spellengineextension.server": "Server Side Settings",
+
+	"spellengineextension.server.disable_auto_swap": "Disable Auto Swap",
+	"spellengineextension.server.disable_auto_swap.desc": "Disables the client side auto swap feature for all connected clients.",
+
+	"spellengineextension.server.spell_cost_health_allowed": "Health Cost Allowed",
+	"spellengineextension.server.spell_cost_health_allowed.desc": "Spells should cost health. Set to `false` to remove health cost from all spells.",
+
+	"spellengineextension.server.spell_cost_mana_allowed": "Mana Cost Allowed",
+	"spellengineextension.server.spell_cost_mana_allowed.desc": "Spells should cost mana. Set to `false` to remove mana cost from all spells.",
+
+	"spellengineextension.server.spell_cost_stamina_allowed": "Stamina Cost Allowed",
+	"spellengineextension.server.spell_cost_stamina_allowed.desc": "Spells should cost stamina. Set to `false` to remove stamina cost from all spells.",
+
+	"spellengineextension.server.spell_cost_effects_allowed": "Status Effect Cost Allowed",
+	"spellengineextension.server.spell_cost_effects_allowed.desc": "Spells should require and optionally remove status effects. Set to `false` to remove effect cost from all spells.",
+
+	"spellengineextension.server.spell_launch_properties_extra_launch_count_attribute_allowed": "Enable 'Extra Launch Count'",
+	"spellengineextension.server.spell_launch_properties_extra_launch_count_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_launch_count' entity attribute",
+
+	"spellengineextension.server.spell_launch_properties_extra_launch_delay_attribute_allowed": "Enable 'Extra Launch Delay'",
+	"spellengineextension.server.spell_launch_properties_extra_launch_delay_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_launch_delay' entity attribute",
+
+	"spellengineextension.server.spell_launch_properties_extra_velocity_attribute_allowed": "Enable 'Extra Velocity'",
+	"spellengineextension.server.spell_launch_properties_extra_velocity_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_velocity' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_ricochet_attribute_allowed": "Enable 'Extra Ricochet'",
+	"spellengineextension.server.spell_projectile_perk_extra_ricochet_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_ricochet' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_ricochet_range_attribute_allowed": "Enable 'Extra Ricochet Range'",
+	"spellengineextension.server.spell_projectile_perk_extra_ricochet_range_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_ricochet_range' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_bounce_attribute_allowed": "Enable 'Extra Bounce'",
+	"spellengineextension.server.spell_projectile_perk_extra_bounce_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_bounce' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_pierce_attribute_allowed": "Enable 'Extra Pierce'",
+	"spellengineextension.server.spell_projectile_perk_extra_pierce_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_pierce' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed": "Enable 'Extra Chain Reaction Size'",
+	"spellengineextension.server.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_chain_reaction_size' entity attribute",
+
+	"spellengineextension.server.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed": "Enable 'Extra Chain Reaction Triggers'",
+	"spellengineextension.server.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.desc": "Spells can be affected by the 'generic.extra_chain_reaction_triggers' entity attribute"
 }

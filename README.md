@@ -3,6 +3,7 @@
 This is an extension to the [Spell Engine](https://modrinth.com/mod/spell-engine) mod by Daedelus. On its own it changes nothing in the game, but mod and data pack authors have more possibilities when designing spells.
 
 ## Additions to spell.json
+
 Several aspects of spells can be controlled more directly.
 
 Damage Impact
@@ -20,7 +21,7 @@ Spell Cost
 - check_health_cost (if casting fails when player has not enough health)
 - health_cost_multiplier_applies (whether the health cost should be multiplied with the "generic.health_spell_cost_multiplier" entity attribute)
 
-Spending health to cast spells inflicts damage with the "spellengineextension:blood_magic_casting_damage_type" damage type.
+> Spending health to cast spells inflicts damage with the "spellengineextension:blood_magic_casting_damage_type" damage type.
 
 - stamina_cost (amount of stamina casting the spell is costing)
 - check_stamina_cost (if casting fails when player has not enough stamina)
@@ -33,6 +34,103 @@ This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stam
 - mana_cost_multiplier_applies (whether the mana cost should be multiplied with the "generic.mana_spell_cost_multiplier" entity attribute)
 
 This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-attributes) is installed.
+
+### Example
+
+This is an example spell.json where all added values are present (with their default values)
+
+> Note that this is not a valid spell.json, as several fields added by Spell Engine are not present. It is also normally not possible to have multiple release target fields
+
+```json
+{
+	"release": {
+		"target": {
+			"type": "PROJECTILE",
+			"projectile": {
+				"projectile": {
+					"launch_properties": {
+						"respect_extra_launch_count_attribute": true,
+						"respect_extra_launch_delay_attribute": true,
+						"respect_extra_velocity_attribute": true
+					},
+					"perks": {
+						"respect_extra_ricochet_attribute": true,
+						"respect_extra_ricochet_range_attribute": true,
+						"respect_extra_bounce_attribute": true,
+						"respect_extra_pierce_attribute": true,
+						"respect_extra_chain_reaction_size_attribute": true,
+						"respect_extra_chain_reaction_triggers_attribute": true
+					}
+				}
+			}
+		},
+		"target": {
+			"type": "SHOOT_ARROW",
+			"projectile": {
+				"projectile": {
+					"launch_properties": {
+						"respect_extra_launch_count_attribute": true,
+						"respect_extra_launch_delay_attribute": true,
+						"respect_extra_velocity_attribute": true
+					}
+				}
+			}
+		},
+		"target": {
+			"type": "METEOR",
+			"projectile": {
+				"projectile": {
+					"launch_properties": {
+						"respect_extra_launch_count_attribute": true,
+						"respect_extra_launch_delay_attribute": true,
+						"respect_extra_velocity_attribute": true
+					},
+					"perks": {
+						"respect_extra_ricochet_attribute": true,
+						"respect_extra_ricochet_range_attribute": true,
+						"respect_extra_bounce_attribute": true,
+						"respect_extra_pierce_attribute": true,
+						"respect_extra_chain_reaction_size_attribute": true,
+						"respect_extra_chain_reaction_triggers_attribute": true
+					}
+				}
+			}
+		}
+	},
+	"impact": [
+		{
+			"action": {
+				"type": "DAMAGE",
+				"damage": {
+					"direct_damage": 0.0,
+					"damage_type_override": ""
+				}
+			}
+		},
+		{
+			"action": {
+				"type": "HEAL",
+				"damage": {
+					"direct_heal": 0.0
+				}
+			}
+		}
+	],
+	"cost": {
+		"check_health_cost": false,
+		"check_mana_cost": true,
+		"check_stamina_cost": false,
+		"health_cost_multiplier_applies": true,
+		"mana_cost_multiplier_applies": true,
+		"stamina_cost_multiplier_applies": true,
+		"consume_self": false,
+		"decrement_effect_amount": -1,
+		"mana_cost": 0.0,
+		"health_cost": 0.0,
+		"stamina_cost": 0.0
+	}
+}
+```
 
 ## Spell schools
 

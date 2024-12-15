@@ -1,3 +1,8 @@
+# 2.3.0
+
+- removed dependency on Cloth Config
+- added dependency on Fzzy Config
+
 # 2.2.0
 
 - added 3 new spell schools ("Generic Melee", "Generic Ranged", "Generic Magic")

@@ -28,7 +28,7 @@
 		"minecraft": "${minecraft_version}",
 		"fabricloader": ">=${loader_version}",
 		"fabric-api": "*",
-		"cloth-config": ">=${cloth_config_version}",
+		"fzzy_config": ">=${fzzy_config_version}",
 		"spell_engine": ">=${spell_engine_version}"
 	},
 	"suggests": {
