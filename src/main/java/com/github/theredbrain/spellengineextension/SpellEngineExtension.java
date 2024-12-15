@@ -3,18 +3,22 @@ package com.github.theredbrain.spellengineextension;
 import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfigWrapper;
+import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellContainerMixin;
 import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import com.google.gson.Gson;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
+import net.fabric_extras.ranged_weapon.api.EntityAttributes_RangedWeapon;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.SpellContainer;
@@ -28,8 +32,25 @@ public class SpellEngineExtension implements ModInitializer {
 	public static ServerConfig serverConfig;
 	private static PacketByteBuf serverConfigSerialized = PacketByteBufs.create();
 
+	public static EntityAttribute GENERIC_MAGIC_DAMAGE;
+
+	public static EntityAttribute HEALTH_SPELL_COST_MULTIPLIER;
+	public static EntityAttribute MANA_SPELL_COST_MULTIPLIER;
+	public static EntityAttribute STAMINA_SPELL_COST_MULTIPLIER;
+
+	public static EntityAttribute EXTRA_LAUNCH_COUNT;
+	public static EntityAttribute EXTRA_LAUNCH_DELAY;
+	public static EntityAttribute EXTRA_VELOCITY;
+	public static EntityAttribute EXTRA_RICOCHET;
+	public static EntityAttribute EXTRA_RICOCHET_RANGE;
+	public static EntityAttribute EXTRA_BOUNCE;
+	public static EntityAttribute EXTRA_PIERCE;
+	public static EntityAttribute EXTRA_CHAIN_REACTION_SIZE;
+	public static EntityAttribute EXTRA_CHAIN_REACTION_TRIGGERS;
+
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
+	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
 
 	public static float getCurrentMana(LivingEntity livingEntity) {
 		float currentMana = 0.0F;
@@ -59,6 +80,21 @@ public class SpellEngineExtension implements ModInitializer {
 		}
 	}
 
+	public static EntityAttribute getRangedAttackDamageAttribute() {
+		if (isRangedWeaponAPILoaded) {
+			return EntityAttributes_RangedWeapon.DAMAGE.attribute;
+		} else {
+			return EntityAttributes.GENERIC_ATTACK_DAMAGE;
+		}
+	}
+	public static EntityAttribute getRangedAttackSpeedAttribute() {
+		if (isRangedWeaponAPILoaded) {
+			return EntityAttributes_RangedWeapon.HASTE.attribute;
+		} else {
+			return EntityAttributes.GENERIC_ATTACK_SPEED;
+		}
+	}
+
 	@Override
 	public void onInitialize() {
 		LOGGER.info("SpellEngine was extended!");
@@ -71,6 +107,8 @@ public class SpellEngineExtension implements ModInitializer {
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			sender.sendPacket(ServerConfigSync.ID, serverConfigSerialized);
 		});
+
+		SpellSchoolRegistry.init();
 	}
 
 	@Deprecated(forRemoval = true)

@@ -35,27 +35,27 @@ public class SpellTooltipMixin {
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.serverConfig;
 
         if (spellEngineExtensionConfig.spell_cost_health_allowed && spell.cost != null) {
-            float healthCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getHealthCost();
+            float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
             if (healthCost != 0.0F) {
-                boolean hasEnoughHealth = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkHealthCost() || healthCost <= 0 || healthCost < player.getHealth();
+                boolean hasEnoughHealth = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost() || healthCost <= 0 || healthCost < player.getHealth();
                 lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.health", healthCost).formatted(hasEnoughHealth ? Formatting.GREEN : Formatting.RED)));
             }
         }
 
         if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed && spell.cost != null) {
-            float manaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getManaCost();
+            float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
             if (manaCost != 0.0F) {
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
-                boolean hasEnoughMana = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkManaCost() || manaCost <= 0 || manaCost < currentMana;
+                boolean hasEnoughMana = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost() || manaCost <= 0 || manaCost < currentMana;
                 lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.mana", manaCost).formatted(hasEnoughMana ? Formatting.GREEN : Formatting.RED)));
             }
         }
 
         if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed && spell.cost != null) {
-            float staminaCost = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getStaminaCost();
+            float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
             if (staminaCost != 0.0F) {
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
-                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell.cost).betteradventuremode$checkStaminaCost() || staminaCost <= 0 || staminaCost < currentStamina;
+                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost() || staminaCost <= 0 || staminaCost < currentStamina;
                 lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
             }
         }
@@ -63,7 +63,7 @@ public class SpellTooltipMixin {
         if (spellEngineExtensionConfig.spell_cost_effects_allowed && spell.cost != null && spell.cost.effect_id != null && !spell.cost.effect_id.isEmpty()) {
             StatusEffect effect = (StatusEffect) Registries.STATUS_EFFECT.get(new Identifier(spell.cost.effect_id));
             if (effect != null) {
-                int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).betteradventuremode$getDecrementEffectAmount();
+                int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
                 StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect);
                 int currentAmplifier = -1;
                 if (statusEffectInstance != null) {

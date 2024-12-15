@@ -1,12 +1,15 @@
 package com.github.theredbrain.spellengineextension.spell_engine;
 
 public interface DuckSpellCostMixin {
-    boolean betteradventuremode$checkHealthCost();
-    boolean betteradventuremode$checkManaCost();
-    boolean betteradventuremode$checkStaminaCost();
-    float betteradventuremode$getManaCost();
-    float betteradventuremode$getHealthCost();
-    float betteradventuremode$getStaminaCost();
-    boolean betteradventuremode$consumeSelf();
-    int betteradventuremode$getDecrementEffectAmount();
+    boolean spellengineextension$checkHealthCost();
+    boolean spellengineextension$checkManaCost();
+    boolean spellengineextension$checkStaminaCost();
+    boolean spellengineextension$healthCostMultiplierApplies();
+    boolean spellengineextension$manaCostMultiplierApplies();
+    boolean spellengineextension$staminaCostMultiplierApplies();
+    float spellengineextension$getManaCost();
+    float spellengineextension$getHealthCost();
+    float spellengineextension$getStaminaCost();
+    boolean spellengineextension$consumeSelf();
+    int spellengineextension$getDecrementEffectAmount();
 }

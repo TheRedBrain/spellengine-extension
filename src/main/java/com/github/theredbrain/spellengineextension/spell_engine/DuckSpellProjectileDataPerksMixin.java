@@ -1,0 +1,27 @@
+package com.github.theredbrain.spellengineextension.spell_engine;
+
+public interface DuckSpellProjectileDataPerksMixin {
+	boolean spellengineextension$respectExtraRicochetAttribute();
+
+	void spellengineextension$setRespectExtraRicochetAttribute(boolean respect_extra_ricochet_attribute);
+
+	boolean spellengineextension$respectExtraRicochetRangeAttribute();
+
+	void spellengineextension$setRespectExtraRicochetRangeAttribute(boolean respect_extra_ricochet_range_attribute);
+
+	boolean spellengineextension$respectExtraBounceAttribute();
+
+	void spellengineextension$setRespectExtraBounceAttribute(boolean respect_extra_bounce_attribute);
+
+	boolean spellengineextension$respectExtraPierceAttribute();
+
+	void spellengineextension$setRespectExtraPierceAttribute(boolean respect_extra_pierce_attribute);
+
+	boolean spellengineextension$respectExtraChainReactionSizeAttribute();
+
+	void spellengineextension$setRespectExtraChainReactionSizeAttribute(boolean respect_extra_chain_reaction_size_attribute);
+
+	boolean spellengineextension$respectExtraChainReactionTriggersAttribute();
+
+	void spellengineextension$setRespectExtraChainReactionTriggersAttribute(boolean respect_extra_chain_reaction_triggers_attribute);
+}

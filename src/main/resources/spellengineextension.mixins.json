@@ -3,17 +3,25 @@
 	"package": "com.github.theredbrain.spellengineextension.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
+		"entity.LivingEntityMixin",
+		"entity.attributes.EntityAttributesMixin",
 		"entity.damage.DamageSourcesMixin",
 		"spell_engine.api.spell.SpellContainerMixin",
 		"spell_engine.api.spell.SpellCostMixin",
 		"spell_engine.api.spell.SpellImpactActionDamageMixin",
 		"spell_engine.api.spell.SpellImpactActionHealMixin",
+		"spell_engine.api.spell.SpellLaunchPropertiesMixin",
+		"spell_engine.api.spell.SpellProjectileDataPerksMixin",
 		"spell_engine.client.gui.SpellTooltipMixin",
 		"spell_engine.client.input.AutoSwapHelperMixin",
 		"spell_engine.internals.SpellContainerHelperMixin",
-		"spell_engine.internals.SpellHelperMixin"
+		"spell_engine.internals.SpellHelperMixin",
+		"spell_engine.internals.arrow.ArrowHelperMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
-	}
+	},
+	"client": [
+		"client.MinecraftClient_SpellEngineReplacementMixin"
+	]
 }
