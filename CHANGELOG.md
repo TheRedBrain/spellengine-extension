@@ -3,6 +3,7 @@
 - removed dependency on Cloth Config
 - added dependency on Fzzy Config
 - fixed an issue where casting a meteor spell while targeting an entity was not possible
+- "generic.extra_launch_count", "generic.extra_launch_delay", "generic.extra_velocity" now also affect spells with the "SHOOT_ARROW" release target type 
 
 # 2.2.0
 
