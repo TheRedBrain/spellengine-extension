@@ -28,12 +28,11 @@
 		"spellengineextension.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.14.20",
-		"minecraft": "1.20.1",
-		"java": ">=17",
+		"minecraft": "${minecraft_version}",
+		"fabricloader": ">=${loader_version}",
 		"fabric-api": "*",
-		"cloth-config": ">=11.1.106",
-		"spell_engine": ">=0.15.6"
+		"fzzy_config": ">=${fzzy_config_version}",
+		"spell_engine": "${spell_engine_version}"
 	},
 	"suggests": {
 		"manaattributes": "*",
