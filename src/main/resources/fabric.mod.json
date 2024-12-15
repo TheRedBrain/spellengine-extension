@@ -29,7 +29,7 @@
 		"fabricloader": ">=${loader_version}",
 		"fabric-api": "*",
 		"fzzy_config": ">=${fzzy_config_version}",
-		"spell_engine": ">=${spell_engine_version}"
+		"spell_engine": "${spell_engine_version}"
 	},
 	"suggests": {
 		"manaattributes": "*",
