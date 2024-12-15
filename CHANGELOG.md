@@ -2,6 +2,7 @@
 
 - removed dependency on Cloth Config
 - added dependency on Fzzy Config
+- fixed an issue where casting a meteor spell while targeting an entity was not possible
 
 # 2.2.0
 

@@ -253,7 +253,7 @@ public abstract class SpellHelperMixin {
                                         break;
                                     case METEOR:
                                         optionalTarget = targets.stream().findFirst();
-                                        if (optionalTarget.isPresent() && targetLocation == null) {
+                                        if (!optionalTarget.isPresent() && targetLocation == null) {
                                             released = false;
                                             break;
                                         }
