@@ -1,3 +1,7 @@
+# 1.3.0
+
+- added client config option to disable rendering of the spell hotbar background
+
 # 1.2.0
 
 - backported a 1.21.1 Spell Engine fix for an exploit that allowed using an item while casting a spell

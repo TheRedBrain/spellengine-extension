@@ -27,6 +27,10 @@
 	"spell.tooltip.effect.1": "Requires: ",
 	"spell.tooltip.effect.2": "Effect",
 
+	"spellengineextension.client": "Client Side Settings",
+
+	"spellengineextension.client.enable_spell_hotbar_background_rendering": "Enable Spell Hotbar Background Rendering",
+
 	"spellengineextension.server": "Server Side Settings",
 
 	"spellengineextension.server.disable_auto_swap": "Disable Auto Swap",
