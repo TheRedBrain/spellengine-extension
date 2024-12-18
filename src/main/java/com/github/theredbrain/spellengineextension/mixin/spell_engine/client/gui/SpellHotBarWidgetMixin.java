@@ -21,10 +21,10 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(HudRenderHelper.SpellHotBarWidget.class)
 public abstract class SpellHotBarWidgetMixin {
 
-	@Shadow
+	@Shadow(remap = false)
 	public static Rect lastRendered;
 
-	@Shadow
+	@Shadow(remap = false)
 	@Final
 	private static TextureFile HOTBAR;
 
