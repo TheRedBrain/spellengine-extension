@@ -81,16 +81,16 @@ public abstract class SpellHelperMixin {
     }
 
     @Shadow
-    private static void applyAreaImpact(World world, LivingEntity caster, List<Entity> targets, float range, Spell.Release.Target.Area area, SpellInfo spellInfo, SpellHelper.ImpactContext context, boolean additionalTargetLookup) {
-        throw new AssertionError();
-    }
-
-    @Shadow
     private static void directImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, SpellHelper.ImpactContext context) {
         throw new AssertionError();
     }
 
     @Shadow(remap = false) private static boolean launchSequenceEligible(int index, int rule) {
+        throw new AssertionError();
+    }
+
+    @Shadow
+	private static void applyAreaImpact(World world, LivingEntity caster, List<Entity> targets, float range, Spell.Release.Target.Area area, SpellInfo spellInfo, Spell.Impact[] impacts, SpellHelper.ImpactContext context, boolean additionalTargetLookup) {
         throw new AssertionError();
     }
 
@@ -226,7 +226,7 @@ public abstract class SpellHelperMixin {
                                     case AREA:
                                         Vec3d center = player.getPos().add(0.0, (double) (player.getHeight() / 2.0F), 0.0);
                                         Spell.Release.Target.Area area = spell.release.target.area;
-                                        applyAreaImpact(world, player, targets, spell.range * player.getScale(), area, spellInfo, context.position(center), true);
+                                        applyAreaImpact(world, player, targets, spell.range * player.getScale(), area, spellInfo, spell.impact, context.position(center), true);
                                         break;
                                     case BEAM:
                                         beamImpact(world, player, targets, spellInfo, context);
