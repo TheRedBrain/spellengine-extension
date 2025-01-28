@@ -39,15 +39,15 @@ import net.spell_engine.SpellEngineMod;
 import net.spell_engine.api.effect.EntityImmunity;
 import net.spell_engine.api.entity.SpellSpawnedEntity;
 import net.spell_engine.api.event.CombatEvents;
-import net.spell_engine.api.spell.CustomSpellHandler;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.api.spell.SpellEvents;
-import net.spell_engine.api.spell.SpellInfo;
+import net.spell_engine.api.spell.event.CustomSpellHandler;
+import net.spell_engine.api.spell.event.SpellEvents;
+import net.spell_engine.api.spell.registry.SpellRegistry;
 import net.spell_engine.entity.ConfigurableKnockback;
 import net.spell_engine.entity.SpellProjectile;
 import net.spell_engine.internals.SpellCastSyncHelper;
+import net.spell_engine.internals.SpellContainerHelper;
 import net.spell_engine.internals.SpellHelper;
-import net.spell_engine.internals.SpellRegistry;
 import net.spell_engine.internals.WorldScheduler;
 import net.spell_engine.internals.arrow.ArrowHelper;
 import net.spell_engine.internals.casting.SpellCast;
@@ -76,12 +76,12 @@ import java.util.function.Supplier;
 public abstract class SpellHelperMixin {
 
     @Shadow
-    private static void beamImpact(World world, LivingEntity caster, List<Entity> targets, SpellInfo spellInfo, SpellHelper.ImpactContext context) {
+    private static void beamImpact(World world, LivingEntity caster, List<Entity> targets, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context) {
         throw new AssertionError();
     }
 
     @Shadow
-    private static void directImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, SpellHelper.ImpactContext context) {
+    private static void directImpact(World world, LivingEntity caster, Entity target, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context) {
         throw new AssertionError();
     }
 
@@ -90,7 +90,7 @@ public abstract class SpellHelperMixin {
     }
 
     @Shadow
-	private static void applyAreaImpact(World world, LivingEntity caster, List<Entity> targets, float range, Spell.Release.Target.Area area, SpellInfo spellInfo, Spell.Impact[] impacts, SpellHelper.ImpactContext context, boolean additionalTargetLookup) {
+	private static void applyAreaImpact(World world, LivingEntity caster, List<Entity> targets, float range, Spell.Release.Target.Area area, RegistryEntry<Spell> spellEntry, Spell.Impact[] impacts, SpellHelper.ImpactContext context, boolean additionalTargetLookup) {
         throw new AssertionError();
     }
 
@@ -100,14 +100,16 @@ public abstract class SpellHelperMixin {
      */
     @Overwrite
     public static SpellCast.Attempt attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo) {
-
         SpellCasterEntity caster = (SpellCasterEntity) player;
-        Spell spell = SpellRegistry.getSpell(spellId);
-        if (spell == null) {
+        RegistryEntry.Reference<Spell> spellEntry = (RegistryEntry.Reference) SpellRegistry.from(player.getWorld()).getEntry(spellId).orElse(null);
+        if (spellEntry == null) {
             return SpellCast.Attempt.none();
-        } else if (caster.getCooldownManager().isCoolingDown(spellId)) {
-            return SpellCast.Attempt.failOnCooldown(new SpellCast.Attempt.OnCooldownInfo());
         } else {
+            Spell spell = (Spell)spellEntry.value();
+            if (caster.getCooldownManager().isCoolingDown(spellId)) {
+                return SpellCast.Attempt.failOnCooldown(new SpellCast.Attempt.OnCooldownInfo());
+            }
+
             if (checkAmmo) {
                 SpellHelper.AmmoResult ammoResult = SpellHelper.ammoForSpell(player, spell, itemStack);
                 if (!ammoResult.satisfied()) {
@@ -177,196 +179,210 @@ public abstract class SpellHelperMixin {
     @Overwrite
     public static void performSpell(World world, PlayerEntity player, Identifier spellId, TargetHelper.SpellTargetResult targetResult, SpellCast.Action action, float progress) {
         if (!player.isSpectator()) {
-            Spell spell = SpellRegistry.getSpell(spellId);
-            if (spell != null) {
-                SpellInfo spellInfo = new SpellInfo(spell, spellId);
-                ItemStack itemStack = player.getMainHandStack();
-                SpellCast.Attempt attempt = SpellHelper.attemptCasting(player, itemStack, spellId);
-                if (attempt.isSuccess()) {
-                    List<Entity> targets = targetResult.entities();
-                    Vec3d targetLocation = targetResult.location();
-                    float castingSpeed = ((SpellCasterEntity)player).getCurrentCastingSpeed();
-                    progress = Math.max(Math.min(progress, 1.0F), 0.0F);
-                    float channelMultiplier = 1.0F;
-                    boolean shouldPerformImpact = true;
-                    Supplier<Collection<ServerPlayerEntity>> trackingPlayers = Suppliers.memoize(() -> {
-                        return PlayerLookup.tracking(player);
-                    });
-                    switch (action) {
-                        case CHANNEL:
-                            channelMultiplier = SpellHelper.channelValueMultiplier(spell);
-                            break;
-                        case RELEASE:
-                            if (SpellHelper.isChanneled(spell)) {
-                                shouldPerformImpact = false;
-                                channelMultiplier = 1.0F;
-                            } else {
-                                channelMultiplier = progress >= 1.0F ? 1.0F : 0.0F;
-                            }
+            Optional<RegistryEntry.Reference<Spell>> optionalSpellEntry = SpellRegistry.from(world).getEntry(spellId);
+            if (!optionalSpellEntry.isEmpty()) {
+                RegistryEntry.Reference<Spell> spellEntry = (RegistryEntry.Reference)optionalSpellEntry.get();
+                Spell spell = (Spell)spellEntry.value();
+                ItemStack heldItemStack = player.getMainHandStack();
+                SpellContainerHelper.Source spellSource = SpellContainerHelper.getFirstSourceOfSpell(spellId, player);
+                if (spellSource != null) {
+                    SpellCast.Attempt attempt = SpellHelper.attemptCasting(player, heldItemStack, spellId);
+					if (attempt.isSuccess()) {
+						SpellCasterEntity caster = (SpellCasterEntity)player;
+						List<Entity> targets = targetResult.entities();
+						Vec3d targetLocation = targetResult.location();
+						float castingSpeed = caster.getCurrentCastingSpeed();
+						progress = Math.max(Math.min(progress, 1.0F), 0.0F);
+						float channelMultiplier = 1.0F;
+						int channelTickIndex = 0;
+						int incrementChannelTicks = 0;
+						boolean shouldPerformImpact = true;
+						Supplier<Collection<ServerPlayerEntity>> trackingPlayers = Suppliers.memoize(() -> {
+							return PlayerLookup.tracking(player);
+						});
+						switch (action) {
+							case CHANNEL:
+								channelTickIndex = caster.getChannelTickIndex();
+								incrementChannelTicks = 1;
+								channelMultiplier = SpellHelper.channelValueMultiplier(spell);
+								break;
+							case RELEASE:
+								if (SpellHelper.isChanneled(spell)) {
+									shouldPerformImpact = false;
+									channelMultiplier = 1.0F;
+								} else {
+									channelMultiplier = progress >= 1.0F ? 1.0F : 0.0F;
+								}
 
-                            SpellCastSyncHelper.clearCasting(player);
-                    }
+								SpellCastSyncHelper.clearCasting(player);
+						}
 
-                    SpellHelper.AmmoResult ammoResult = SpellHelper.ammoForSpell(player, spell, itemStack);
-                    if (channelMultiplier > 0.0F && ammoResult.satisfied()) {
-                        Spell.Release.Target targeting = spell.release.target;
-                        boolean released = action == SpellCast.Action.RELEASE;
-                        if (shouldPerformImpact) {
-                            SpellHelper.ImpactContext context = new SpellHelper.ImpactContext(channelMultiplier, 1.0F, (Vec3d) null, SpellPower.getSpellPower(spell.school, player), SpellHelper.impactTargetingMode(spell));
-                            if (spell.release.custom_impact) {
-                                Function<CustomSpellHandler.Data, Boolean> handler = (Function) CustomSpellHandler.handlers.get(spellId);
-                                released = false;
-                                if (handler != null) {
-                                    released = (Boolean) handler.apply(new CustomSpellHandler.Data(player, targets, itemStack, action, progress, context));
-                                }
-                            } else {
-                                Optional optionalTarget;
-                                Entity targetEntity = null;
-                                switch (targeting.type) {
-                                    case AREA:
-                                        Vec3d center = player.getPos().add(0.0, (double) (player.getHeight() / 2.0F), 0.0);
-                                        Spell.Release.Target.Area area = spell.release.target.area;
-                                        applyAreaImpact(world, player, targets, spell.range * player.getScale(), area, spellInfo, spell.impact, context.position(center), true);
-                                        break;
-                                    case BEAM:
-                                        beamImpact(world, player, targets, spellInfo, context);
-                                        break;
-                                    case CLOUD:
-                                        SpellHelper.placeCloud(world, player, spellInfo, context);
-                                        released = true;
-                                        break;
-                                    case CURSOR:
-                                        optionalTarget = targets.stream().findFirst();
-                                        if (optionalTarget.isPresent()) {
-                                            directImpact(world, player, (Entity) optionalTarget.get(), spellInfo, context);
-                                        } else {
-                                            released = false;
-                                        }
-                                        break;
-                                    case PROJECTILE:
-                                        Optional<Entity> entityFound = targets.stream().findFirst();
-                                        if (entityFound.isPresent()) {
-                                            targetEntity = (Entity) entityFound.get();
-                                        }
+						SpellHelper.AmmoResult ammoResult = SpellHelper.ammoForSpell(player, spell, heldItemStack);
+						if (channelMultiplier > 0.0F && ammoResult.satisfied()) {
+							Spell.Release.Target targeting = spell.release.target;
+							boolean released = action == SpellCast.Action.RELEASE;
+							if (shouldPerformImpact) {
+								SpellHelper.ImpactContext context = new SpellHelper.ImpactContext(channelMultiplier, 1.0F, (Vec3d) null, SpellPower.getSpellPower(spell.school, player), SpellHelper.impactTargetingMode(spell), channelTickIndex);
+								if (spell.release.custom_impact) {
+									Function<CustomSpellHandler.Data, Boolean> handler = (Function) CustomSpellHandler.handlers.get(spellId);
+									released = false;
+									if (handler != null) {
+										released = (Boolean) handler.apply(new CustomSpellHandler.Data(player, targets, heldItemStack, action, progress, context));
+									}
+								} else {
+									Optional optionalTarget;
+									Entity targetEntity = null;
+									switch (targeting.type) {
+										case AREA:
+											Vec3d center = player.getPos().add(0.0, (double) (player.getHeight() / 2.0F), 0.0);
+											Spell.Release.Target.Area area = spell.release.target.area;
+											float range = SpellHelper.getRange(player, spell) * player.getScale();
+											applyAreaImpact(world, player, targets, range, area, spellEntry, spell.impact, context.position(center), true);
+											break;
+										case BEAM:
+											beamImpact(world, player, targets, spellEntry, context);
+											break;
+										case CLOUD:
+											SpellHelper.placeCloud(world, player, spellEntry, context);
+											released = true;
+											break;
+										case CURSOR:
+											optionalTarget = targets.stream().findFirst();
+											if (optionalTarget.isPresent()) {
+												directImpact(world, player, (Entity) optionalTarget.get(), spellEntry, context);
+											} else {
+												released = false;
+											}
+											break;
+										case PROJECTILE:
+											Entity target = null;
+											Optional<Entity> entityFound = targets.stream().findFirst();
+											if (entityFound.isPresent()) {
+												target = (Entity) entityFound.get();
+											}
 
-                                        SpellHelper.shootProjectile(world, player, targetEntity, spellInfo, context);
-                                        break;
-                                    case METEOR:
-                                        optionalTarget = targets.stream().findFirst();
-                                        if (!optionalTarget.isPresent() && targetLocation == null) {
-                                            released = false;
-                                            break;
-                                        }
+											SpellHelper.shootProjectile(world, player, target, spellEntry, context);
+											break;
+										case METEOR:
+											optionalTarget = targets.stream().findFirst();
+											if (!optionalTarget.isPresent() && targetLocation == null) {
+												released = false;
+												break;
+											}
 
-                                        SpellHelper.fallProjectile(world, player, (Entity) optionalTarget.orElse((Object) null), targetLocation, spellInfo, context);
-                                        break;
-                                    case SELF:
-                                        directImpact(world, player, player, spellInfo, context);
-                                        released = true;
-                                        break;
-                                    case SHOOT_ARROW:
-                                        ArrowHelper.shootArrow(world, player, spellInfo, context);
-                                        released = true;
-                                }
-                            }
-                        }
+											SpellHelper.fallProjectile(world, player, (Entity) optionalTarget.orElse((Object) null), targetLocation, spellEntry, context);
+											break;
+										case SELF:
+											directImpact(world, player, player, spellEntry, context);
+											released = true;
+											break;
+										case SHOOT_ARROW:
+											ArrowHelper.shootArrow(world, player, spellEntry, context);
+											released = true;
+									}
+								}
 
-                        if (released) {
-                            ParticleHelper.sendBatches(player, spell.release.particles);
-                            SoundHelper.playSound(world, player, spell.release.sound);
-                            AnimationHelper.sendAnimation(player, (Collection) trackingPlayers.get(), SpellCast.Animation.RELEASE, spell.release.animation, castingSpeed);
-                            SpellHelper.imposeCooldown(player, spellId, spell, progress);
-                            player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
+								caster.setChannelTickIndex(channelTickIndex + incrementChannelTicks);
+							}
 
-                            var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
+							if (released) {
+								ParticleHelper.sendBatches(player, spell.release.particles);
+								SoundHelper.playSound(world, player, spell.release.sound);
+								AnimationHelper.sendAnimation(player, (Collection) trackingPlayers.get(), SpellCast.Animation.RELEASE, spell.release.animation, castingSpeed);
+								SpellHelper.imposeCooldown(player, spellSource, spellId, spell, progress);
+								player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
 
-                            // health cost
-                            if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
-                                float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
-                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
-                                    healthCost = healthCost * ((DuckLivingEntityMixin)player).spellengineextension$getHealthSpellCostMultiplier();
-                                }
-                                if (healthCost > 0.0F) {
-                                    player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
-                                }
-                            }
+								var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
-                            // mana cost
-                            if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
-                                float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
-                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
-                                    manaCost = manaCost * ((DuckLivingEntityMixin)player).spellengineextension$getManaSpellCostMultiplier();
-                                }
-                                if (manaCost > 0.0F) {
-                                    SpellEngineExtension.addMana(player, -manaCost);
-                                }
-                            }
+								// health cost
+								if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
+									float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
+									if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
+										healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
+									}
+									if (healthCost > 0.0F) {
+										player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).betteradventuremode$bloodMagicCasting(), healthCost);
+									}
+								}
 
-                            // stamina cost
-                            if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
-                                float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
-                                if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
-                                    staminaCost = staminaCost * ((DuckLivingEntityMixin)player).spellengineextension$getStaminaSpellCostMultiplier();
-                                }
-                                if (staminaCost > 0.0F) {
-                                    SpellEngineExtension.addStamina(player, -staminaCost);
-                                }
-                            }
+								// mana cost
+								if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
+									float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
+									if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
+										manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
+									}
+									if (manaCost > 0.0F) {
+										SpellEngineExtension.addMana(player, -manaCost);
+									}
+								}
 
-                            // consume spell casting item
-                            if (((DuckSpellCostMixin) spell.cost).spellengineextension$consumeSelf()) {
-                                player.incrementStat(Stats.USED.getOrCreateStat(itemStack.getItem()));
-                                if (!player.isCreative()) {
-                                    itemStack.decrement(1);
-                                }
-                            }
+								// stamina cost
+								if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
+									float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
+									if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
+										staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
+									}
+									if (staminaCost > 0.0F) {
+										SpellEngineExtension.addStamina(player, -staminaCost);
+									}
+								}
 
-                            if (SpellEngineMod.config.spell_cost_durability_allowed && spell.cost.durability > 0) {
-                                itemStack.damage(spell.cost.durability, player, EquipmentSlot.MAINHAND);
-                            }
+//								// consume spell casting item
+//								if (((DuckSpellCostMixin) spell.cost).spellengineextension$consumeSelf()) {
+//									player.incrementStat(Stats.USED.getOrCreateStat(heldItemStack.getItem()));
+//									if (!player.isCreative()) {
+//										heldItemStack.decrement(1);
+//									}
+//								}
 
-                            if (ammoResult.ammo() != null && spell.cost.consume_item) {
-                                for (int i = 0; i < player.getInventory().size(); ++i) {
-                                    ItemStack stack = player.getInventory().getStack(i);
-                                    if (stack.isOf(ammoResult.ammo().getItem())) {
-                                        stack.decrement(1);
-                                        if (stack.isEmpty()) {
-                                            player.getInventory().removeOne(stack);
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
+								if (SpellEngineMod.config.spell_cost_durability_allowed && spell.cost.durability > 0) {
+									ItemStack stackToDamage = spellSource.itemStack().isDamageable() ? spellSource.itemStack() : heldItemStack;
+									stackToDamage.damage(spell.cost.durability, player, EquipmentSlot.MAINHAND);
+								}
 
-                            if (spell.cost.effect_id != null) {
-                                Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
-                                if (effect.isPresent()) {
-                                    int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
-                                    if (decrementEffectAmount < 0) {
-                                        player.removeStatusEffect(effect.get());
-                                    } else if (decrementEffectAmount > 0) {
-                                        int newAmplifier = -1;
-                                        StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
-                                        if (statusEffectInstance != null) {
-                                            int oldAmplifier = statusEffectInstance.getAmplifier();
-                                            newAmplifier = oldAmplifier - decrementEffectAmount;
-                                        }
-                                        player.removeStatusEffect(effect.get());
-                                        if (newAmplifier >= 0) {
-                                            player.addStatusEffect(new StatusEffectInstance(effect.get(), statusEffectInstance.getDuration(), newAmplifier, statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon()));
-                                        }
-                                    }
-                                }
-                            }
+								if (ammoResult.ammo() != null && spell.cost.consume_item) {
+									for (int i = 0; i < player.getInventory().size(); ++i) {
+										ItemStack stack = player.getInventory().getStack(i);
+										if (stack.isOf(ammoResult.ammo().getItem())) {
+											stack.decrement(1);
+											if (stack.isEmpty()) {
+												player.getInventory().removeOne(stack);
+											}
+											break;
+										}
+									}
+								}
 
-                            if (CombatEvents.SPELL_CAST.isListened()) {
-                                CombatEvents.SpellCast.Args args = new CombatEvents.SpellCast.Args(player, spellInfo, targets, action, progress);
-                                CombatEvents.SPELL_CAST.invoke((listener) -> {
-                                    listener.onSpellCast(args);
-                                });
-                            }
-                        }
-                    }
+								if (spell.cost.effect_id != null) {
+									Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
+									if (effect.isPresent()) {
+										int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
+										if (decrementEffectAmount < 0) {
+											player.removeStatusEffect(effect.get());
+										} else if (decrementEffectAmount > 0) {
+											int newAmplifier = -1;
+											StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
+											if (statusEffectInstance != null) {
+												int oldAmplifier = statusEffectInstance.getAmplifier();
+												newAmplifier = oldAmplifier - decrementEffectAmount;
+											}
+											player.removeStatusEffect(effect.get());
+											if (newAmplifier >= 0) {
+												player.addStatusEffect(new StatusEffectInstance(effect.get(), statusEffectInstance.getDuration(), newAmplifier, statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon()));
+											}
+										}
+									}
+								}
+
+								if (CombatEvents.SPELL_CAST.isListened()) {
+									CombatEvents.SpellCast.Args args = new CombatEvents.SpellCast.Args(player, spellEntry, targets, action, progress);
+									CombatEvents.SPELL_CAST.invoke((listener) -> {
+										listener.onSpellCast(args);
+									});
+								}
+							}
+						}
+					}
                 }
             }
         }
@@ -377,9 +393,9 @@ public abstract class SpellHelperMixin {
      * @reason integrate perks and launch properties entity attributes
      */
     @Overwrite
-    public static void shootProjectile(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, SpellHelper.ImpactContext context, int sequenceIndex) {
+    public static void shootProjectile(World world, LivingEntity caster, Entity target, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context, int sequenceIndex) {
         if (!world.isClient) {
-            Spell spell = spellInfo.spell();
+			Spell spell = (Spell)spellEntry.value();
             Vec3d launchPoint = SpellHelper.launchPoint(caster);
             Spell.Release.Target.ShootProjectile data = spell.release.target.projectile;
             Spell.ProjectileData projectileData = data.projectile;
@@ -412,7 +428,7 @@ public abstract class SpellHelperMixin {
             }
             // endregion modifying mutable perks
 
-            SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FLY, spellInfo.id(), target, context, mutablePerks);
+            SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FLY, ((RegistryKey)spellEntry.getKey().get()).getValue(), target, context, mutablePerks);
             Spell.LaunchProperties mutableLaunchProperties = data.launch_properties.copy();
 
             // region modifying mutable launch properties
@@ -431,7 +447,7 @@ public abstract class SpellHelperMixin {
 
             if (SpellEvents.PROJECTILE_SHOOT.isListened()) {
                 SpellEvents.PROJECTILE_SHOOT.invoke((listener) -> {
-                    listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellInfo, context, sequenceIndex));
+                    listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellEntry, context, sequenceIndex));
                 });
             }
 
@@ -439,25 +455,38 @@ public abstract class SpellHelperMixin {
 
             float divergence = projectileData.divergence;
 
+			float casterPitch = caster.getPitch();
+			float casterYaw = caster.getYaw();
+			int i;
+			int ticks;
             if (data.inherit_shooter_velocity) {
-                projectile.setVelocity(caster, caster.getPitch(), caster.getYaw(), 0.0F, velocity, divergence);
+				projectile.setVelocity(caster, casterPitch, casterYaw, 0.0F, velocity, divergence);
             } else {
-                Vec3d look = caster.getRotationVector().normalize();
+				if (data.direction_offsets != null && data.direction_offsets.length > 0 && (!data.direction_offsets_require_target || target != null)) {
+					i = context.isChanneled() ? context.channelTickIndex() : sequenceIndex;
+					ticks = i % data.direction_offsets.length;
+					Spell.Release.Target.ShootProjectile.DirectionOffset offset = data.direction_offsets[ticks];
+					casterPitch += offset.pitch;
+					casterYaw += offset.yaw;
+				}
+
+				Vec3d look = caster.getRotationVector(casterPitch, casterYaw).normalize();
                 projectile.setVelocity(look.x, look.y, look.z, velocity, divergence);
             }
 
             projectile.range = spell.range;
-            projectile.setPitch(caster.getPitch());
-            projectile.setYaw(caster.getYaw());
+			projectile.setPitch(casterPitch);
+			projectile.setYaw(casterYaw);
+			projectile.setFollowedTarget(target);
             world.spawnEntity(projectile);
             SoundHelper.playSound(world, projectile, mutableLaunchProperties.sound);
             if (sequenceIndex == 0 && mutableLaunchProperties.extra_launch_count > 0) {
-                for(int i = 0; i < mutableLaunchProperties.extra_launch_count; ++i) {
-                    int ticks = (i + 1) * mutableLaunchProperties.extra_launch_delay;
+				for(i = 0; i < mutableLaunchProperties.extra_launch_count; ++i) {
+					ticks = (i + 1) * mutableLaunchProperties.extra_launch_delay;
                     int nextSequenceIndex = i + 1;
                     ((WorldScheduler)world).schedule(ticks, () -> {
                         if (caster != null && caster.isAlive()) {
-                            shootProjectile(world, caster, target, spellInfo, context, nextSequenceIndex);
+                            shootProjectile(world, caster, target, spellEntry, context, nextSequenceIndex);
                         }
                     });
                 }
@@ -471,7 +500,7 @@ public abstract class SpellHelperMixin {
      * @reason integrate perks and launch properties entity attributes
      */
     @Overwrite
-    public static boolean fallProjectile(World world, LivingEntity caster, Entity target, @Nullable Vec3d targetLocation, SpellInfo spellInfo, SpellHelper.ImpactContext context, int sequenceIndex) {
+    public static boolean fallProjectile(World world, LivingEntity caster, Entity target, @Nullable Vec3d targetLocation, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context, int sequenceIndex) {
         if (world.isClient) {
             return false;
         } else {
@@ -479,7 +508,7 @@ public abstract class SpellHelperMixin {
             if (targetPosition == null) {
                 return false;
             } else {
-                Spell spell = spellInfo.spell();
+				Spell spell = (Spell)spellEntry.value();
                 Spell.Release.Target.Meteor meteor = spell.release.target.meteor;
                 if (meteor.requires_entity && target == null) {
                     return false;
@@ -533,10 +562,10 @@ public abstract class SpellHelperMixin {
                     }
                     // endregion modifying mutable perks
 
-                    SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FALL, spellInfo.id(), target, context, mutablePerks);
+                    SpellProjectile projectile = new SpellProjectile(world, caster, launchPoint.getX(), launchPoint.getY(), launchPoint.getZ(), SpellProjectile.Behaviour.FALL, ((RegistryKey)spellEntry.getKey().get()).getValue(), target, context, mutablePerks);
                     if (SpellEvents.PROJECTILE_FALL.isListened()) {
                         SpellEvents.PROJECTILE_FALL.invoke((listener) -> {
-                            listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellInfo, context, sequenceIndex));
+                            listener.onProjectileLaunch(new SpellEvents.ProjectileLaunchEvent(projectile, mutableLaunchProperties, caster, target, spellEntry, context, sequenceIndex));
                         });
                     }
 
@@ -570,7 +599,7 @@ public abstract class SpellHelperMixin {
                             int nextSequenceIndex = i + 1;
                             ((WorldScheduler)world).schedule(ticks, () -> {
                                 if (caster != null && caster.isAlive()) {
-                                    fallProjectile(world, caster, target, targetLocation, spellInfo, context, nextSequenceIndex);
+                                    fallProjectile(world, caster, target, targetLocation, spellEntry, context, nextSequenceIndex);
                                 }
                             });
                         }
@@ -587,38 +616,53 @@ public abstract class SpellHelperMixin {
      * @reason integrate direct damage, direct healing and damage type override
      */
     @Overwrite
-    private static boolean performImpact(World world, LivingEntity caster, Entity target, SpellInfo spellInfo, Spell.Impact impact, SpellHelper.ImpactContext context, Collection<ServerPlayerEntity> trackers) {
+    private static boolean performImpact(World world, LivingEntity caster, Entity target, RegistryEntry<Spell> spellEntry, Spell.Impact impact, SpellHelper.ImpactContext context, Collection<ServerPlayerEntity> trackers) {
         if (!((Entity) target).isAttackable()) {
             return false;
         } else {
             boolean success = false;
             boolean isKnockbackPushed = false;
-            Spell spell = spellInfo.spell();
+			Spell spell = (Spell)spellEntry.value();
 
             try {
-                double particleMultiplier = (double) (1.0F * context.total());
+				if (impact.action.apply_to_caster) {
+					target = caster;
+				}
+
+				TargetHelper.Intent intent = SpellHelper.intent(impact.action);
+				if (!TargetHelper.actionAllowed(context.targetingMode(), intent, caster, (Entity)target)) {
+					return false;
+				}
+
+				if (intent == TargetHelper.Intent.HARMFUL && context.targetingMode() == TargetHelper.TargetingMode.AREA && ((EntityImmunity)target).isImmuneTo(EntityImmunity.Type.AREA_EFFECT)) {
+					return false;
+				}
+
+				SpellHelper.TargetConditionResult conditionResult = SpellHelper.evaluateImpactConditions((Entity)target, impact.target_conditions);
+				if (!conditionResult.allowed()) {
+					return false;
+				}
+
+				double particleMultiplier = (double) (1.0F * context.total());
                 SpellPower.Result power = context.power();
                 SpellSchool school = impact.school != null ? impact.school : spell.school;
                 if (power == null || power.school() != school) {
                     power = SpellPower.getSpellPower(school, caster);
                 }
 
-                if (power.baseValue() < (double) impact.action.min_power) {
-                    power = new SpellPower.Result(power.school(), (double) impact.action.min_power, power.criticalChance(), power.criticalDamage());
-                }
-
-                if (impact.action.apply_to_caster) {
-                    target = caster;
-                }
-
-                TargetHelper.Intent intent = SpellHelper.intent(impact.action);
-                if (!TargetHelper.actionAllowed(context.targetingMode(), intent, caster, (Entity) target)) {
-                    return false;
-                }
-
-                if (intent == TargetHelper.Intent.HARMFUL && context.targetingMode() == TargetHelper.TargetingMode.AREA && ((EntityImmunity) target).isImmuneTo(EntityImmunity.Type.AREA_EFFECT)) {
-                    return false;
-                }
+				float bonusPower = 1.0F + (Float)conditionResult.modifiers().stream().map((modifier) -> {
+					return modifier.power_multiplier;
+				}).reduce(0.0F, Float::sum);
+				Float bonusCritChance = (Float)conditionResult.modifiers().stream().map((modifier) -> {
+					return modifier.critical_chance_bonus;
+				}).reduce(0.0F, Float::sum);
+				Float bonusCritDamage = (Float)conditionResult.modifiers().stream().map((modifier) -> {
+					return modifier.critical_damage_bonus;
+				}).reduce(0.0F, Float::sum);
+				power = new SpellPower.Result(power.school(), power.baseValue() * (double)bonusPower, power.criticalChance() + (double)bonusCritChance, power.criticalDamage() + (double)bonusCritDamage);
+				if (power.baseValue() < (double)impact.action.min_power) {
+					power = new SpellPower.Result(power.school(), (double)impact.action.min_power, power.criticalChance(), power.criticalDamage());
+				}
 
                 LivingEntity livingTarget;
                 Vec3d direction;
@@ -771,7 +815,7 @@ public abstract class SpellHelperMixin {
                             SpellHelper.applyEntityPlacement(entity, caster, ((Entity) target).getPos(), spawnData.placement);
                             if (entity instanceof SpellSpawnedEntity) {
                                 SpellSpawnedEntity spellSpawnedEntity = (SpellSpawnedEntity) entity;
-                                spellSpawnedEntity.onCreatedFromSpell(caster, spellInfo.id(), spawnData);
+                                spellSpawnedEntity.onCreatedFromSpell(caster, ((RegistryKey)spellEntry.getKey().get()).getValue(), spawnData);
                             }
 
                             ((WorldScheduler) world).schedule(spawnData.delay_ticks, () -> {
@@ -850,7 +894,7 @@ public abstract class SpellHelperMixin {
 
                 if (success) {
                     if (impact.particles != null) {
-                        ParticleHelper.sendBatches((Entity) target, impact.particles, (float) particleMultiplier, trackers);
+						ParticleHelper.sendBatches((Entity)target, impact.particles, (float)particleMultiplier * caster.getScale(), trackers);
                     }
 
                     if (impact.sound != null) {

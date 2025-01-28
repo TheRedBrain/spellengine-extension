@@ -3,6 +3,7 @@ package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gu
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,7 +22,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +30,8 @@ import java.util.Optional;
 @Mixin(SpellTooltip.class)
 public class SpellTooltipMixin {
 
-    @Inject(method = "spellInfo", at = @At("TAIL"),
-            locals = LocalCapture.CAPTURE_FAILSOFT)
-    private static void spellengineextension$spellInfo(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, boolean indented, CallbackInfoReturnable<List<Text>> cir, ArrayList<Text> lines, Spell spell, SpellPower.Result primaryPower, MutableText name, String description, SpellTooltip.DescriptionMutator mutator, float cooldownDuration, boolean showItemCost, net.spell_engine.config.ServerConfig config) {
+    @Inject(method = "spellEntry", at = @At("TAIL"))
+    private static void spellengineextension$spellEntry(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, boolean indented, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines, @Local Spell spell, @Local SpellPower.Result primaryPower, @Local MutableText name, @Local String description, @Local SpellTooltip.DescriptionMutator mutator, @Local float cooldownDuration, @Local(ordinal = 2) boolean showItemCost, @Local net.spell_engine.config.ServerConfig config) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 

@@ -11,13 +11,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.RangedWeaponItem;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.api.spell.SpellInfo;
 import net.spell_engine.internals.SpellHelper;
 import net.spell_engine.internals.WorldScheduler;
 import net.spell_engine.internals.arrow.ArrowHelper;
@@ -37,8 +37,8 @@ public class ArrowHelperMixin {
 	 * @reason integrate launch properties entity attributes
 	 */
 	@Overwrite
-	public static void shootArrow(World world, LivingEntity shooter, SpellInfo spellInfo, SpellHelper.ImpactContext context, int sequenceIndex) {
-		Spell spell = spellInfo.spell();
+	public static void shootArrow(World world, LivingEntity shooter, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context, int sequenceIndex) {
+		Spell spell = (Spell)spellEntry.value();
 		Spell.Release.Target.ShootArrow shoot_arrow = spell.release.target.shoot_arrow;
 		ItemStack weaponStack = shooter.getMainHandStack();
 		Item weapon = Items.CROSSBOW;
@@ -72,7 +72,7 @@ public class ArrowHelperMixin {
 				}
 
 				if (shooter instanceof SpellCasterEntity caster) {
-					caster.setTemporaryActiveSpell(spellInfo);
+					caster.setTemporaryActiveSpell(spellEntry);
 				}
 
 				float divergence = sequenceIndex == 0 ? 0.0F : shoot_arrow.divergence;
@@ -82,7 +82,7 @@ public class ArrowHelperMixin {
 				}
 
 				if (shooter instanceof SpellCasterEntity caster) {
-					caster.setTemporaryActiveSpell((SpellInfo)null);
+					caster.setTemporaryActiveSpell(null);
 				}
 
 				int extra_launch = launchProperties.extra_launch_count;
@@ -92,7 +92,7 @@ public class ArrowHelperMixin {
 						int nextSequenceIndex = i + 1;
 						((WorldScheduler)world).schedule(ticks, () -> {
 							if (shooter != null && shooter.isAlive()) {
-								shootArrow(world, shooter, spellInfo, context, nextSequenceIndex);
+								shootArrow(world, shooter, spellEntry, context, nextSequenceIndex);
 							}
 						});
 					}
