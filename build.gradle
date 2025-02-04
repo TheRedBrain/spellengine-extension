@@ -72,7 +72,8 @@ dependencies {
 	modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_animator_version}")
 
 	// Spell Engine
-	modImplementation("maven.modrinth:spell-engine:${project.spell_engine_version}")
+//	modImplementation("maven.modrinth:spell-engine:${project.spell_engine_version}")
+	modImplementation(files("libs/spell_engine-${project.spell_engine_version}.jar"))
 
 	// Spell Power
 	modImplementation("maven.modrinth:spell-power:${project.spell_power_version}")

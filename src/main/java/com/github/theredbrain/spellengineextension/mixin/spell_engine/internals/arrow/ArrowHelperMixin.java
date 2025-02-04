@@ -19,10 +19,10 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.internals.SpellHelper;
-import net.spell_engine.internals.WorldScheduler;
 import net.spell_engine.internals.arrow.ArrowHelper;
 import net.spell_engine.internals.casting.SpellCasterEntity;
 import net.spell_engine.mixin.item.RangedWeaponAccessor;
+import net.spell_engine.utils.WorldScheduler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
@@ -39,7 +39,7 @@ public class ArrowHelperMixin {
 	@Overwrite
 	public static void shootArrow(World world, LivingEntity shooter, RegistryEntry<Spell> spellEntry, SpellHelper.ImpactContext context, int sequenceIndex) {
 		Spell spell = (Spell)spellEntry.value();
-		Spell.Release.Target.ShootArrow shoot_arrow = spell.release.target.shoot_arrow;
+		Spell.Delivery.ShootArrow shoot_arrow = spell.deliver.shoot_arrow;
 		ItemStack weaponStack = shooter.getMainHandStack();
 		Item weapon = Items.CROSSBOW;
 		if (shoot_arrow != null && world instanceof ServerWorld serverWorld) {

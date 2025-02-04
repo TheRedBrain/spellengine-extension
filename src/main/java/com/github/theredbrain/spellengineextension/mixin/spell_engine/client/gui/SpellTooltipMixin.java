@@ -17,8 +17,8 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.client.gui.SpellTooltip;
-import net.spell_power.api.SpellPower;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -30,8 +30,13 @@ import java.util.Optional;
 @Mixin(SpellTooltip.class)
 public class SpellTooltipMixin {
 
+    @Shadow
+    private static MutableText indentation(int level) {
+        throw new AssertionError();
+    }
+
     @Inject(method = "spellEntry", at = @At("TAIL"))
-    private static void spellengineextension$spellEntry(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, boolean indented, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines, @Local Spell spell, @Local SpellPower.Result primaryPower, @Local MutableText name, @Local String description, @Local SpellTooltip.DescriptionMutator mutator, @Local float cooldownDuration, @Local(ordinal = 2) boolean showItemCost, @Local net.spell_engine.config.ServerConfig config) {
+    private static void spellengineextension$spellEntry(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, int indentLevel, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines, @Local Spell spell) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
@@ -39,7 +44,7 @@ public class SpellTooltipMixin {
             float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
             if (healthCost != 0.0F) {
                 boolean hasEnoughHealth = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost() || healthCost <= 0 || healthCost < player.getHealth();
-                lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.health", healthCost).formatted(hasEnoughHealth ? Formatting.GREEN : Formatting.RED)));
+                lines.add(indentation(indentLevel).append(Text.translatable("spell.tooltip.health", healthCost).formatted(hasEnoughHealth ? Formatting.GREEN : Formatting.RED)));
             }
         }
 
@@ -48,7 +53,7 @@ public class SpellTooltipMixin {
             if (manaCost != 0.0F) {
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
                 boolean hasEnoughMana = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost() || manaCost <= 0 || manaCost < currentMana;
-                lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.mana", manaCost).formatted(hasEnoughMana ? Formatting.GREEN : Formatting.RED)));
+                lines.add(indentation(indentLevel).append(Text.translatable("spell.tooltip.mana", manaCost).formatted(hasEnoughMana ? Formatting.GREEN : Formatting.RED)));
             }
         }
 
@@ -57,7 +62,7 @@ public class SpellTooltipMixin {
             if (staminaCost != 0.0F) {
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
                 boolean hasEnoughStamina = !((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost() || staminaCost <= 0 || staminaCost < currentStamina;
-                lines.add(Text.literal(" ").append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
+                lines.add(indentation(indentLevel).append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
             }
         }
 
@@ -73,7 +78,7 @@ public class SpellTooltipMixin {
                 }
                 boolean hasRequiredEffectAndLevel = player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0);
                 lines.add(
-                        Text.literal(" ")
+                        indentation(indentLevel)
                                 .append(Text.translatable("spell.tooltip.effect.1"))
                                 .append(statusEffectReference.value().getName().copy())
                                 .append(ScreenTexts.SPACE)
