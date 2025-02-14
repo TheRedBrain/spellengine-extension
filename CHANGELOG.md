@@ -1,3 +1,8 @@
+# 2.5.0
+
+- now works with Spell Engine 1.5.0
+- re-enabled "consume_self" Spell.Cost option, as it is not redundant to the capabilities of Spell Engine
+
 # 2.4.6
 
 - now works with Spell Engine 1.4.5+1.21.1
