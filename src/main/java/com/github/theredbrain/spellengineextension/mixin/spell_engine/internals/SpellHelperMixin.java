@@ -227,7 +227,7 @@ public abstract class SpellHelperMixin {
 									success = SpellHelper.deliver(world, spellEntry, player, List.of(), context, (Vec3d) null);
 									break;
 								case CASTER:
-									targetsWithContext = List.of(new SpellHelper.TargetWithContext(player, context.position(player.getPos())));
+									targetsWithContext = List.of(new SpellHelper.TargetWithContext(player, context));
 									success = SpellHelper.deliver(world, spellEntry, player, targetsWithContext, context, (Vec3d) null);
 									break;
 								case AIM:
@@ -236,7 +236,7 @@ public abstract class SpellHelperMixin {
 									targetsWithContext = List.of();
 									if (firstTarget.isPresent()) {
 										Entity target = (Entity) firstTarget.get();
-										SpellHelper.ImpactContext targetSpecificContext = context.position(target.getPos());
+										SpellHelper.ImpactContext targetSpecificContext = context;
 										targetsWithContext = List.of(new SpellHelper.TargetWithContext(target, targetSpecificContext));
 									}
 
@@ -248,7 +248,7 @@ public abstract class SpellHelperMixin {
 									Vec3d center = player.getPos().add(0.0, (double) (player.getHeight() / 2.0F), 0.0);
 									Spell.Target.Area area = spell.target.area;
 									float range = SpellHelper.getRange(player, spell) * player.getScale();
-									SpellHelper.ImpactContext centeredContext = context.position(center);
+									SpellHelper.ImpactContext centeredContext = context;
 									double squaredRange = (double) (range * range);
 									targetsWithContext = targets.stream().map((targetx) -> {
 										float distanceBasedMultiplier = 1.0F;
@@ -267,7 +267,7 @@ public abstract class SpellHelperMixin {
 								case BEAM:
 								case FROM_TRIGGER:
 									targetsWithContext = targets.stream().map((targetx) -> {
-										return new SpellHelper.TargetWithContext(targetx, context.position(targetx.getPos()));
+										return new SpellHelper.TargetWithContext(targetx, context);
 									}).toList();
 									success = SpellHelper.deliver(world, spellEntry, player, targetsWithContext, context, (Vec3d) null);
 									break;
@@ -335,7 +335,7 @@ public abstract class SpellHelperMixin {
 
 							Ammo.consume(ammoResult, player);
 							if (spell.cost.effect_id != null) {
-								Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
+								Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.of(spell.cost.effect_id));
 								if (effect.isPresent()) {
 									int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
 									if (decrementEffectAmount < 0) {
