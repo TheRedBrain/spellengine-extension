@@ -35,8 +35,8 @@ public class SpellTooltipMixin {
         throw new AssertionError();
     }
 
-    @Inject(method = "spellEntry", at = @At("TAIL"))
-    private static void spellengineextension$spellEntry(Identifier spellId, PlayerEntity player, ItemStack itemStack, boolean details, int indentLevel, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines, @Local Spell spell) {
+    @Inject(method = "spellEntry(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;ZI)Ljava/util/List;", at = @At("TAIL"))
+    private static void spellengineextension$spellEntry(RegistryEntry<Spell> spellEntry, PlayerEntity player, ItemStack itemStack, boolean details, int indentLevel, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines, @Local Spell spell) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 

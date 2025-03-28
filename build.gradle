@@ -95,6 +95,9 @@ dependencies {
 	// Ranged Weapon API
 	modImplementation("maven.modrinth:ranged-weapon-api:${project.ranged_weapon_api_version}")
 
+	// Bundle API
+	modImplementation("maven.modrinth:bundle-api:${project.bundle_api_version}")
+
 }
 
 processResources {

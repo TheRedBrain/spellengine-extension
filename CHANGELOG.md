@@ -1,3 +1,8 @@
+# 2.5.3
+
+- now works with Spell Engine 1.6.0
+- rewrote several mixins to make the mod easier to maintain.
+
 # 2.5.2
 
 - now works with Spell Engine 1.5.2

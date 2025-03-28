@@ -15,7 +15,7 @@ public abstract class DamageSourcesMixin implements DuckDamageSourcesMixin {
     @Shadow public abstract DamageSource create(RegistryKey<DamageType> key);
 
     @Override
-    public DamageSource betteradventuremode$bloodMagicCasting() {
+    public DamageSource spellengineextension$bloodMagicCasting() {
         return this.create(DamageTypesRegistry.BLOOD_MAGIC_CASTING_DAMAGE_TYPE);
     }
 }
