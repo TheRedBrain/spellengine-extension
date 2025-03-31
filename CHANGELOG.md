@@ -1,6 +1,7 @@
 # 2.5.5
 
 - now works with Spell Engine 1.6.2
+- fixed a crash that could occur when rendering tooltips
 
 # 2.5.4
 

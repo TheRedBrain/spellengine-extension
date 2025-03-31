@@ -315,9 +315,9 @@ public abstract class SpellHelperMixin {
 
 	@WrapOperation(
 			method = "performImpact(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/api/spell/Spell$Impact;Lnet/spell_engine/internals/SpellHelper$ImpactContext;Ljava/util/Collection;)Z",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z", remap = false)
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	)
-	private static boolean spellengineextension$wrap_damage(Entity instance, DamageSource source, float amount, Operation<Boolean> original, @Local LivingEntity caster, @Local Spell.Impact.Action.Damage damageData) {
+	private static boolean spellengineextension$wrap_damage(Entity instance, DamageSource source, float amount, Operation<Boolean> original, @Local(argsOnly = true) LivingEntity caster, @Local Spell.Impact.Action.Damage damageData) {
 
 		// direct damage
 		double directDamageAmount = ((DuckSpellImpactActionDamageMixin) damageData).betteradventuremode$getDirectDamage();
@@ -338,7 +338,7 @@ public abstract class SpellHelperMixin {
 
 	@WrapOperation(
 			method = "performImpact(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/api/spell/Spell$Impact;Lnet/spell_engine/internals/SpellHelper$ImpactContext;Ljava/util/Collection;)Z",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;heal(F)V", remap = false)
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;heal(F)V")
 	)
 	private static void spellengineextension$wrap_heal(LivingEntity instance, float amount, Operation<Void> original, @Local Spell.Impact.Action.Heal healData) {
 
