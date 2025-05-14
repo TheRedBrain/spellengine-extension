@@ -1,10 +1,13 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
+import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.spell_engine.client.SpellEngineClient;
 import net.spell_engine.client.gui.Drawable;
@@ -13,10 +16,13 @@ import net.spell_engine.client.gui.HudRenderHelper;
 import net.spell_engine.client.util.Rect;
 import net.spell_engine.client.util.TextureFile;
 import net.spell_engine.config.HudConfig;
+import net.spell_engine.internals.SpellCooldownManager;
+import net.spell_engine.internals.casting.SpellCasterClient;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(HudRenderHelper.SpellHotBarWidget.class)
 public abstract class SpellHotBarWidgetMixin {
@@ -40,13 +46,14 @@ public abstract class SpellHotBarWidgetMixin {
 
 	/**
 	 * @author TheRedBrain
-	 * @reason integrate toggleable spell bar background rendering
+	 * @reason integrate spell hotbar rendering options
 	 */
 	@Overwrite
 	public static void render(DrawContext context, int screenWidth, int screenHeight, HudRenderHelper.SpellHotBarWidget.ViewModel viewModel) {
 		HudElement config = ((HudConfig) SpellEngineClient.hudConfig.value).hotbar;
 		MinecraftClient client = MinecraftClient.getInstance();
 		TextRenderer textRenderer = client.inGameHud.getTextRenderer();
+		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
 		if (!viewModel.spells().isEmpty()) {
 			float estimatedWidth = (float) (20 * viewModel.spells().size());
 			float estimatedHeight = 22.0F;
@@ -54,7 +61,7 @@ public abstract class SpellHotBarWidgetMixin {
 			lastRendered = new Rect(origin, origin.add(new Vec2f(estimatedWidth, estimatedHeight)));
 			RenderSystem.enableBlend();
 			RenderSystem.defaultBlendFunc();
-			if (SpellEngineExtensionClient.CLIENT_CONFIG.enable_spell_hotbar_background_rendering.get()) {
+			if (spellEngineExtensionClientConfig.enable_spell_hotbar_background_rendering.get()) {
 				float barOpacity = 1.0F;
 				context.setShaderColor(1.0F, 1.0F, 1.0F, barOpacity);
 				context.drawTexture(HOTBAR.id(), (int) origin.x, (int) origin.y, 0.0F, 0.0F, 10, 22, HOTBAR.width(), HOTBAR.height());
@@ -76,16 +83,35 @@ public abstract class SpellHotBarWidgetMixin {
 				int y = (int) (origin.y + iconsOffset.y);
 				RenderSystem.enableBlend();
 				if (spell.iconId() != null) {
-					context.drawTexture(spell.iconId(), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+					if (spell.cooldown() > 0.0F && spellEngineExtensionClientConfig.enable_cooldown_icons.get()) {
+						context.drawTexture(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace(".png", "_cooldown.png")), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+					} else {
+						context.drawTexture(spell.iconId(), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
+					}
 				} else if (spell.itemStack() != null) {
 					context.drawItem(spell.itemStack(), x, y);
 				}
 
-				if (spell.cooldown() > 0.0F) {
+				if (spell.cooldown() > 0.0F && spellEngineExtensionClientConfig.enable_spell_hotbar_cooldown_overlay.get()) {
 					renderCooldown(context, spell.cooldown(), x, y);
 				}
 
-				if (spell.keybinding() != null) {
+				int remainingCooldown = 0;
+				if (spell.iconId() != null) {
+					Identifier spellId = Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", ""));
+					ClientPlayerEntity player = client.player;
+					if (player != null && !player.isSpectator()) {
+						SpellCasterClient caster = (SpellCasterClient) player;
+						SpellCooldownManager cooldownManager = caster.getCooldownManager();
+						remainingCooldown = cooldownManager.getCooldownDuration(spellId);
+					}
+				}
+
+				if (remainingCooldown > 0 && spellEngineExtensionClientConfig.enable_spell_hotbar_cooldown_number.get()) {
+					renderCooldownNumber(context, textRenderer, remainingCooldown, x + spellEngineExtensionClientConfig.spell_cooldown_number_offset_x.get(), y + spellEngineExtensionClientConfig.spell_cooldown_number_offset_y.get(), spellEngineExtensionClientConfig.spell_cooldown_number_color.get().toInt());
+				}
+
+				if (spell.keybinding() != null && spellEngineExtensionClientConfig.enable_spell_hotkey_icons.get()) {
 					int keybindingX = x + iconSize / 2;
 					int keybindingY = (int) origin.y + 2;
 					if (spell.modifier() != null) {
@@ -107,6 +133,18 @@ public abstract class SpellHotBarWidgetMixin {
 			RenderSystem.disableBlend();
 			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		}
+	}
+
+	@Unique
+	private static void renderCooldownNumber(DrawContext context, TextRenderer textRenderer, int progress, int x, int y, int color) {
+		String progressString = String.valueOf((int) Math.ceil((double) Math.max(1, progress) / 20));
+		int k = x - textRenderer.getWidth(progressString) / 2;
+
+		context.drawText(textRenderer, progressString, k + 1, y, 0, false);
+		context.drawText(textRenderer, progressString, k - 1, y, 0, false);
+		context.drawText(textRenderer, progressString, k, y + 1, 0, false);
+		context.drawText(textRenderer, progressString, k, y - 1, 0, false);
+		context.drawText(textRenderer, progressString, k, y, color, false);
 	}
 
 }
