@@ -320,11 +320,11 @@ public abstract class SpellHelperMixin {
 	private static boolean spellengineextension$wrap_damage(Entity instance, DamageSource source, float amount, Operation<Boolean> original, @Local(argsOnly = true) LivingEntity caster, @Local Spell.Impact.Action.Damage damageData) {
 
 		// direct damage
-		double directDamageAmount = ((DuckSpellImpactActionDamageMixin) damageData).betteradventuremode$getDirectDamage();
+		double directDamageAmount = ((DuckSpellImpactActionDamageMixin) damageData).spellengineextension$getDirectDamage();
 
 		// damage type override
 		DamageSource damageSource = null;
-		String damageTypeOverride = ((DuckSpellImpactActionDamageMixin) damageData).betteradventuremode$getDamageTypeOverride();
+		String damageTypeOverride = ((DuckSpellImpactActionDamageMixin) damageData).spellengineextension$getDamageTypeOverride();
 		if (!damageTypeOverride.isEmpty()) {
 			Identifier damageTypeOverrideId = Identifier.tryParse(damageTypeOverride);
 			if (damageTypeOverrideId != null) {
@@ -343,7 +343,7 @@ public abstract class SpellHelperMixin {
 	private static void spellengineextension$wrap_heal(LivingEntity instance, float amount, Operation<Void> original, @Local Spell.Impact.Action.Heal healData) {
 
 		// direct heal
-		double directHealAmount = ((DuckSpellImpactActionHealMixin) healData).betteradventuremode$getDirectHeal();
+		double directHealAmount = ((DuckSpellImpactActionHealMixin) healData).spellengineextension$getDirectHeal();
 
 		original.call(instance, directHealAmount > 0 ? ((float) directHealAmount) : amount);
 	}

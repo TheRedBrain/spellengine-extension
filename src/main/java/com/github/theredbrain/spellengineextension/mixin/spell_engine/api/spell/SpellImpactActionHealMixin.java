@@ -11,7 +11,12 @@ public class SpellImpactActionHealMixin implements DuckSpellImpactActionHealMixi
     private double direct_heal = 0.0;
 
     @Override
-    public double betteradventuremode$getDirectHeal() {
+    public double spellengineextension$getDirectHeal() {
         return direct_heal;
+    }
+
+    @Override
+    public void spellengineextension$setDirectHeal(double directHeal) {
+        this.direct_heal = directHeal;
     }
 }

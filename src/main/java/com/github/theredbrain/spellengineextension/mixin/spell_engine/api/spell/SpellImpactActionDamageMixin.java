@@ -13,12 +13,22 @@ public class SpellImpactActionDamageMixin implements DuckSpellImpactActionDamage
     private String damage_type_override = "";
 
     @Override
-    public double betteradventuremode$getDirectDamage() {
+    public double spellengineextension$getDirectDamage() {
         return direct_damage;
     }
 
     @Override
-    public String betteradventuremode$getDamageTypeOverride() {
+    public void spellengineextension$setDirectDamage(double directDamage) {
+        this.direct_damage = directDamage;
+    }
+
+    @Override
+    public String spellengineextension$getDamageTypeOverride() {
         return damage_type_override;
+    }
+
+    @Override
+    public void spellengineextension$setDamageTypeOverride(String damageTypeOverride) {
+        this.damage_type_override = damageTypeOverride;
     }
 }

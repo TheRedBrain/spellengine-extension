@@ -36,8 +36,18 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     }
 
     @Override
+    public void spellengineextension$setCheckHealthCost(boolean checkHealthCost) {
+        this.check_health_cost = checkHealthCost;
+    }
+
+    @Override
     public boolean spellengineextension$checkManaCost() {
         return this.check_mana_cost;
+    }
+
+    @Override
+    public void spellengineextension$setCheckManaCost(boolean checkManaCost) {
+        this.check_mana_cost = checkManaCost;
     }
 
     @Override
@@ -46,8 +56,18 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     }
 
     @Override
+    public void spellengineextension$setCheckStaminaCost(boolean checkStaminaCost) {
+        this.check_stamina_cost = checkStaminaCost;
+    }
+
+    @Override
     public boolean spellengineextension$healthCostMultiplierApplies() {
         return this.health_cost_multiplier_applies;
+    }
+
+    @Override
+    public void spellengineextension$setHealthCostMultiplierApplies(boolean healthCostMultiplierApplies) {
+        this.health_cost_multiplier_applies = healthCostMultiplierApplies;
     }
 
     @Override
@@ -56,8 +76,18 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     }
 
     @Override
+    public void spellengineextension$setManaCostMultiplierApplies(boolean manaCostMultiplierApplies) {
+        this.mana_cost_multiplier_applies = manaCostMultiplierApplies;
+    }
+
+    @Override
     public boolean spellengineextension$staminaCostMultiplierApplies() {
         return this.stamina_cost_multiplier_applies;
+    }
+
+    @Override
+    public void spellengineextension$setStaminaCostMultiplierApplies(boolean staminaCostMultiplierApplies) {
+        this.stamina_cost_multiplier_applies = staminaCostMultiplierApplies;
     }
 
     @Override
@@ -66,8 +96,18 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     }
 
     @Override
+    public void spellengineextension$setManaCost(float manaCost) {
+        this.mana_cost = manaCost;
+    }
+
+    @Override
     public float spellengineextension$getHealthCost() {
         return this.health_cost;
+    }
+
+    @Override
+    public void spellengineextension$setHealthCost(float healthCost) {
+        this.health_cost = healthCost;
     }
 
     @Override
@@ -76,12 +116,27 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     }
 
     @Override
+    public void spellengineextension$setStaminaCost(float staminaCost) {
+        this.stamina_cost = staminaCost;
+    }
+
+    @Override
     public boolean spellengineextension$consumeSelf() {
         return this.consume_self;
     }
 
     @Override
+    public void spellengineextension$setConsumeSelf(boolean consumeSelf) {
+        this.consume_self = consumeSelf;
+    }
+
+    @Override
     public int spellengineextension$getDecrementEffectAmount() {
         return this.decrement_effect_amount;
+    }
+
+    @Override
+    public void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount) {
+        this.decrement_effect_amount = decrementEffectAmount;
     }
 }
