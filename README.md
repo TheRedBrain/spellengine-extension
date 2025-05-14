@@ -132,6 +132,19 @@ This is an example spell.json where all added values are present (with their def
 }
 ```
 
+## Spell hotbar customization
+
+The spell hotbar can be customized via several options in the client config.
+
+These include:
+- disabling the background
+- disabling the cooldown overlay
+- disabling the hotkey information
+- enabling a number that displays the remaining cooldown in seconds
+    - x and y offset and the color of this number can be customized
+- enabling alternative spell icons when spell is on cooldown
+  - the textures are expected to be located under the same namespace and on the same path as the regular spell texture, with "_cooldown" appended to the file name
+
 ## Spell schools
 
 These spell schools can be used in the spell.json.

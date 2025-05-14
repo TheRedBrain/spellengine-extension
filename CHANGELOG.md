@@ -1,3 +1,9 @@
+# 2.6.0
+
+- now works with Spell Engine 1.6.10
+- added several client config options to customize the spell hotbar
+- added setter methods for fields added to the spell.json. These should allow data generation of those fields.
+
 # 2.5.5
 
 - now works with Spell Engine 1.6.2
