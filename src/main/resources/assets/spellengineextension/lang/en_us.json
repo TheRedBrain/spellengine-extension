@@ -32,6 +32,7 @@
 	"spellengineextension.client.enable_spell_hotbar_background_rendering": "Enable Spell Hotbar Background",
 	"spellengineextension.client.enable_spell_hotbar_cooldown_overlay": "Enable Spell Cooldown Overlay",
 	"spellengineextension.client.enable_spell_hotkey_icons": "Enable Spell Hotkey Icons",
+	"spellengineextension.client.show_items_in_spell_hot_bar": "Spell Hotbar Includes Items",
 	"spellengineextension.client.enable_cooldown_icons": "Enable Spell Cooldown Icons",
 	"spellengineextension.client.enable_spell_hotbar_cooldown_number": "Enable Spell Cooldown Number",
 	"spellengineextension.client.spell_cooldown_number_offset_x": "Spell Cooldown Number X Offset",

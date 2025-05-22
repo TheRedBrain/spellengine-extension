@@ -16,6 +16,7 @@ public class ClientConfig extends Config {
 	public ValidatedBoolean enable_spell_hotbar_background_rendering = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotbar_cooldown_overlay = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotkey_icons = new ValidatedBoolean(true);
+	public ValidatedBoolean show_items_in_spell_hot_bar = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_cooldown_icons = new ValidatedBoolean(false);
 	public ValidatedBoolean enable_spell_hotbar_cooldown_number = new ValidatedBoolean(false);
 	public ValidatedInt spell_cooldown_number_offset_x = new ValidatedInt(10);
