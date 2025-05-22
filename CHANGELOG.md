@@ -1,5 +1,6 @@
 # 2.7.0
 
+- now works with Spell Engine 1.6.12
 - added client config option to disable rendering of items in the spell hot bar
 
 # 2.6.0
