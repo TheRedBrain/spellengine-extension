@@ -139,6 +139,7 @@ The spell hotbar can be customized via several options in the client config.
 These include:
 - disabling the background
 - disabling the cooldown overlay
+- disabling the display of items in the spell hot bar
 - disabling the hotkey information
 - enabling a number that displays the remaining cooldown in seconds
     - x and y offset and the color of this number can be customized
