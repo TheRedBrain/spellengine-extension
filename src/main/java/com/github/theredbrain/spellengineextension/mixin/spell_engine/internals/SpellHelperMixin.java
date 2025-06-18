@@ -205,112 +205,136 @@ public abstract class SpellHelperMixin {
 		}
 	}
 
+	// shootProjectile: LaunchProperties
 	@WrapOperation(
 			method = "shootProjectile(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)V",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
-	private static Spell.LaunchProperties spellengineextension$wrap_shootProjectile_mutableLaunchProperties(Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster) {
-
+	private static Spell.LaunchProperties spellengineextension$wrap_shootProjectile_mutableLaunchProperties(
+			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster
+	) {
+		Spell.LaunchProperties copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchCountAttribute()) {
-			instance.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
+
+		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
+			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
+		}
+		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
+			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
+		}
+		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
+			copy.velocity += ((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity();
 		}
 
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			instance.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
-		}
-
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraVelocityAttribute()) {
-			instance.velocity += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity());
-		}
-		return original.call(instance);
+		return copy;
 	}
 
+	// shootProjectile: Perks
 	@WrapOperation(
 			method = "shootProjectile(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)V",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$ProjectileData$Perks;copy()Lnet/spell_engine/api/spell/Spell$ProjectileData$Perks;", remap = false)
 	)
-	private static Spell.ProjectileData.Perks spellengineextension$wrap_shootProjectile_mutablePerks(Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster) {
-
+	private static Spell.ProjectileData.Perks spellengineextension$wrap_shootProjectile_mutablePerks(
+			Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster
+	) {
+		Spell.ProjectileData.Perks copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraRicochetAttribute()) {
-			instance.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
+
+		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetAttribute()) {
+			copy.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
+		}
+		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetRangeAttribute()) {
+			copy.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
+		}
+		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraBounceAttribute()) {
+			copy.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
+		}
+		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraPierceAttribute()) {
+			copy.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
+		}
+		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+			copy.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
+		}
+		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+			copy.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
 		}
 
-		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraRicochetRangeAttribute()) {
-			instance.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraBounceAttribute()) {
-			instance.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraPierceAttribute()) {
-			instance.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraChainReactionSizeAttribute()) {
-			instance.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
-			instance.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
-		}
-		return original.call(instance);
+		return copy;
 	}
 
+	// fallProjectile: LaunchProperties
 	@WrapOperation(
 			method = "fallProjectile(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)Z",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
-	private static Spell.LaunchProperties spellengineextension$wrap_fallProjectile_mutableLaunchProperties(Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster) {
-
+	private static Spell.LaunchProperties spellengineextension$wrap_fallProjectile_mutableLaunchProperties(
+			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster
+	) {
+		Spell.LaunchProperties copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchCountAttribute()) {
-			instance.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
+
+		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
+			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
+		}
+		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
+			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
+		}
+		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
+			copy.velocity += ((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity();
 		}
 
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			instance.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
-		}
-
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraVelocityAttribute()) {
-			instance.velocity += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity());
-		}
-		return original.call(instance);
+		return copy;
 	}
 
+	// fallProjectile: Perks
 	@WrapOperation(
 			method = "fallProjectile(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)Z",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$ProjectileData$Perks;copy()Lnet/spell_engine/api/spell/Spell$ProjectileData$Perks;", remap = false)
 	)
-	private static Spell.ProjectileData.Perks spellengineextension$wrap_fallProjectile_mutablePerks(Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster) {
-
+	private static Spell.ProjectileData.Perks spellengineextension$wrap_fallProjectile_mutablePerks(
+			Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster
+	) {
+		Spell.ProjectileData.Perks copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraRicochetAttribute()) {
-			instance.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
+
+		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetAttribute()) {
+			copy.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
+		}
+		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetRangeAttribute()) {
+			copy.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
+		}
+		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraBounceAttribute()) {
+			copy.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
+		}
+		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraPierceAttribute()) {
+			copy.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
+		}
+		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionSizeAttribute()) {
+			copy.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
+		}
+		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get()
+				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
+			copy.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
 		}
 
-		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraRicochetRangeAttribute()) {
-			instance.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraBounceAttribute()) {
-			instance.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraPierceAttribute()) {
-			instance.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraChainReactionSizeAttribute()) {
-			instance.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
-		}
-
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get() && ((DuckSpellProjectileDataPerksMixin) instance).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
-			instance.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
-		}
-		return original.call(instance);
+		return copy;
 	}
 
 	@WrapOperation(

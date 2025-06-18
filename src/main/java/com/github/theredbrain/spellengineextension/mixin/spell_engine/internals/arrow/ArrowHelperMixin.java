@@ -20,21 +20,26 @@ public class ArrowHelperMixin {
 			method = "shootArrow(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)V",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
-	private static Spell.LaunchProperties spellengineextension$wrap_shootArrow_mutableLaunchProperties(Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity shooter) {
-
+	private static Spell.LaunchProperties spellengineextension$wrap_shootArrow_mutableLaunchProperties(
+			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity shooter
+	) {
+		Spell.LaunchProperties copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchCountAttribute()) {
-			instance.extra_launch_count += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchCount());
+
+		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
+			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchCount());
+		}
+		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
+			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchDelay());
+		}
+		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
+				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
+			copy.velocity += ((DuckLivingEntityMixin) shooter).spellengineextension$getExtraVelocity();
 		}
 
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			instance.extra_launch_delay += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchDelay());
-		}
-
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get() && ((DuckSpellLaunchPropertiesMixin) instance).spellengineextension$respectExtraVelocityAttribute()) {
-			instance.velocity += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraVelocity());
-		}
-
-		return original.call(instance);
+		return copy;
 	}
 }
+
