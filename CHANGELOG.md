@@ -1,3 +1,7 @@
+# 2.7.1
+
+- fixed spell modifier attributes persistence (Thanks @KevinCz)
+
 # 2.7.0
 
 - now works with Spell Engine 1.6.12
