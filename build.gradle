@@ -60,7 +60,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// Fzzy Config
 	modImplementation"me.fzzyhmstrs:fzzy_config:${project.fzzy_config_version}"
@@ -97,6 +97,10 @@ dependencies {
 
 	// Bundle API
 	modImplementation("maven.modrinth:bundle-api:${project.bundle_api_version}")
+
+	// Merged Items
+//	modImplementation("maven.modrinth:merged-items:${project.merged_items_version}")
+	modImplementation(files("libs/merged-items-${project.merged_items_version}.jar"))
 
 }
 

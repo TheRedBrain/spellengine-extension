@@ -1,6 +1,7 @@
 package com.github.theredbrain.spellengineextension;
 
 import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
+import com.github.theredbrain.spellengineextension.compat.MergedItemsCompatibility;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
 import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
@@ -12,8 +13,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
+import net.spell_engine.api.spell.container.SpellContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,15 @@ public class SpellEngineExtension implements ModInitializer {
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
+	public static final boolean isMergedItemsLoaded = FabricLoader.getInstance().isModLoaded("mergeditems");
+
+	public static SpellContainer addMergedSpellContainer(SpellContainer spellContainer, ItemStack itemStack) {
+		if (isMergedItemsLoaded) {
+			return MergedItemsCompatibility.addMergedSpellContainer(spellContainer, itemStack);
+		} else {
+			return spellContainer;
+		}
+	}
 
 	public static float getCurrentMana(LivingEntity livingEntity) {
 		float currentMana = 0.0F;

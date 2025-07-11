@@ -1,3 +1,7 @@
+# 2.8.0
+
+- added compatibility with Merged Items
+
 # 2.7.1
 
 - fixed spell modifier attributes persistence (Thanks @KevinCz)
