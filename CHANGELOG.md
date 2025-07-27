@@ -1,5 +1,6 @@
 # 2.8.0
 
+- now works with Spell Engine 1.7.0
 - added compatibility with Merged Items
 
 # 2.7.1

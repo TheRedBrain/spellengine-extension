@@ -55,7 +55,9 @@ public abstract class SpellHelperMixin {
 	 * @reason check for custom cost
 	 */
 	@Inject(method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;", at = @At(value = "RETURN", ordinal = 3), cancellable = true)
-	private static void attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local Spell spell) {
+	private static void attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local RegistryEntry.Reference<Spell> spellEntry) {
+
+		Spell spell = (Spell)spellEntry.value();
 		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
 		if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
@@ -120,17 +122,18 @@ public abstract class SpellHelperMixin {
 	 * @reason integrate health cost, mana cost, stamina cost, reducing amplifier of status effect cost instead of removing them, self consuming of casting item
 	 */
 	@Overwrite
-	private static void consumeSpellCost(PlayerEntity player, float progress, SpellContainerSource.SourcedContainer spellSource, Identifier spellId, Spell spell, ItemStack heldItemStack, Ammo.Result ammoResult, boolean scheduled) {
+	private static void consumeSpellCost(PlayerEntity player, float progress, SpellContainerSource.SourcedContainer spellSource, Identifier spellId, RegistryEntry<Spell> spellEntry, ItemStack heldItemStack, Ammo.Result ammoResult, boolean scheduled) {
+		Spell spell = (Spell)spellEntry.value();
 		boolean batching = spell.cost.batching;
 		if (batching && !scheduled) {
 			if (!((SpellBatcher) player).hasBatchedCost(spellId)) {
 				((WorldScheduler) player.getWorld()).schedule(0, () -> {
-					consumeSpellCost(player, progress, spellSource, spellId, spell, heldItemStack, ammoResult, true);
+					consumeSpellCost(player, progress, spellSource, spellId, spellEntry, heldItemStack, ammoResult, true);
 				});
 				((SpellBatcher) player).batchCost(spellId, true);
 			}
 		} else {
-			SpellHelper.imposeCooldown(player, spellSource, spellId, spell, progress);
+			SpellHelper.imposeCooldown(player, spellSource, spellId, spellEntry, progress);
 			player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
 
 			var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
@@ -177,7 +180,7 @@ public abstract class SpellHelperMixin {
 			}
 
 			if (SpellEngineMod.config.spell_cost_durability_allowed && spell.cost.durability > 0) {
-				ItemStack stackToDamage = spellSource.itemStack().isDamageable() ? spellSource.itemStack() : heldItemStack;
+				ItemStack stackToDamage = spellSource.itemStack() != null && spellSource.itemStack().isDamageable() ? spellSource.itemStack() : heldItemStack;
 				stackToDamage.damage(spell.cost.durability, player, EquipmentSlot.MAINHAND);
 			}
 
