@@ -10,6 +10,7 @@
     "spell_engine.api.spell.SpellImpactActionDamageMixin",
     "spell_engine.api.spell.SpellImpactActionHealMixin",
     "spell_engine.api.spell.SpellLaunchPropertiesMixin",
+    "spell_engine.api.spell.SpellModifierMixin",
     "spell_engine.api.spell.SpellProjectileDataPerksMixin",
     "spell_engine.api.spell.container.SpellContainerHelperMixin",
     "spell_engine.client.gui.SpellHotBarWidgetMixin",
@@ -17,6 +18,7 @@
     "spell_engine.client.input.AutoSwapHelperMixin",
     "spell_engine.client.input.SpellHotbarMixin",
     "spell_engine.internals.SpellHelperMixin",
+    "spell_engine.internals.SpellModifiersMixin",
     "spell_engine.internals.arrow.ArrowHelperMixin"
   ],
   "injectors": {

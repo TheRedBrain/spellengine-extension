@@ -4,9 +4,9 @@ import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
+import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModifiers;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionHealMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellProjectileDataPerksMixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -57,11 +57,11 @@ public abstract class SpellHelperMixin {
 	@Inject(method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;", at = @At(value = "RETURN", ordinal = 3), cancellable = true)
 	private static void attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local RegistryEntry.Reference<Spell> spellEntry) {
 
-		Spell spell = (Spell)spellEntry.value();
+		Spell spell = (Spell) spellEntry.value();
 		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
 		if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
-			float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
+			float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
 				healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
 			}
@@ -72,7 +72,7 @@ public abstract class SpellHelperMixin {
 			}
 		}
 		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
-			float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
+			float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 				manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
 			}
@@ -84,7 +84,7 @@ public abstract class SpellHelperMixin {
 			}
 		}
 		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
-			float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
+			float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
 				staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
 			}
@@ -123,7 +123,7 @@ public abstract class SpellHelperMixin {
 	 */
 	@Overwrite
 	private static void consumeSpellCost(PlayerEntity player, float progress, SpellContainerSource.SourcedContainer spellSource, Identifier spellId, RegistryEntry<Spell> spellEntry, ItemStack heldItemStack, Ammo.Result ammoResult, boolean scheduled) {
-		Spell spell = (Spell)spellEntry.value();
+		Spell spell = (Spell) spellEntry.value();
 		boolean batching = spell.cost.batching;
 		if (batching && !scheduled) {
 			if (!((SpellBatcher) player).hasBatchedCost(spellId)) {
@@ -140,7 +140,7 @@ public abstract class SpellHelperMixin {
 
 			// health cost
 			if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
-				float healthCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getHealthCost();
+				float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
 					healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
 				}
@@ -151,7 +151,7 @@ public abstract class SpellHelperMixin {
 
 			// mana cost
 			if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
-				float manaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getManaCost();
+				float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 					manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
 				}
@@ -162,7 +162,7 @@ public abstract class SpellHelperMixin {
 
 			// stamina cost
 			if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
-				float staminaCost = ((DuckSpellCostMixin) spell.cost).spellengineextension$getStaminaCost();
+				float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
 					staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
 				}
@@ -344,10 +344,13 @@ public abstract class SpellHelperMixin {
 			method = "performImpact(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/api/spell/Spell$Impact;Lnet/spell_engine/internals/SpellHelper$ImpactContext;Ljava/util/Collection;)Z",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;damage(Lnet/minecraft/entity/damage/DamageSource;F)Z")
 	)
-	private static boolean spellengineextension$wrap_damage(Entity instance, DamageSource source, float amount, Operation<Boolean> original, @Local(argsOnly = true) LivingEntity caster, @Local Spell.Impact.Action.Damage damageData) {
+	private static boolean spellengineextension$wrap_damage(Entity instance, DamageSource source, float amount, Operation<Boolean> original, @Local(argsOnly = true) LivingEntity caster, @Local Spell.Impact.Action.Damage damageData, @Local(argsOnly = true) RegistryEntry<Spell> spellEntry) {
 
 		// direct damage
-		double directDamageAmount = ((DuckSpellImpactActionDamageMixin) damageData).spellengineextension$getDirectDamage();
+		double directDamageAmount = 0.0;
+		if (caster instanceof PlayerEntity playerCaster) {
+			directDamageAmount = CustomSpellModifiers.getModifiedDirectDamage(playerCaster, damageData, spellEntry);
+		}
 
 		// damage type override
 		DamageSource damageSource = null;
@@ -367,10 +370,13 @@ public abstract class SpellHelperMixin {
 			method = "performImpact(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/api/spell/Spell$Impact;Lnet/spell_engine/internals/SpellHelper$ImpactContext;Ljava/util/Collection;)Z",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;heal(F)V")
 	)
-	private static void spellengineextension$wrap_heal(LivingEntity instance, float amount, Operation<Void> original, @Local Spell.Impact.Action.Heal healData) {
+	private static void spellengineextension$wrap_heal(LivingEntity instance, float amount, Operation<Void> original, @Local(argsOnly = true) LivingEntity caster, @Local Spell.Impact.Action.Heal healData, @Local(argsOnly = true) RegistryEntry<Spell> spellEntry) {
 
 		// direct heal
-		double directHealAmount = ((DuckSpellImpactActionHealMixin) healData).spellengineextension$getDirectHeal();
+		double directHealAmount = 0.0;
+		if (caster instanceof PlayerEntity playerCaster) {
+			directHealAmount = CustomSpellModifiers.getModifiedDirectHealing(playerCaster, healData, spellEntry);
+		}
 
 		original.call(instance, directHealAmount > 0 ? ((float) directHealAmount) : amount);
 	}
