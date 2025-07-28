@@ -2,6 +2,7 @@
 
 - now works with Spell Engine 1.7.0
 - added compatibility with Merged Items
+  - merging items can optionally also merge their spell containers
 - added custom spell modifiers
   - includes health/mana/stamina cost, direct damage/healing
 

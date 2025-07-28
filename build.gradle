@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.9-SNAPSHOT'
+	id 'fabric-loom' version '1.11-SNAPSHOT'
 	id "com.matthewprenger.cursegradle" version "1.4.0"
 	id "com.github.breadmoirai.github-release" version "2.4.1"
 	id "com.modrinth.minotaur" version "2.+"
@@ -99,8 +99,8 @@ dependencies {
 	modImplementation("maven.modrinth:bundle-api:${project.bundle_api_version}")
 
 	// Merged Items
-//	modImplementation("maven.modrinth:merged-items:${project.merged_items_version}")
-	modImplementation(files("libs/merged-items-${project.merged_items_version}.jar"))
+	modImplementation("maven.modrinth:merged-items:${project.merged_items_version}")
+//	modImplementation(files("libs/merged-items-${project.merged_items_version}.jar"))
 
 }
 
