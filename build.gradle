@@ -51,6 +51,10 @@ repositories {
 		url 'https://maven.kosmx.dev/'
 	}
 
+	// Mixin Squared
+	maven {
+		url 'https://jitpack.io'
+	}
 }
 
 dependencies {
@@ -104,6 +108,9 @@ dependencies {
 
 	// RPG Inventory
 	modImplementation("maven.modrinth:rpg-inventory:${project.rpg_inventory_version}")
+
+	// Mixin Squared
+	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.2-beta.4")))
 
 }
 
