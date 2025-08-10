@@ -8,15 +8,13 @@ import net.minecraft.item.ItemStack;
 
 public class PlayerEntityHelper {
 
-	public static void spellengineextension$updateConditionalSpellContainerItems(PlayerEntity playerEntity) {
-
-		PlayerInventory playerInventory = playerEntity.getInventory();
+	public static void spellengineextension$updateConditionalSpellContainerItems(PlayerInventory playerInventory) {
 
 		ItemStack itemStack;
 		HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent;
 		HasConditionalSpellContainerComponent newHasConditionalSpellContainerComponent;
 
-		itemStack = playerInventory.offHand.get(0);
+		itemStack = playerInventory.offHand.get(0).copy();
 		hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
 		if (hasConditionalSpellContainerComponent != null) {
 			if (hasConditionalSpellContainerComponent.is_off_hand_valid() != hasConditionalSpellContainerComponent.is_valid()) {
@@ -26,7 +24,7 @@ public class PlayerEntityHelper {
 			}
 		}
 
-		itemStack = playerInventory.main.get(playerInventory.selectedSlot);
+		itemStack = playerInventory.main.get(playerInventory.selectedSlot).copy();
 		hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
 		if (hasConditionalSpellContainerComponent != null) {
 			if (hasConditionalSpellContainerComponent.is_main_hand_valid() != hasConditionalSpellContainerComponent.is_valid()) {
@@ -36,6 +34,6 @@ public class PlayerEntityHelper {
 			}
 		}
 
-		SpellEngineExtension.updateConditionalSpellContainerItems(playerEntity);
+		SpellEngineExtension.updateConditionalSpellContainerItems(playerInventory);
 	}
 }

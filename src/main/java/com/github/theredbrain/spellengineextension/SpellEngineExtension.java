@@ -18,6 +18,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
@@ -108,9 +109,9 @@ public class SpellEngineExtension implements ModInitializer {
 		}
 	}
 
-	public static void updateConditionalSpellContainerItems(PlayerEntity playerEntity) {
+	public static void updateConditionalSpellContainerItems(PlayerInventory playerInventory) {
 		if (isRPGInventoryLoaded) {
-			RPGInventoryCompatibility.updateConditionalSpellContainerItems(playerEntity);
+			RPGInventoryCompatibility.updateConditionalSpellContainerItems(playerInventory);
 		}
 	}
 

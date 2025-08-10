@@ -102,6 +102,9 @@ dependencies {
 	modImplementation("maven.modrinth:merged-items:${project.merged_items_version}")
 //	modImplementation(files("libs/merged-items-${project.merged_items_version}.jar"))
 
+	// RPG Inventory
+	modImplementation("maven.modrinth:rpg-inventory:${project.rpg_inventory_version}")
+
 }
 
 processResources {
@@ -162,6 +165,7 @@ if(project.hasProperty('release_type')) {
 				optionalDependency 'stamina-attributes'
 				optionalDependency 'mana-attributes'
 				optionalDependency 'ranged-weapon-api'
+				optionalDependency 'rpg-inventory'
 			}
 
 			mainArtifact(remapJar)
@@ -194,6 +198,7 @@ if(project.hasProperty('release_type')) {
 			optional.project 'stamina-attributes'
 			optional.project 'mana-attributes'
 			optional.project 'ranged-weapon-api'
+			optional.project 'rpg-inventory'
 		}
 	}
 
