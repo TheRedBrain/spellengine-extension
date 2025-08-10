@@ -5,12 +5,15 @@ import me.fzzyhmstrs.fzzy_config.annotations.Comment;
 import me.fzzyhmstrs.fzzy_config.annotations.ConvertFrom;
 import me.fzzyhmstrs.fzzy_config.config.Config;
 import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedBoolean;
+import me.fzzyhmstrs.fzzy_config.validation.number.ValidatedInt;
 
 @ConvertFrom(fileName = "server.json5", folder = "spellengineextension")
 public class ServerConfig extends Config {
     public ServerConfig() {
         super(SpellEngineExtension.identifier("server"));
     }
+    @Comment("Only spells with tier lesser or equal can be bound to use hotkey.")
+    public ValidatedInt max_spell_tier_for_use_key = new ValidatedInt(1);
     @Comment("Disables the client side auto swap feature for all connected clients.")
     public ValidatedBoolean disable_auto_swap = new ValidatedBoolean(true);
     @Comment("Spells should cost health. Set to `false` to remove health cost from all spells.")

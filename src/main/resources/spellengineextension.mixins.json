@@ -6,6 +6,7 @@
     "entity.LivingEntityMixin",
     "entity.attribute.EntityAttributesMixin",
     "entity.damage.DamageSourcesMixin",
+    "entity.player.PlayerEntityMixin",
     "spell_engine.api.spell.SpellCostMixin",
     "spell_engine.api.spell.SpellImpactActionDamageMixin",
     "spell_engine.api.spell.SpellImpactActionHealMixin",
@@ -18,7 +19,8 @@
     "spell_engine.client.input.AutoSwapHelperMixin",
     "spell_engine.client.input.SpellHotbarMixin",
     "spell_engine.internals.SpellHelperMixin",
-    "spell_engine.internals.arrow.ArrowHelperMixin"
+    "spell_engine.internals.arrow.ArrowHelperMixin",
+    "spell_engine.internals.container.SpellContainerSourceMixin"
   ],
   "injectors": {
     "defaultRequire": 1
