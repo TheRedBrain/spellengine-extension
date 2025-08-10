@@ -174,10 +174,16 @@ The following attributes add to the respective values defined in the spell.json.
 - "generic.extra_chain_reaction_size"
 - "generic.extra_chain_reaction_triggers"
 
-## Proxy Pools (1.20.1 only)
+## Proxy Pools
 
-### Note: This feature is not available on the 1.21.1 version due to technical reasons
+Items can be defined as spell proxies, which means they can cast spells which are added by spell sources.
 
-Items can be defined as spell proxies, which means they can cast spells which are added by spell books.
+By defining a "proxy pool" for an item, the item can only cast spells that are in that spell pool.
 
-Normally a spell proxy can cast all spells from equipped spell books, but if the 'proxy_pool' field in the spell_assignment for that spell proxy is a valid spell pool identifier, the spell proxy can only cast spells that are both on equipped spell books and in the specified spell pool.
+### 1.20.1
+
+In old versions 'Spell Engine Extension' adds the 'proxy_pool' field in the spell_assignment file.
+
+### 1.21.1 +
+
+In modern versions the proxy pool is set via the "spellengineextension:proxy_pool" item component.

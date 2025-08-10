@@ -1,3 +1,9 @@
+# 2.9.0
+
+- added "spellengineextension:has_conditional_spell_container" item component, which can be used to disable the spell container of an item, depending on the hand it's held in (supports RPG Inventory)
+- added "spellengineextension:proxy_pool" item component, which can be used to limit what spells a spell casting item can cast
+- added config option to limit the types of spells that can be in the 'use key' spell hotbar slot (using spell tier)
+
 # 2.8.0
 
 - now works with Spell Engine 1.7.0
