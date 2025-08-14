@@ -8,6 +8,10 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(Spell.Cost.class)
 public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
+    private boolean check_mana = true;
+    @Unique
+    private boolean check_stamina = true;
+    @Unique
     private boolean check_health_cost = false;
     @Unique
     private boolean check_mana_cost = true;
@@ -20,6 +24,8 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
     private boolean stamina_cost_multiplier_applies = true;
     @Unique
+    private boolean add_item_use_stamina_cost_attribute_value = false;
+    @Unique
     private boolean consume_self = false;
     @Unique
     private int decrement_effect_amount = -1;
@@ -29,6 +35,26 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     private float health_cost = 0.0F;
     @Unique
     private float stamina_cost = 0.0F;
+
+    @Override
+    public boolean spellengineextension$checkMana() {
+        return this.check_mana;
+    }
+
+    @Override
+    public void spellengineextension$setCheckMana(boolean checkMana) {
+        this.check_mana = checkMana;
+    }
+
+    @Override
+    public boolean spellengineextension$checkStamina() {
+        return this.check_stamina;
+    }
+
+    @Override
+    public void spellengineextension$setCheckStamina(boolean checkStamina) {
+        this.check_stamina = checkStamina;
+    }
 
     @Override
     public boolean spellengineextension$checkHealthCost() {
@@ -88,6 +114,16 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public void spellengineextension$setStaminaCostMultiplierApplies(boolean staminaCostMultiplierApplies) {
         this.stamina_cost_multiplier_applies = staminaCostMultiplierApplies;
+    }
+
+    @Override
+    public boolean spellengineextension$addItemUseStaminaCostAttributeValue() {
+        return this.add_item_use_stamina_cost_attribute_value;
+    }
+
+    @Override
+    public void spellengineextension$setAddItemUseStaminaCostAttributeValue(boolean addItemUseStaminaCostAttributeValue) {
+        this.add_item_use_stamina_cost_attribute_value = addItemUseStaminaCostAttributeValue;
     }
 
     @Override

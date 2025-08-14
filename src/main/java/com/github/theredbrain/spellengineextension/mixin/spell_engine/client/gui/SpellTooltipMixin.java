@@ -40,6 +40,7 @@ public class SpellTooltipMixin {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
+        // called spell1 to avoid potential problems with spell field in original method
         Spell spell1 = spellEntry.value();
 
         if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && spell1.cost != null) {
@@ -54,7 +55,7 @@ public class SpellTooltipMixin {
             float manaCost = ((DuckSpellCostMixin) spell1.cost).spellengineextension$getManaCost();
             if (manaCost != 0.0F) {
                 float currentMana = SpellEngineExtension.getCurrentMana(player);
-                boolean hasEnoughMana = !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkManaCost() || manaCost <= 0 || manaCost < currentMana;
+                boolean hasEnoughMana = !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkMana() || (manaCost > 0 && (manaCost < currentMana || !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkManaCost()));
                 lines.add(indentation(indentLevel).append(Text.translatable("spell.tooltip.mana", manaCost).formatted(hasEnoughMana ? Formatting.GREEN : Formatting.RED)));
             }
         }
@@ -63,7 +64,7 @@ public class SpellTooltipMixin {
             float staminaCost = ((DuckSpellCostMixin) spell1.cost).spellengineextension$getStaminaCost();
             if (staminaCost != 0.0F) {
                 float currentStamina = SpellEngineExtension.getCurrentStamina(player);
-                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkStaminaCost() || staminaCost <= 0 || staminaCost < currentStamina;
+                boolean hasEnoughStamina = !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkStamina() || (staminaCost > 0 && (staminaCost < currentStamina || !((DuckSpellCostMixin) spell1.cost).spellengineextension$checkStaminaCost()));
                 lines.add(indentation(indentLevel).append(Text.translatable("spell.tooltip.stamina", staminaCost).formatted(hasEnoughStamina ? Formatting.GREEN : Formatting.RED)));
             }
         }

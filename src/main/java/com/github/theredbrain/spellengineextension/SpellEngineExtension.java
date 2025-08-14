@@ -1,23 +1,22 @@
 package com.github.theredbrain.spellengineextension;
 
-import com.github.theredbrain.manaattributes.entity.ManaUsingEntity;
+import com.github.theredbrain.spellengineextension.compat.ManaAttributesCompatibility;
 import com.github.theredbrain.spellengineextension.compat.MergedItemsCompatibility;
 import com.github.theredbrain.spellengineextension.compat.RPGInventoryCompatibility;
+import com.github.theredbrain.spellengineextension.compat.RangedWeaponAPICompatibility;
+import com.github.theredbrain.spellengineextension.compat.StaminaAttributesCompatibility;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.registry.ItemComponentRegistry;
 import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
-import com.github.theredbrain.staminaattributes.entity.StaminaUsingEntity;
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.RegisterType;
-import net.fabric_extras.ranged_weapon.api.EntityAttributes_RangedWeapon;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.component.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -73,7 +72,7 @@ public class SpellEngineExtension implements ModInitializer {
 	public static float getCurrentMana(LivingEntity livingEntity) {
 		float currentMana = 0.0F;
 		if (isManaAttributesLoaded) {
-			currentMana = ((ManaUsingEntity) livingEntity).manaattributes$getMana();
+			currentMana = ManaAttributesCompatibility.getCurrentMana(livingEntity);
 		}
 		return currentMana;
 	}
@@ -81,26 +80,34 @@ public class SpellEngineExtension implements ModInitializer {
 	public static float getCurrentStamina(LivingEntity livingEntity) {
 		float currentStamina = 0.0F;
 		if (isStaminaAttributesLoaded) {
-			currentStamina = ((StaminaUsingEntity) livingEntity).staminaattributes$getStamina();
+			currentStamina = StaminaAttributesCompatibility.getCurrentStamina(livingEntity);
+		}
+		return currentStamina;
+	}
+
+	public static float getItemUseStaminaCost(LivingEntity livingEntity) {
+		float currentStamina = 0.0F;
+		if (isStaminaAttributesLoaded) {
+			currentStamina = StaminaAttributesCompatibility.getItemUseStaminaCost(livingEntity);
 		}
 		return currentStamina;
 	}
 
 	public static void addMana(LivingEntity livingEntity, float amount) {
 		if (isManaAttributesLoaded) {
-			((ManaUsingEntity) livingEntity).manaattributes$addMana(amount);
+			ManaAttributesCompatibility.addMana(livingEntity, amount);
 		}
 	}
 
 	public static void addStamina(LivingEntity livingEntity, float amount) {
 		if (isStaminaAttributesLoaded) {
-			((StaminaUsingEntity) livingEntity).staminaattributes$addStamina(amount);
+			StaminaAttributesCompatibility.addStamina(livingEntity, amount);
 		}
 	}
 
 	public static RegistryEntry<EntityAttribute> getRangedAttackDamageAttribute() {
 		if (isRangedWeaponAPILoaded) {
-			return EntityAttributes_RangedWeapon.DAMAGE.entry;
+			return RangedWeaponAPICompatibility.getRangedAttackDamageAttribute();
 		} else {
 			return EntityAttributes.GENERIC_ATTACK_DAMAGE;
 		}
@@ -108,7 +115,7 @@ public class SpellEngineExtension implements ModInitializer {
 
 	public static RegistryEntry<EntityAttribute> getRangedAttackSpeedAttribute() {
 		if (isRangedWeaponAPILoaded) {
-			return EntityAttributes_RangedWeapon.HASTE.entry;
+			return RangedWeaponAPICompatibility.getRangedAttackSpeedAttribute();
 		} else {
 			return EntityAttributes.GENERIC_ATTACK_SPEED;
 		}

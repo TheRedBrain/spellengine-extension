@@ -1,6 +1,15 @@
 package com.github.theredbrain.spellengineextension.spell_engine;
 
 public interface DuckSpellCostMixin {
+
+	boolean spellengineextension$checkMana();
+
+	void spellengineextension$setCheckMana(boolean checkMana);
+
+	boolean spellengineextension$checkStamina();
+
+	void spellengineextension$setCheckStamina(boolean checkStamina);
+
 	boolean spellengineextension$checkHealthCost();
 
 	void spellengineextension$setCheckHealthCost(boolean checkHealthCost);
@@ -24,6 +33,10 @@ public interface DuckSpellCostMixin {
 	boolean spellengineextension$staminaCostMultiplierApplies();
 
 	void spellengineextension$setStaminaCostMultiplierApplies(boolean staminaCostMultiplierApplies);
+
+	boolean spellengineextension$addItemUseStaminaCostAttributeValue();
+
+	void spellengineextension$setAddItemUseStaminaCostAttributeValue(boolean addItemUseStaminaCostAttributeValue);
 
 	float spellengineextension$getManaCost();
 

@@ -71,25 +71,25 @@ public abstract class SpellHelperMixin {
 				cir.cancel();
 			}
 		}
-		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
+		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkMana()) {
 			float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 				manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
 			}
 			float currentMana = SpellEngineExtension.getCurrentMana(player);
-			if (manaCost > 0 && manaCost > currentMana) {
+			if (manaCost > 0 && manaCost > currentMana && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
 				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
 				cir.setReturnValue(SpellCast.Attempt.none());
 				cir.cancel();
 			}
 		}
-		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
+		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStamina()) {
 			float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
 				staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
 			}
 			float currentStamina = SpellEngineExtension.getCurrentStamina(player);
-			if (staminaCost > 0 && staminaCost > currentStamina) {
+			if (staminaCost > 0 && staminaCost > currentStamina && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
 				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
 				cir.setReturnValue(SpellCast.Attempt.none());
 				cir.cancel();
@@ -163,6 +163,9 @@ public abstract class SpellHelperMixin {
 			// stamina cost
 			if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
 				float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
+				if (((DuckSpellCostMixin) spell.cost).spellengineextension$addItemUseStaminaCostAttributeValue()) {
+					staminaCost = staminaCost + SpellEngineExtension.getItemUseStaminaCost(player);
+				}
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
 					staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
 				}
@@ -214,7 +217,7 @@ public abstract class SpellHelperMixin {
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
 	private static Spell.LaunchProperties spellengineextension$wrap_shootProjectile_mutableLaunchProperties(
-			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster
+			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity caster
 	) {
 		Spell.LaunchProperties copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
@@ -280,7 +283,7 @@ public abstract class SpellHelperMixin {
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
 	private static Spell.LaunchProperties spellengineextension$wrap_fallProjectile_mutableLaunchProperties(
-			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local LivingEntity caster
+			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity caster
 	) {
 		Spell.LaunchProperties copy = original.call(instance);
 		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
