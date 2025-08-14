@@ -117,6 +117,24 @@ public abstract class SpellHelperMixin {
 		}
 	}
 
+//	/* TODO casting with offhand */
+//	@WrapOperation(
+//			method = "startCasting",
+//			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMainHandStack()Lnet/minecraft/item/ItemStack;")
+//	)
+//	private static ItemStack spellengineextension$startCasting_wrap_getMainHandStack(PlayerEntity instance, Operation<ItemStack> original, @Local Spell spell) {
+//		return ((DuckSpellMixin) spell).spellengineextension$useOffhandForCasting() ? instance.getOffHandStack() : original.call(instance);
+//	}
+//
+//	/* TODO casting with offhand */
+//	@WrapOperation(
+//			method = "performSpell",
+//			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getMainHandStack()Lnet/minecraft/item/ItemStack;")
+//	)
+//	private static ItemStack spellengineextension$performSpell_wrap_getMainHandStack(PlayerEntity instance, Operation<ItemStack> original, @Local Spell spell) {
+//		return ((DuckSpellMixin) spell).spellengineextension$useOffhandForCasting() ? instance.getOffHandStack() : original.call(instance);
+//	}
+
 	/**
 	 * @author TheRedBrain
 	 * @reason integrate health cost, mana cost, stamina cost, reducing amplifier of status effect cost instead of removing them, self consuming of casting item
