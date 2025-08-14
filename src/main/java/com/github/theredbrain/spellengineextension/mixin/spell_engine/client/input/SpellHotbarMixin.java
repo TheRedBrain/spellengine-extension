@@ -86,9 +86,11 @@ public class SpellHotbarMixin {
 				}
 
 				// Override keybinding with UseKey if available
-				if (spell.tier <= SpellEngineExtension.SERVER_CONFIG.max_spell_tier_for_use_key.get() && SpellEngineClient.config.spellHotbarUseKey) {
+				if (SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEntry.isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT) && SpellEngineClient.config.spellHotbarUseKey) {
 					if (onUseKey == null) {
 						keyBinding = useKeyBinding;
+						// makes sure all 9 regular keybindings can still be used
+						keyBindingIndex--;
 					}
 				}
 

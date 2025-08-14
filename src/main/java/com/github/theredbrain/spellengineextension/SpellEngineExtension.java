@@ -21,8 +21,11 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.spell_engine.api.spell.Spell;
 import net.spell_engine.api.spell.container.SpellContainer;
+import net.spell_engine.api.spell.registry.SpellRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,8 @@ public class SpellEngineExtension implements ModInitializer {
 
 	public static ComponentType<HasConditionalSpellContainerComponent> HAS_CONDITIONAL_SPELL_CONTAINER;
 	public static ComponentType<Identifier> PROXY_POOL;
+
+	public static final TagKey<Spell> CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("can_be_in_use_item_spell_hotbar_slot"));
 
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
