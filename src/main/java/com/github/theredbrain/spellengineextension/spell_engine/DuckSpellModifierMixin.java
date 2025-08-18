@@ -1,5 +1,7 @@
 package com.github.theredbrain.spellengineextension.spell_engine;
 
+import org.jetbrains.annotations.Nullable;
+
 public interface DuckSpellModifierMixin {
 
 	float spellengineextension$getAdditionalHealthCost();
@@ -21,5 +23,13 @@ public interface DuckSpellModifierMixin {
 	double spellengineextension$getAdditionalDirectHealing();
 
 	void spellengineextension$setAdditionalDirectHealing(double additionalDirectHealing);
+
+	@Nullable String spellengineextension$getReplacedEffectCostId();
+
+	void spellengineextension$setReplacedEffectCostId(String replacedEffectCostId);
+
+	int spellengineextension$getReplacedDecrementEffectCostAmount();
+
+	void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount);
 
 }

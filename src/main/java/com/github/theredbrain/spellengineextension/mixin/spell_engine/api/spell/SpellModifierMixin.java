@@ -2,6 +2,7 @@ package com.github.theredbrain.spellengineextension.mixin.spell_engine.api.spell
 
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellModifierMixin;
 import net.spell_engine.api.spell.Spell;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -22,6 +23,13 @@ public class SpellModifierMixin implements DuckSpellModifierMixin {
 
 	@Unique
 	private double additional_direct_healing = 0.0;
+
+	@Unique
+	@Nullable
+	private String replaced_effect_cost_id = null;
+
+	@Unique
+	private int replaced_decrement_effect_cost_amount = -1;
 
 	@Override
 	public float spellengineextension$getAdditionalHealthCost() {
@@ -71,6 +79,27 @@ public class SpellModifierMixin implements DuckSpellModifierMixin {
 	@Override
 	public void spellengineextension$setAdditionalDirectHealing(double additionalDirectHealing) {
 		this.additional_direct_healing = additionalDirectHealing;
+	}
+
+	@Override
+	@Nullable
+	public String spellengineextension$getReplacedEffectCostId() {
+		return this.replaced_effect_cost_id;
+	}
+
+	@Override
+	public void spellengineextension$setReplacedEffectCostId(String replacedEffectCostId) {
+		this.replaced_effect_cost_id = replacedEffectCostId;
+	}
+
+	@Override
+	public int spellengineextension$getReplacedDecrementEffectCostAmount() {
+		return this.replaced_decrement_effect_cost_amount;
+	}
+
+	@Override
+	public void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount) {
+		this.replaced_decrement_effect_cost_amount = replacedDecrementEffectCostAmount;
 	}
 
 }

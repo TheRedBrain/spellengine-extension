@@ -64,4 +64,24 @@ public class CustomSpellModifiers {
 		}
 		return directHeal;
 	}
+
+	public static String getModifiedEffectCostId(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
+		List<Spell.Modifier> modifiers = SpellModifiers.of(player, spellEntry);
+		Spell spell = spellEntry.value();
+		String effectId = spell.cost.effect_id;
+		for (Spell.Modifier modifier : modifiers) {
+			effectId = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedEffectCostId();
+		}
+		return effectId;
+	}
+
+	public static int getModifiedDecrementEffectCostAmount(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
+		List<Spell.Modifier> modifiers = SpellModifiers.of(player, spellEntry);
+		Spell spell = spellEntry.value();
+		int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
+		for (Spell.Modifier modifier : modifiers) {
+			decrementEffectAmount = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedDecrementEffectCostAmount();
+		}
+		return decrementEffectAmount;
+	}
 }
