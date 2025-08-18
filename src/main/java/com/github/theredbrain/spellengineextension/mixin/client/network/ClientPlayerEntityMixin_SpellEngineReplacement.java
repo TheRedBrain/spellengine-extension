@@ -1,6 +1,8 @@
 package com.github.theredbrain.spellengineextension.mixin.client.network;
 
+import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
@@ -31,13 +33,19 @@ import java.util.List;
 import java.util.Objects;
 
 /*
-* @author ZsoltMolnarrr
-*/
+ * @author ZsoltMolnarrr
+ */
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin_SpellEngineReplacement implements SpellCasterClient {
 	@Shadow
 	@Final
 	public ClientPlayNetworkHandler networkHandler;
+
+	@Shadow
+	public Input input;
+
+	@Shadow
+	protected int ticksLeftToDoubleTapSprint;
 
 	@Unique
 	private SpellTarget.SearchResult spellTarget = SpellTarget.SearchResult.empty();
@@ -284,6 +292,31 @@ public abstract class ClientPlayerEntityMixin_SpellEngineReplacement implements 
 					player.getYaw(), player.getPitch(),
 					player.isOnGround())
 			);
+		}
+	}
+
+	/*
+	 * @author TheRedBrain
+	 */
+	@Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/Input;tick(ZF)V", shift = At.Shift.AFTER))
+	private void tickMovement_ModifyInput(CallbackInfo ci) {
+		var player = (ClientPlayerEntity) (Object) this;
+		var caster = (SpellCasterClient) player;
+		var process = caster.getSpellCastProcess();
+		if (process != null && process.spell().value().active.cast != null && !player.hasVehicle()) {
+			var multiplier = process.spell().value().active.cast.movement_speed * SpellEngineMod.config.movement_multiplier_speed_while_casting;
+			input.movementSideways *= multiplier;
+			input.movementForward *= multiplier;
+			ticksLeftToDoubleTapSprint = 0;
+		}
+		if (process != null) {
+			boolean isMovementLockingEnabled = process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING);
+			if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get() && isMovementLockingEnabled && process.spell().value().active.cast != null && !player.hasVehicle()) {
+				Input var10000 = player.input;
+				var10000.movementForward = 0.0F;
+				var10000 = player.input;
+				var10000.movementSideways = 0.0F;
+			}
 		}
 	}
 }

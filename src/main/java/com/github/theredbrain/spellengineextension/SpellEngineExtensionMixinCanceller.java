@@ -8,7 +8,8 @@ public class SpellEngineExtensionMixinCanceller implements MixinCanceller {
 	@Override
 	public boolean shouldCancel(List<String> targetClassNames, String mixinClassName) {
 		return switch (mixinClassName) {
-			case "net.spell_engine.mixin.client.ClientPlayerEntityMixin" -> true;
+			case "net.spell_engine.mixin.client.ClientPlayerEntityMixin",
+				 "net.spell_engine.mixin.client.control.SpellCastingMovement" -> true;
 			default -> false;
 		};
 	}

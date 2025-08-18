@@ -54,12 +54,14 @@ public class SpellEngineExtension implements ModInitializer {
 	public static ComponentType<Identifier> PROXY_POOL;
 
 	public static final TagKey<Spell> CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("can_be_in_use_item_spell_hotbar_slot"));
+	public static final TagKey<Spell> ENABLES_MOVEMENT_LOCKING_DURING_CASTING = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("enables_movement_locking_during_casting"));
 
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
 	public static final boolean isMergedItemsLoaded = FabricLoader.getInstance().isModLoaded("mergeditems");
 	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
+	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
 
 	public static SpellContainer addMergedSpellContainer(SpellContainer spellContainer, ItemStack itemStack) {
 		if (isMergedItemsLoaded) {

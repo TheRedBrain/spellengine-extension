@@ -28,6 +28,7 @@
     "defaultRequire": 1
   },
   "client": [
+    "client.MouseMixin",
     "client.network.ClientPlayerEntityMixin_SpellEngineReplacement"
   ]
 }
