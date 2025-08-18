@@ -1,14 +1,11 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModifiers;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellProjectileDataPerksMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.ExtendedSpellHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -28,7 +25,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import net.spell_engine.SpellEngineMod;
@@ -46,7 +42,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
@@ -58,67 +53,12 @@ public abstract class SpellHelperMixin {
 	 * @author TheRedBrain
 	 * @reason check for custom cost
 	 */
-	@Inject(method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;", at = @At(value = "RETURN", ordinal = 3), cancellable = true)
-	private static void spellengineextension$attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local RegistryEntry.Reference<Spell> spellEntry) {
-
-		Spell spell = (Spell) spellEntry.value();
-		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
-			float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
-				healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
-			}
-			if (healthCost > 0 && healthCost > player.getHealth()) {
-				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_health"), true);
-				cir.setReturnValue(SpellCast.Attempt.none());
-				cir.cancel();
-			}
-		}
-		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkMana()) {
-			float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
-				manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
-			}
-			float currentMana = SpellEngineExtension.getCurrentMana(player);
-			if (manaCost > 0 && manaCost > currentMana && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
-				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
-				cir.setReturnValue(SpellCast.Attempt.none());
-				cir.cancel();
-			}
-		}
-		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStamina()) {
-			float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
-				staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
-			}
-			float currentStamina = SpellEngineExtension.getCurrentStamina(player);
-			if (staminaCost > 0 && staminaCost > currentStamina && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
-				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
-				cir.setReturnValue(SpellCast.Attempt.none());
-				cir.cancel();
-			}
-		}
-		if (spellEngineExtensionConfig.spell_cost_effects_allowed.get() && spell.cost.effect_id != null) {
-			Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell.cost.effect_id));
-			if (effect.isPresent()) {
-				if (!player.hasStatusEffect(effect.get())) {
-					player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_status_effect", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
-					cir.setReturnValue(SpellCast.Attempt.none());
-					cir.cancel();
-				} else {
-					StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
-					if (statusEffectInstance != null) {
-						int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
-						if (decrementEffectAmount > 0 && statusEffectInstance.getAmplifier() + 1 < decrementEffectAmount) {
-							player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
-							cir.setReturnValue(SpellCast.Attempt.none());
-							cir.cancel();
-						}
-					}
-				}
-			}
-		}
+	@WrapOperation(
+			method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;",
+			at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/casting/SpellCast$Attempt;success()Lnet/spell_engine/internals/casting/SpellCast$Attempt;")
+	)
+	private static SpellCast.Attempt spellengineextension$attemptCasting(Operation<SpellCast.Attempt> original, @Local(argsOnly = true) PlayerEntity player, @Local RegistryEntry.Reference<Spell> spellEntry) {
+		return ExtendedSpellHelper.checkForCustomSpellCost(player, spellEntry);
 	}
 
 	@Inject(method = "performSpell", at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/SpellHelper;channelValueMultiplier(Lnet/spell_engine/api/spell/Spell;)F", remap = false))
@@ -246,23 +186,7 @@ public abstract class SpellHelperMixin {
 	private static Spell.LaunchProperties spellengineextension$wrap_shootProjectile_mutableLaunchProperties(
 			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity caster
 	) {
-		Spell.LaunchProperties copy = original.call(instance);
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
-			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
-		}
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
-		}
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
-			copy.velocity += ((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity();
-		}
-
-		return copy;
+		return ExtendedSpellHelper.applySpellLaunchPropertiesAttributes(original.call(instance), caster);
 	}
 
 	// shootProjectile: Perks
@@ -273,35 +197,7 @@ public abstract class SpellHelperMixin {
 	private static Spell.ProjectileData.Perks spellengineextension$wrap_shootProjectile_mutablePerks(
 			Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster
 	) {
-		Spell.ProjectileData.Perks copy = original.call(instance);
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetAttribute()) {
-			copy.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
-		}
-		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetRangeAttribute()) {
-			copy.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
-		}
-		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraBounceAttribute()) {
-			copy.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
-		}
-		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraPierceAttribute()) {
-			copy.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
-		}
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionSizeAttribute()) {
-			copy.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
-		}
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
-			copy.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
-		}
-
-		return copy;
+		return ExtendedSpellHelper.applySpellProjectileDataPerkAttributes(original.call(instance), caster);
 	}
 
 	// fallProjectile: LaunchProperties
@@ -312,23 +208,7 @@ public abstract class SpellHelperMixin {
 	private static Spell.LaunchProperties spellengineextension$wrap_fallProjectile_mutableLaunchProperties(
 			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity caster
 	) {
-		Spell.LaunchProperties copy = original.call(instance);
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
-			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchCount());
-		}
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraLaunchDelay());
-		}
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
-			copy.velocity += ((DuckLivingEntityMixin) caster).spellengineextension$getExtraVelocity();
-		}
-
-		return copy;
+		return ExtendedSpellHelper.applySpellLaunchPropertiesAttributes(original.call(instance), caster);
 	}
 
 	// fallProjectile: Perks
@@ -339,35 +219,7 @@ public abstract class SpellHelperMixin {
 	private static Spell.ProjectileData.Perks spellengineextension$wrap_fallProjectile_mutablePerks(
 			Spell.ProjectileData.Perks instance, Operation<Spell.ProjectileData.Perks> original, @Local(argsOnly = true) LivingEntity caster
 	) {
-		Spell.ProjectileData.Perks copy = original.call(instance);
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetAttribute()) {
-			copy.ricochet += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochet());
-		}
-		if (serverConfig.spell_projectile_perk_extra_ricochet_range_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraRicochetRangeAttribute()) {
-			copy.ricochet_range += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraRicochetRange());
-		}
-		if (serverConfig.spell_projectile_perk_extra_bounce_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraBounceAttribute()) {
-			copy.bounce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraBounce());
-		}
-		if (serverConfig.spell_projectile_perk_extra_pierce_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraPierceAttribute()) {
-			copy.pierce += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraPierce());
-		}
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_size_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionSizeAttribute()) {
-			copy.chain_reaction_size += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionSize());
-		}
-		if (serverConfig.spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed.get()
-				&& ((DuckSpellProjectileDataPerksMixin) copy).spellengineextension$respectExtraChainReactionTriggersAttribute()) {
-			copy.chain_reaction_triggers += (int) (((DuckLivingEntityMixin) caster).spellengineextension$getExtraChainReactionTriggers());
-		}
-
-		return copy;
+		return ExtendedSpellHelper.applySpellProjectileDataPerkAttributes(original.call(instance), caster);
 	}
 
 	@WrapOperation(
