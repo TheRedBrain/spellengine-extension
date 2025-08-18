@@ -54,6 +54,10 @@ public interface DuckSpellCostMixin {
 
 	void spellengineextension$setConsumeSelf(boolean consumeSelf);
 
+	boolean spellengineextension$checkEffectCost();
+
+	void spellengineextension$setCheckEffectCost(boolean checkEffectCost);
+
 	int spellengineextension$getDecrementEffectAmount();
 
 	void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount);

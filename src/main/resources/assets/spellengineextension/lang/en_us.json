@@ -25,7 +25,8 @@
 	"spell.tooltip.mana": "Requires: %s Mana",
 	"spell.tooltip.stamina": "Requires: %s Stamina",
 	"spell.tooltip.effect.1": "Requires: ",
-	"spell.tooltip.effect.2": "Effect",
+	"spell.tooltip.effect.2": "Consumes: ",
+	"spell.tooltip.effect.3": "Effect",
 
 	"spellengineextension.client": "Client Side Settings",
 

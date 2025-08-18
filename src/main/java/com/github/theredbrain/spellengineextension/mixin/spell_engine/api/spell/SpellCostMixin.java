@@ -28,6 +28,8 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
     private boolean consume_self = false;
     @Unique
+    private boolean check_effect_cost = true;
+    @Unique
     private int decrement_effect_amount = -1;
     @Unique
     private float mana_cost = 0.0F;
@@ -170,6 +172,16 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public void spellengineextension$setConsumeSelf(boolean consumeSelf) {
         this.consume_self = consumeSelf;
+    }
+
+    @Override
+    public boolean spellengineextension$checkEffectCost() {
+        return this.check_effect_cost;
+    }
+
+    @Override
+    public void spellengineextension$setCheckEffectCost(boolean checkEffectCost) {
+        this.check_effect_cost = checkEffectCost;
     }
 
     @Override

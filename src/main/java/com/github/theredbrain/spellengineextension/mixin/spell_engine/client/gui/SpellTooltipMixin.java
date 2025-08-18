@@ -79,14 +79,15 @@ public class SpellTooltipMixin {
                 if (statusEffectInstance != null) {
                     currentAmplifier = statusEffectInstance.getAmplifier();
                 }
-                boolean hasRequiredEffectAndLevel = player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0);
+                boolean checkEffectCost = ((DuckSpellCostMixin) spell1.cost).spellengineextension$checkEffectCost();
+                boolean hasRequiredEffectAndLevel = !checkEffectCost || (player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0));
                 lines.add(
                         indentation(indentLevel)
-                                .append(Text.translatable("spell.tooltip.effect.1"))
+                                .append(checkEffectCost ? Text.translatable("spell.tooltip.effect.1") : Text.translatable("spell.tooltip.effect.2"))
                                 .append(statusEffectReference.value().getName().copy())
                                 .append(ScreenTexts.SPACE)
                                 .append(decrementEffectAmount > 1 ? Text.translatable("enchantment.level." + (decrementEffectAmount - 1)).append(ScreenTexts.SPACE) : Text.empty())
-                                .append(Text.translatable("spell.tooltip.effect.2"))
+                                .append(Text.translatable("spell.tooltip.effect.3"))
                                 .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
                 );
             }
