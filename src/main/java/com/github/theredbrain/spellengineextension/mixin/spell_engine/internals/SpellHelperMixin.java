@@ -9,6 +9,7 @@ import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMix
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellProjectileDataPerksMixin;
+import com.github.theredbrain.spellengineextension.spell_engine.ExtendedSpellHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -29,6 +30,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import net.spell_engine.SpellEngineMod;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.internals.Ammo;
@@ -36,12 +38,14 @@ import net.spell_engine.internals.SpellHelper;
 import net.spell_engine.internals.casting.SpellBatcher;
 import net.spell_engine.internals.casting.SpellCast;
 import net.spell_engine.internals.container.SpellContainerSource;
+import net.spell_engine.internals.target.SpellTarget;
 import net.spell_engine.utils.WorldScheduler;
 import net.spell_power.mixin.DamageSourcesAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
@@ -55,7 +59,7 @@ public abstract class SpellHelperMixin {
 	 * @reason check for custom cost
 	 */
 	@Inject(method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;", at = @At(value = "RETURN", ordinal = 3), cancellable = true)
-	private static void attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local RegistryEntry.Reference<Spell> spellEntry) {
+	private static void spellengineextension$attemptCasting(PlayerEntity player, ItemStack itemStack, Identifier spellId, boolean checkAmmo, CallbackInfoReturnable<SpellCast.Attempt> cir, @Local RegistryEntry.Reference<Spell> spellEntry) {
 
 		Spell spell = (Spell) spellEntry.value();
 		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
@@ -117,6 +121,11 @@ public abstract class SpellHelperMixin {
 		}
 	}
 
+	@Inject(method = "performSpell", at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/SpellHelper;channelValueMultiplier(Lnet/spell_engine/api/spell/Spell;)F", remap = false))
+	private static void spellengineextension$performSpell_applyChannelingCost(World world, PlayerEntity player, RegistryEntry<Spell> spellEntry, SpellTarget.SearchResult targetResult, SpellCast.Action action, float progress, CallbackInfo ci) {
+		ExtendedSpellHelper.applyChannelingCost(player, spellEntry);
+	}
+
 //	/* TODO casting with offhand */
 //	@WrapOperation(
 //			method = "startCasting",
@@ -157,7 +166,7 @@ public abstract class SpellHelperMixin {
 			var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
 			// health cost
-			if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
+			if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingHealthCost()) {
 				float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
 					healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
@@ -168,7 +177,7 @@ public abstract class SpellHelperMixin {
 			}
 
 			// mana cost
-			if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
+			if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingManaCost()) {
 				float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 					manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
@@ -179,7 +188,7 @@ public abstract class SpellHelperMixin {
 			}
 
 			// stamina cost
-			if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
+			if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingStaminaCost()) {
 				float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$addItemUseStaminaCostAttributeValue()) {
 					staminaCost = staminaCost + SpellEngineExtension.getItemUseStaminaCost(player);

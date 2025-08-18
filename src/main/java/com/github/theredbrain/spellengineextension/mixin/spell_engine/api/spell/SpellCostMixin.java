@@ -35,6 +35,12 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     private float health_cost = 0.0F;
     @Unique
     private float stamina_cost = 0.0F;
+    @Unique
+    private boolean apply_channeling_health_cost = false;
+    @Unique
+    private boolean apply_channeling_mana_cost = false;
+    @Unique
+    private boolean apply_channeling_stamina_cost = false;
 
     @Override
     public boolean spellengineextension$checkMana() {
@@ -174,5 +180,35 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount) {
         this.decrement_effect_amount = decrementEffectAmount;
+    }
+
+    @Override
+    public boolean spellengineextension$applyChannelingHealthCost() {
+        return this.apply_channeling_health_cost;
+    }
+
+    @Override
+    public void spellengineextension$setApplyChannelingHealthCost(boolean applyChannelingHealthCost) {
+        this.apply_channeling_health_cost = applyChannelingHealthCost;
+    }
+
+    @Override
+    public boolean spellengineextension$applyChannelingManaCost() {
+        return this.apply_channeling_mana_cost;
+    }
+
+    @Override
+    public void spellengineextension$setApplyChannelingManaCost(boolean applyChannelingManaCost) {
+        this.apply_channeling_mana_cost = applyChannelingManaCost;
+    }
+
+    @Override
+    public boolean spellengineextension$applyChannelingStaminaCost() {
+        return this.apply_channeling_stamina_cost;
+    }
+
+    @Override
+    public void spellengineextension$setApplyChannelingStaminaCost(boolean applyChannelingStaminaCost) {
+        this.apply_channeling_stamina_cost = applyChannelingStaminaCost;
     }
 }

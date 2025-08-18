@@ -19,6 +19,9 @@
 		],
 		"client": [
 			"com.github.theredbrain.spellengineextension.SpellEngineExtensionClient"
+		],
+		"mixinsquared": [
+			"com.github.theredbrain.spellengineextension.SpellEngineExtensionMixinCanceller"
 		]
 	},
 	"mixins": [

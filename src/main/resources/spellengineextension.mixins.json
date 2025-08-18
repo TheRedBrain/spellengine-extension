@@ -26,5 +26,8 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "client.network.ClientPlayerEntityMixin_SpellEngineReplacement"
+  ]
 }
