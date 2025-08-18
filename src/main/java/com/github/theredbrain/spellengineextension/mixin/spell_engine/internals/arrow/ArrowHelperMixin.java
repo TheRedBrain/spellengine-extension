@@ -1,9 +1,6 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals.arrow;
 
-import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.config.ServerConfig;
-import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
+import com.github.theredbrain.spellengineextension.spell_engine.ExtendedSpellHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -23,23 +20,7 @@ public class ArrowHelperMixin {
 	private static Spell.LaunchProperties spellengineextension$wrap_shootArrow_mutableLaunchProperties(
 			Spell.LaunchProperties instance, Operation<Spell.LaunchProperties> original, @Local(argsOnly = true) LivingEntity shooter
 	) {
-		Spell.LaunchProperties copy = original.call(instance);
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchCountAttribute()) {
-			copy.extra_launch_count += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchCount());
-		}
-		if (serverConfig.spell_launch_properties_extra_launch_delay_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraLaunchDelayAttribute()) {
-			copy.extra_launch_delay += (int) (((DuckLivingEntityMixin) shooter).spellengineextension$getExtraLaunchDelay());
-		}
-		if (serverConfig.spell_launch_properties_extra_velocity_attribute_allowed.get()
-				&& ((DuckSpellLaunchPropertiesMixin) copy).spellengineextension$respectExtraVelocityAttribute()) {
-			copy.velocity += ((DuckLivingEntityMixin) shooter).spellengineextension$getExtraVelocity();
-		}
-
-		return copy;
+		return ExtendedSpellHelper.applySpellLaunchPropertiesAttributes(original.call(instance), shooter);
 	}
 }
 
