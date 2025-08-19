@@ -23,34 +23,34 @@ public class ExtendedSpellHelper {
 		Spell spell = (Spell) spellEntry.value();
 		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
-		if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost()) {
+		if (spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
 			float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
 				healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
 			}
-			if (healthCost > 0 && healthCost > player.getHealth()) {
+			if (healthCost > 0 && (!((DuckSpellCostMixin) spell.cost).spellengineextension$checkHealthCost() || healthCost > player.getHealth())) {
 				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_health"), true);
 				return SpellCast.Attempt.none();
 			}
 		}
-		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkMana()) {
+		if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get()) {
 			float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 				manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
 			}
 			float currentMana = SpellEngineExtension.getCurrentMana(player);
-			if (manaCost > 0 && manaCost > currentMana && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost()) {
+			if (manaCost > 0 && (currentMana > 0 || !((DuckSpellCostMixin) spell.cost).spellengineextension$checkMana()) && (manaCost > currentMana || !((DuckSpellCostMixin) spell.cost).spellengineextension$checkManaCost())) {
 				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_mana"), true);
 				return SpellCast.Attempt.none();
 			}
 		}
-		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStamina()) {
+		if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get()) {
 			float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 			if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
 				staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
 			}
 			float currentStamina = SpellEngineExtension.getCurrentStamina(player);
-			if (staminaCost > 0 && staminaCost > currentStamina && ((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost()) {
+			if (staminaCost > 0 && (currentStamina > 0 || !((DuckSpellCostMixin) spell.cost).spellengineextension$checkStamina()) && (staminaCost > currentStamina || !((DuckSpellCostMixin) spell.cost).spellengineextension$checkStaminaCost())) {
 				player.sendMessage(Text.translatable("hud.cast_attempt_error.missing_stamina"), true);
 				return SpellCast.Attempt.none();
 			}
