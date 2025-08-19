@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 public class SpellEngineExtension implements ModInitializer {
 	public static final String MOD_ID = "spellengineextension";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ServerConfig SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
+	public static ServerConfig SERVER_CONFIG;
 
 	public static RegistryEntry<EntityAttribute> GENERIC_MAGIC_DAMAGE;
 
@@ -132,6 +132,7 @@ public class SpellEngineExtension implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Spell Engine was extended!");
+		SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
 
 		ItemComponentRegistry.init();
 		SpellSchoolRegistry.init();
