@@ -9,6 +9,7 @@
     "entity.effect.StatusEffectMixin",
     "entity.player.PlayerEntityMixin",
     "server.network.ServerPlayerEntityMixin",
+    "spell_engine.api.spell.SpellActiveCastMixin",
     "spell_engine.api.spell.SpellCostMixin",
     "spell_engine.api.spell.SpellImpactActionDamageMixin",
     "spell_engine.api.spell.SpellImpactActionHealMixin",

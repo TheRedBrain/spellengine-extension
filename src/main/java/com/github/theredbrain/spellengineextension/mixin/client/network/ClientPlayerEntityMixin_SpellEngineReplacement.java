@@ -1,6 +1,7 @@
 package com.github.theredbrain.spellengineextension.mixin.client.network;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
+import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -309,9 +310,8 @@ public abstract class ClientPlayerEntityMixin_SpellEngineReplacement implements 
 			input.movementForward *= multiplier;
 			ticksLeftToDoubleTapSprint = 0;
 		}
-		if (process != null) {
-			boolean isMovementLockingEnabled = process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING);
-			if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get() && isMovementLockingEnabled && process.spell().value().active.cast != null && !player.hasVehicle()) {
+		if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
+			if (((((DuckPlayerEntityMixin)player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
 				Input var10000 = player.input;
 				var10000.movementForward = 0.0F;
 				var10000 = player.input;

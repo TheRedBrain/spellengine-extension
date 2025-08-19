@@ -7,8 +7,10 @@ import com.github.theredbrain.spellengineextension.compat.RangedWeaponAPICompati
 import com.github.theredbrain.spellengineextension.compat.StaminaAttributesCompatibility;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
+import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
 import com.github.theredbrain.spellengineextension.registry.ItemComponentRegistry;
 import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
+import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellActiveCastMixin;
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.RegisterType;
 import net.fabricmc.api.ModInitializer;
@@ -24,6 +26,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.api.spell.container.SpellContainer;
+import net.spell_engine.api.spell.event.SpellEvents;
 import net.spell_engine.api.spell.registry.SpellRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,6 +139,12 @@ public class SpellEngineExtension implements ModInitializer {
 
 		ItemComponentRegistry.init();
 		SpellSchoolRegistry.init();
+
+		SpellEvents.SPELL_CAST.register((args) -> {
+			if (SERVER_CONFIG.enable_movement_locking_spell_casting.get() && args.spell().isIn(ENABLES_MOVEMENT_LOCKING_DURING_CASTING)) {
+				((DuckPlayerEntityMixin) args.caster()).spellengineextension$setMovementLockingTicks(Math.max(0, ((DuckSpellActiveCastMixin) args.spell().value().active.cast).spellengineextension$getAfterCastingMovementLockingTicks()));
+			}
+		});
 	}
 
 	public static Identifier identifier(String path) {
