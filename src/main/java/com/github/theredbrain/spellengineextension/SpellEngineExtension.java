@@ -64,7 +64,7 @@ public class SpellEngineExtension implements ModInitializer {
 	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
 	public static final boolean isMergedItemsLoaded = FabricLoader.getInstance().isModLoaded("mergeditems");
 	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
-	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing");
+//	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing"); // TODO Shoulder Surfing Compat
 
 	public static SpellContainer addMergedSpellContainer(SpellContainer spellContainer, ItemStack itemStack) {
 		if (isMergedItemsLoaded) {

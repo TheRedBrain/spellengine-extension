@@ -1,7 +1,6 @@
 package com.github.theredbrain.spellengineextension.mixin.client;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.compat.ShoulderSurfingCompat;
 import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
@@ -13,7 +12,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 
 @Mixin(Mouse.class)
 public abstract class MouseMixin {
@@ -28,7 +26,7 @@ public abstract class MouseMixin {
 			ClientPlayerEntity player = client.player;
 			if (player != null) {
 				var process = ((SpellCasterClient) player).getSpellCastProcess();
-				if ((((DuckPlayerEntityMixin)player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().value().active.cast != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING))) {
+				if ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().value().active.cast != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING))) {
 					ci.cancel();
 				}
 			}

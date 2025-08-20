@@ -51,13 +51,13 @@ repositories {
 		url 'https://maven.kosmx.dev/'
 	}
 
-	// Shoulder Surfing Reloaded
-	maven {
-		url "https://www.cursemaven.com"
-		content {
-			includeGroup("curse.maven")
-		}
-	}
+//	// Shoulder Surfing Reloaded // TODO Shoulder Surfing Compat
+//	maven {
+//		url "https://www.cursemaven.com"
+//		content {
+//			includeGroup("curse.maven")
+//		}
+//	}
 
 	// Mixin Squared
 	maven {
@@ -117,8 +117,8 @@ dependencies {
 	// RPG Inventory
 	modImplementation("maven.modrinth:rpg-inventory:${project.rpg_inventory_version}")
 
-	// Shoulder Surfing Reloaded
-	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
+//	// Shoulder Surfing Reloaded // TODO Shoulder Surfing Compat
+//	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
 
 	// Mixin Squared
 	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.1.2-beta.4")))
