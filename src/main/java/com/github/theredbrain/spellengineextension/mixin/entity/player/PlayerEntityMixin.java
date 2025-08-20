@@ -1,6 +1,5 @@
 package com.github.theredbrain.spellengineextension.mixin.entity.player;
 
-import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
 import com.github.theredbrain.spellengineextension.entity.player.PlayerEntityHelper;
 import net.minecraft.entity.EntityType;
@@ -21,7 +20,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements DuckPlayerEntityMixin {
 
-	@Shadow public abstract PlayerInventory getInventory();
+	@Shadow
+	public abstract PlayerInventory getInventory();
 
 	@Unique
 	private static final TrackedData<Integer> MOVEMENT_LOCKING_TICKS = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -41,7 +41,6 @@ public abstract class PlayerEntityMixin extends LivingEntity implements DuckPlay
 		if (!this.getWorld().isClient) {
 			PlayerEntityHelper.spellengineextension$updateConditionalSpellContainerItems(this.getInventory());
 			if (this.spellengineextension$getMovementLockingTicks() > 0) {
-				SpellEngineExtension.LOGGER.info("this.spellengineextension$getMovementLockingTicks() > 0");
 				this.spellengineextension$setMovementLockingTicks(this.spellengineextension$getMovementLockingTicks() - 1);
 			}
 		}

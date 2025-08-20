@@ -55,7 +55,7 @@ public abstract class SpellHelperMixin {
 	 */
 	@WrapOperation(
 			method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;",
-			at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/casting/SpellCast$Attempt;success()Lnet/spell_engine/internals/casting/SpellCast$Attempt;")
+			at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/casting/SpellCast$Attempt;success()Lnet/spell_engine/internals/casting/SpellCast$Attempt;", remap = false)
 	)
 	private static SpellCast.Attempt spellengineextension$attemptCasting(Operation<SpellCast.Attempt> original, @Local(argsOnly = true) PlayerEntity player, @Local RegistryEntry.Reference<Spell> spellEntry) {
 		return ExtendedSpellHelper.checkForCustomSpellCost(player, spellEntry);
