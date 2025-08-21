@@ -1,3 +1,21 @@
+# 2.10.0
+
+- now works with Spell Engine 1.7.1
+- added 'ProvidesSpell' status effect API
+- added movement locking spell casting, enabled via a server config option and the "spellengineextension:enables_movement_locking_during_casting" spell tag.
+- added "add_item_use_stamina_cost_attribute_value" boolean field to 'spell.cost'
+- added channeling health/mana/stamina costs, using the existing amounts and new boolean fields added to 'spell.cost'
+- added "check_mana" and "check_stamina" boolean fields to 'spell.cost', which allow spell casting when the corresponding resource is above 0 (the existing checks only allow casting when the resource is above the cost)
+- added "check_effect_cost" boolean field to 'spell.cost'
+- added "after_casting_movement_locking_ticks" int field to 'spell.active.cast', the movement locking for this spell is extended by this amount of ticks
+- added "is_two_handed_valid" condition to the "spellengineextension:has_conditional_spell_container" item component, which is true when the item is in the main hand and the offhand is empty
+- added "is_dual_wielding_valid" condition to the "spellengineextension:has_conditional_spell_container" item component, which is true when the item is in the main hand and the offhand contains an item that is in the tag defined by the "dual_wielding_tag" field
+- added "replaced_effect_cost_id" and "replaced_decrement_effect_cost_amount" fields to 'spell.modifier'
+- added client config option to hide the use_key spell hotbar slot. This does not prevent casting the spell in that slot.
+- added server config option to disable the use_key spell hotbar slot restriction
+- removed the server config option added in the last update, this functionality is now controlled by a spell tag ("spellengineextension:can_be_in_use_item_spell_hotbar_slot")
+- improved optional mod integrations, fixing several issues where the mods were still required
+
 # 2.9.0
 
 - added "spellengineextension:has_conditional_spell_container" item component, which can be used to disable the spell container of an item, depending on the hand it's held in (supports RPG Inventory)

@@ -16,6 +16,7 @@ Heal Impact
 Spell Cost
 - consume_self (consumes the item used to cast the spell)
 - decrement_effect_amount (allows better control over what happens with status effects defined as spell cost. When < 0, the effect is removed (the normal behaviour), when > 0 the effects amplifier (also known as effect level) is reduced (0 is the lowest amplifier possible)). When the decrement amount is 0, nothing happens to the effect.
+- check_effect_cost (if the caster has to have the effect applied)
 
 - health_cost (amount of health casting the spell is costing)
 - check_health_cost (if casting fails when player has not enough health)
@@ -23,19 +24,47 @@ Spell Cost
 
 > Spending health to cast spells inflicts damage with the "spellengineextension:blood_magic_casting_damage_type" damage type.
 
+### Stamina Attributes integration
+
 - stamina_cost (amount of stamina casting the spell is costing)
+- check_stamina (if casting fails when player has no stamina)
 - check_stamina_cost (if casting fails when player has not enough stamina)
+- add_item_use_stamina_cost_attribute_value (if the value of the "staminaattributes:generic.item_use_stamina_cost" entity attribute should be added to the spell stamina cost)
 - stamina_cost_multiplier_applies (whether the stamina cost should be multiplied with the "generic.stamina_spell_cost_multiplier" entity attribute)
+- apply_channeling_mana_cost (whether the stamina cost should be applied every 'channel_tick')
 
 This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) is installed.
 
+### Mana Attributes integration
+
 - mana_cost (amount of mana casting the spell is costing)
+- check_mana (if casting fails when player has no mana)
 - check_mana_cost (if casting fails when player has not enough mana)
 - mana_cost_multiplier_applies (whether the mana cost should be multiplied with the "generic.mana_spell_cost_multiplier" entity attribute)
+- apply_channeling_mana_cost (whether the mana cost should be applied every 'channel_tick')
 
 This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-attributes) is installed.
 
-### Example
+## Movement locking spell casting
+
+While casting spells in the "spellengineextension:enables_movement_locking_during_casting" spell tag, all player movements and rotations are disabled.
+The movement locking is extended by x amount of ticks, where x is defined by the "after_casting_movement_locking_ticks" int field, located in the spell.json under 'spell.active.cast'.
+
+This feature can be disabled in the server config.
+
+## Spell Modifiers
+
+Spell modifiers got more options to modify spells:
+
+- additional_health_cost
+- additional_mana_cost
+- additional_stamina_cost
+- additional_direct_damage
+- additional_direct_healing
+- replaced_effect_cost_id
+- replaced_decrement_effect_cost_amount
+
+## Example
 
 This is an example spell.json where all added values are present (with their default values)
 
@@ -43,92 +72,113 @@ This is an example spell.json where all added values are present (with their def
 
 ```json
 {
-	"release": {
-		"target": {
-			"type": "PROJECTILE",
-			"projectile": {
-				"projectile": {
-					"launch_properties": {
-						"respect_extra_launch_count_attribute": true,
-						"respect_extra_launch_delay_attribute": true,
-						"respect_extra_velocity_attribute": true
-					},
-					"perks": {
-						"respect_extra_ricochet_attribute": true,
-						"respect_extra_ricochet_range_attribute": true,
-						"respect_extra_bounce_attribute": true,
-						"respect_extra_pierce_attribute": true,
-						"respect_extra_chain_reaction_size_attribute": true,
-						"respect_extra_chain_reaction_triggers_attribute": true
-					}
-				}
-			}
-		},
-		"target": {
-			"type": "SHOOT_ARROW",
-			"projectile": {
-				"projectile": {
-					"launch_properties": {
-						"respect_extra_launch_count_attribute": true,
-						"respect_extra_launch_delay_attribute": true,
-						"respect_extra_velocity_attribute": true
-					}
-				}
-			}
-		},
-		"target": {
-			"type": "METEOR",
-			"projectile": {
-				"projectile": {
-					"launch_properties": {
-						"respect_extra_launch_count_attribute": true,
-						"respect_extra_launch_delay_attribute": true,
-						"respect_extra_velocity_attribute": true
-					},
-					"perks": {
-						"respect_extra_ricochet_attribute": true,
-						"respect_extra_ricochet_range_attribute": true,
-						"respect_extra_bounce_attribute": true,
-						"respect_extra_pierce_attribute": true,
-						"respect_extra_chain_reaction_size_attribute": true,
-						"respect_extra_chain_reaction_triggers_attribute": true
-					}
-				}
-			}
-		}
-	},
-	"impact": [
-		{
-			"action": {
-				"type": "DAMAGE",
-				"damage": {
-					"direct_damage": 0.0,
-					"damage_type_override": ""
-				}
-			}
-		},
-		{
-			"action": {
-				"type": "HEAL",
-				"damage": {
-					"direct_heal": 0.0
-				}
-			}
-		}
-	],
-	"cost": {
-		"check_health_cost": false,
-		"check_mana_cost": true,
-		"check_stamina_cost": false,
-		"health_cost_multiplier_applies": true,
-		"mana_cost_multiplier_applies": true,
-		"stamina_cost_multiplier_applies": true,
-		"consume_self": false,
-		"decrement_effect_amount": -1,
-		"mana_cost": 0.0,
-		"health_cost": 0.0,
-		"stamina_cost": 0.0
-	}
+  "active": {
+    "cast": {
+      "after_casting_movement_locking_ticks": 0
+    }
+  },
+  "modifiers": [
+    {
+      "additional_health_cost": 0.0,
+      "additional_mana_cost": 0.0,
+      "additional_stamina_cost": 0.0,
+      "additional_direct_damage": 0.0,
+      "additional_direct_healing": 0.0,
+      "replaced_effect_cost_id": null,
+      "replaced_decrement_effect_cost_amount": -1
+    }
+  ],
+  "deliver": {
+    "type": "PROJECTILE",
+    "projectile": {
+      "projectile": {
+        "launch_properties": {
+          "respect_extra_launch_count_attribute": true,
+          "respect_extra_launch_delay_attribute": true,
+          "respect_extra_velocity_attribute": true
+        },
+        "perks": {
+          "respect_extra_ricochet_attribute": true,
+          "respect_extra_ricochet_range_attribute": true,
+          "respect_extra_bounce_attribute": true,
+          "respect_extra_pierce_attribute": true,
+          "respect_extra_chain_reaction_size_attribute": true,
+          "respect_extra_chain_reaction_triggers_attribute": true
+        }
+      }
+    }
+  },
+  "target": {
+    "type": "SHOOT_ARROW",
+    "projectile": {
+      "projectile": {
+        "launch_properties": {
+          "respect_extra_launch_count_attribute": true,
+          "respect_extra_launch_delay_attribute": true,
+          "respect_extra_velocity_attribute": true
+        }
+      }
+    }
+  },
+  "target": {
+    "type": "METEOR",
+    "projectile": {
+      "projectile": {
+        "launch_properties": {
+          "respect_extra_launch_count_attribute": true,
+          "respect_extra_launch_delay_attribute": true,
+          "respect_extra_velocity_attribute": true
+        },
+        "perks": {
+          "respect_extra_ricochet_attribute": true,
+          "respect_extra_ricochet_range_attribute": true,
+          "respect_extra_bounce_attribute": true,
+          "respect_extra_pierce_attribute": true,
+          "respect_extra_chain_reaction_size_attribute": true,
+          "respect_extra_chain_reaction_triggers_attribute": true
+        }
+      }
+    }
+  },
+  "impacts": [
+    {
+      "action": {
+        "type": "DAMAGE",
+        "damage": {
+          "direct_damage": 0.0,
+          "damage_type_override": ""
+        }
+      }
+    },
+    {
+      "action": {
+        "type": "HEAL",
+        "damage": {
+          "direct_heal": 0.0
+        }
+      }
+    }
+  ],
+  "cost": {
+    "check_health_cost": false,
+    "check_mana": true,
+    "check_mana_cost": true,
+    "check_stamina": true,
+    "check_stamina_cost": false,
+    "health_cost_multiplier_applies": true,
+    "mana_cost_multiplier_applies": true,
+    "stamina_cost_multiplier_applies": true,
+    "add_item_use_stamina_cost_attribute_value": false,
+    "consume_self": false,
+    "check_effect_cost": true,
+    "decrement_effect_amount": -1,
+    "mana_cost": 0.0,
+    "health_cost": 0.0,
+    "stamina_cost": 0.0,
+    "apply_channeling_health_cost": false,
+    "apply_channeling_mana_cost": false,
+    "apply_channeling_stamina_cost": false
+  }
 }
 ```
 
@@ -145,6 +195,10 @@ These include:
     - x and y offset and the color of this number can be customized
 - enabling alternative spell icons when spell is on cooldown
   - the textures are expected to be located under the same namespace and on the same path as the regular spell texture, with "_cooldown" appended to the file name
+- disabling the rendering of the use_key spell hot bar slot. This does not prevent casting of spells in that slot.
+
+Additional server side settings:
+- only spells in the "spellengineextension:can_be_in_use_item_spell_hotbar_slot" spell tag can be in the use_key spell hot bar slot. This restriction can be disabled in the server config.
 
 ## Spell schools
 
@@ -155,6 +209,10 @@ These spell schools can be used in the spell.json.
 - "GENERIC_MAGIC" uses "spellengineextension:generic.magic_damage" and "spell_power:generic.haste" as their power and haste attributes respectively. Uses the "minecraft:magic" damage type.
 
 They have no "crit_chance" or "crit_damage" traits and also no entity attribute or status effect defined, to keep them as simple and generic as possible.
+
+## 'ProvidesSpell' status effect API
+
+This is a small java API that allows status effects to provide a list of spells to players.
 
 ## Entity Attributes
 
@@ -173,6 +231,19 @@ The following attributes add to the respective values defined in the spell.json.
 - "generic.extra_pierce"
 - "generic.extra_chain_reaction_size"
 - "generic.extra_chain_reaction_triggers"
+
+## Conditional Spell Pools
+
+Items with the "spellengineextension:has_conditional_spell_container" item component can "disable" on existing spell container on the item.
+The component has multiple fields that define when the spell container is enabled/disabled:
+- is_main_hand_valid, a boolean field, valid when the item is in the main hand
+- is_off_hand_valid, a boolean field, valid when the item is in the offhand
+- is_two_handed_valid, a boolean field, valid when the item is in the main hand and the offhand is empty
+- is_dual_wielding_valid, a boolean field, valid when the item is in the main hand and the offhand contains an item that is in the 'dual_wielding_tag'
+- dual_wielding_tag, a string field, describes an identifier for an item tag
+- is_valid, a boolean field, when true the spell container is enabled. If one of the other boolean fields is true and the condition fulfilled, this field is set to true. otherwise to false.
+
+> 'is_two_handed_valid' is checked first. If it's set to false, then 'is_dual_wielding_valid' is checked. If that's also set to false, then 'is_main_hand_valid' is checked.
 
 ## Proxy Pools
 
