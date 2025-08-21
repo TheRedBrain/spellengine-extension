@@ -1,5 +1,6 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
+import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -7,8 +8,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
+import net.spell_engine.api.spell.Spell;
+import net.spell_engine.api.spell.registry.SpellRegistry;
 import net.spell_engine.client.SpellEngineClient;
 import net.spell_engine.client.gui.Drawable;
 import net.spell_engine.client.gui.HudElement;
@@ -23,6 +27,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+
+import java.util.Optional;
 
 @Mixin(HudRenderHelper.SpellHotBarWidget.class)
 public abstract class SpellHotBarWidgetMixin {
@@ -54,6 +60,18 @@ public abstract class SpellHotBarWidgetMixin {
 		MinecraftClient client = MinecraftClient.getInstance();
 		TextRenderer textRenderer = client.inGameHud.getTextRenderer();
 		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
+		if (client.world != null && SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
+			for (int ix = 0; ix < viewModel.spells().size(); ix++) {
+				HudRenderHelper.SpellHotBarWidget.SpellViewModel spell = viewModel.spells().get(ix);
+				if (spell.iconId() != null) {
+					Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
+					if (optionalSpellReference.isPresent() && optionalSpellReference.get().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT)) {
+						viewModel.spells().remove(ix);
+						ix--;
+					}
+				}
+			}
+		}
 		if (!viewModel.spells().isEmpty()) {
 			float estimatedWidth = (float) (20 * viewModel.spells().size());
 			float estimatedHeight = 22.0F;
