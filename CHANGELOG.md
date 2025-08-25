@@ -1,3 +1,7 @@
+# 1.3.1
+
+- now works with Spell Engine 0.15.12
+
 # 1.3.0
 
 - added client config option to disable rendering of the spell hotbar background
