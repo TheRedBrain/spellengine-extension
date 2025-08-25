@@ -1,3 +1,7 @@
+# 2.10.1
+
+- fixed mana spell cost
+
 # 2.10.0
 
 - now works with Spell Engine 1.7.1
