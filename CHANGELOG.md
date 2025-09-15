@@ -1,3 +1,8 @@
+# 2.10.2
+
+- now works with Spell Engine 1.7.3
+- fixed "spellengineextension:has_conditional_spell_container" integration with RPG Inventory
+
 # 2.10.1
 
 - fixed mana spell cost
