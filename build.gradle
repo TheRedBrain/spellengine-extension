@@ -117,6 +117,10 @@ dependencies {
 	// RPG Inventory
 	modImplementation("maven.modrinth:rpg-inventory:${project.rpg_inventory_version}")
 
+	// Attack Range Attribute
+//	modImplementation("maven.modrinth:attack-range-attribute:${project.attack_range_attribute_version}")
+	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
+
 //	// Shoulder Surfing Reloaded // TODO Shoulder Surfing Compat
 //	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
 

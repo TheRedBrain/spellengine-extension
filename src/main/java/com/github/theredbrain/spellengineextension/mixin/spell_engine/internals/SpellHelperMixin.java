@@ -84,6 +84,18 @@ public abstract class SpellHelperMixin {
 //		return ((DuckSpellMixin) spell).spellengineextension$useOffhandForCasting() ? instance.getOffHandStack() : original.call(instance);
 //	}
 
+	@WrapOperation(
+			method = "getRange",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEntityInteractionRange()D")
+	)
+	private static double spellengineextension$getRange(PlayerEntity instance, Operation<Double> original) {
+		if (SpellEngineExtension.SERVER_CONFIG.enable_attack_range_attribute_integration.get()) {
+			return SpellEngineExtension.getAttackRange(instance);
+		} else {
+			return original.call(instance);
+		}
+	}
+
 	/**
 	 * @author TheRedBrain
 	 * @reason integrate health cost, mana cost, stamina cost, reducing amplifier of status effect cost instead of removing them, self consuming of casting item

@@ -14,10 +14,10 @@ public class ServerConfig extends Config {
 
 	@Comment("""
 			When set to true, changing the players orientation and position while spell casting is disabled.
-			It is recommended to install Shoulder Surfing Reloaded, play in the third person perspective and activate the decoupled camera setting.
 			Use the spell tag "disables_movement_locking_during_casting" and the entity type tag "disables_movement_locking_when_ridden" to control when the movement locking is applied.
 			""")
 	public ValidatedBoolean enable_movement_locking_spell_casting = new ValidatedBoolean(false);
+	public ValidatedBoolean enable_attack_range_attribute_integration = new ValidatedBoolean(true);
 	@Comment("When enabled, only spells in the 'spellengineextension:can_be_in_use_item_spell_hotbar_slot' are placed in the use_item hotbar slot.")
 	public ValidatedBoolean enable_spell_hotbar_use_key_restriction = new ValidatedBoolean(true);
 	@Comment("Disables the client side auto swap feature for all connected clients.")

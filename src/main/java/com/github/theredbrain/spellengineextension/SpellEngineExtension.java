@@ -2,6 +2,7 @@ package com.github.theredbrain.spellengineextension;
 
 import com.github.theredbrain.spellengineextension.compat.ManaAttributesCompatibility;
 import com.github.theredbrain.spellengineextension.compat.MergedItemsCompatibility;
+import com.github.theredbrain.spellengineextension.compat.AttackRangeAttributeCompat;
 import com.github.theredbrain.spellengineextension.compat.RPGInventoryCompatibility;
 import com.github.theredbrain.spellengineextension.compat.RangedWeaponAPICompatibility;
 import com.github.theredbrain.spellengineextension.compat.StaminaAttributesCompatibility;
@@ -19,6 +20,7 @@ import net.minecraft.component.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -63,6 +65,7 @@ public class SpellEngineExtension implements ModInitializer {
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
 	public static final boolean isRangedWeaponAPILoaded = FabricLoader.getInstance().isModLoaded("ranged_weapon_api");
 	public static final boolean isMergedItemsLoaded = FabricLoader.getInstance().isModLoaded("mergeditems");
+	public static final boolean isAttackRangeAttributeLoaded = FabricLoader.getInstance().isModLoaded("attackrangeattribute");
 	public static final boolean isRPGInventoryLoaded = FabricLoader.getInstance().isModLoaded("rpginventory");
 //	public static final boolean isShoulderSurfingLoaded = FabricLoader.getInstance().isModLoaded("shouldersurfing"); // TODO Shoulder Surfing Compat
 
@@ -107,6 +110,14 @@ public class SpellEngineExtension implements ModInitializer {
 	public static void addStamina(LivingEntity livingEntity, float amount) {
 		if (isStaminaAttributesLoaded) {
 			StaminaAttributesCompatibility.addStamina(livingEntity, amount);
+		}
+	}
+
+	public static double getAttackRange(PlayerEntity playerEntity) {
+		if (isAttackRangeAttributeLoaded) {
+			return AttackRangeAttributeCompat.getAttackRange(playerEntity);
+		} else {
+			return playerEntity.getEntityInteractionRange();
 		}
 	}
 
