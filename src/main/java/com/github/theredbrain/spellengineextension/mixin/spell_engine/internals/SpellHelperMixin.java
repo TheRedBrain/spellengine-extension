@@ -118,7 +118,7 @@ public abstract class SpellHelperMixin {
 			var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
 			// health cost
-			if (spellEngineExtensionConfig.spell_cost_health_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingHealthCost()) {
+			if (!player.isCreative() && spellEngineExtensionConfig.spell_cost_health_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingHealthCost()) {
 				float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
 					healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
@@ -129,7 +129,7 @@ public abstract class SpellHelperMixin {
 			}
 
 			// mana cost
-			if (SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingManaCost()) {
+			if (!player.isCreative() && SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingManaCost()) {
 				float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
 					manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
@@ -140,7 +140,7 @@ public abstract class SpellHelperMixin {
 			}
 
 			// stamina cost
-			if (SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingStaminaCost()) {
+			if (!player.isCreative() && SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingStaminaCost()) {
 				float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
 				if (((DuckSpellCostMixin) spell.cost).spellengineextension$addItemUseStaminaCostAttributeValue()) {
 					staminaCost = staminaCost + SpellEngineExtension.getItemUseStaminaCost(player);
