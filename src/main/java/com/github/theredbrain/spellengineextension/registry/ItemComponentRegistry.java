@@ -12,7 +12,7 @@ public class ItemComponentRegistry {
 		SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER = Registry.register(
 				Registries.DATA_COMPONENT_TYPE,
 				SpellEngineExtension.identifier("has_conditional_spell_container"),
-				ComponentType.<HasConditionalSpellContainerComponent>builder().codec(HasConditionalSpellContainerComponent.CODEC).packetCodec(HasConditionalSpellContainerComponent.PACKET_CODEC).build()
+				ComponentType.<HasConditionalSpellContainerComponent>builder().codec(HasConditionalSpellContainerComponent.CODEC)/*.packetCodec(HasConditionalSpellContainerComponent.PACKET_CODEC)*/.build()
 		);
 		SpellEngineExtension.PROXY_POOL = Registry.register(
 				Registries.DATA_COMPONENT_TYPE,
