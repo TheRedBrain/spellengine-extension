@@ -13,6 +13,8 @@ public class ClientConfig extends Config {
 		super(SpellEngineExtension.identifier("client"));
 	}
 
+	public ValidatedBoolean always_hide_details_hint = new ValidatedBoolean(false);
+	public ValidatedBoolean hide_details_hint_for_invalid_conditional_spell_container = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotbar_background_rendering = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotbar_cooldown_overlay = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotkey_icons = new ValidatedBoolean(true);

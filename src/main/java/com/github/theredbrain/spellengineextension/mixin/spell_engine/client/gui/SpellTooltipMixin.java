@@ -1,8 +1,13 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
+import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
+import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
+import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -16,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.Spell;
+import net.spell_engine.api.spell.container.SpellContainer;
 import net.spell_engine.client.gui.SpellTooltip;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,11 +34,22 @@ import java.util.List;
 import java.util.Optional;
 
 @Mixin(SpellTooltip.class)
-public class SpellTooltipMixin {
+public abstract class SpellTooltipMixin {
 
     @Shadow
     private static MutableText indentation(int level) {
         throw new AssertionError();
+    }
+
+    @WrapOperation(method = "addSpellLines", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/gui/SpellTooltip;getSpellInfo(Lnet/minecraft/item/ItemStack;Lnet/spell_engine/api/spell/container/SpellContainer;Lnet/minecraft/entity/player/PlayerEntity;ZZ)Lnet/spell_engine/client/gui/SpellTooltip$SpellInfo;"))
+    private static SpellTooltip.SpellInfo spellengineextension$wrap_getSpellInfo(ItemStack itemStack, SpellContainer container, PlayerEntity player, boolean forceHideHeader, boolean allowDetailsHint, Operation<SpellTooltip.SpellInfo> original) {
+        ClientConfig clientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
+        HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
+        if (clientConfig.always_hide_details_hint.get() || (clientConfig.hide_details_hint_for_invalid_conditional_spell_container.get() && hasConditionalSpellContainerComponent != null && !hasConditionalSpellContainerComponent.is_valid())) {
+            return SpellTooltip.getSpellInfo(itemStack, container, player, forceHideHeader, false);
+        } else {
+            return original.call(itemStack, container, player, forceHideHeader, allowDetailsHint);
+        }
     }
 
     @Inject(method = "spellEntry(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;ZI)Ljava/util/List;", at = @At("TAIL"))
