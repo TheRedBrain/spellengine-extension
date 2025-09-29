@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
@@ -52,8 +53,8 @@ public abstract class SpellTooltipMixin {
         }
     }
 
-    @Inject(method = "spellEntry(Lnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;ZI)Ljava/util/List;", at = @At("TAIL"))
-    private static void spellengineextension$spellEntry(RegistryEntry<Spell> spellEntry, PlayerEntity player, ItemStack itemStack, boolean details, int indentLevel, CallbackInfoReturnable<List<Text>> cir, @Local ArrayList<Text> lines) {
+    @Inject(method = "addSpellDetails", at = @At("TAIL"))
+    private static void spellengineextension$addSpellDetails(RegistryEntry<Spell> spellEntry, PlayerEntity player, ItemStack itemStack, int indentLevel, ArrayList<Text> lines, CallbackInfo ci) {
 
         ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
 
