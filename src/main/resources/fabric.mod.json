@@ -35,6 +35,7 @@
 		"spell_engine": "${spell_engine_version}"
 	},
 	"suggests": {
+		"attackrangeattribute": "*",
 		"manaattributes": "*",
 		"staminaattributes": "*",
 		"ranged_weapon_api": "*"

@@ -117,8 +117,8 @@ dependencies {
 	modImplementation("maven.modrinth:rpg-inventory:${project.rpg_inventory_version}")
 
 	// Attack Range Attribute
-//	modImplementation("maven.modrinth:attack-range-attribute:${project.attack_range_attribute_version}")
-	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
+	modImplementation("maven.modrinth:attack-range-attribute:${project.attack_range_attribute_version}")
+//	modImplementation(files("libs/attack-range-attribute-${project.attack_range_attribute_version}.jar"))
 
 //	// Shoulder Surfing Reloaded // TODO Shoulder Surfing Compat
 //	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
@@ -183,6 +183,7 @@ if(project.hasProperty('release_type')) {
 				requiredDependency 'fzzy-config'
 				requiredDependency 'fabric-api'
 				requiredDependency 'spell-engine'
+				optionalDependency 'attack-range-attribute'
 				optionalDependency 'stamina-attributes'
 				optionalDependency 'mana-attributes'
 				optionalDependency 'ranged-weapon-api'
@@ -216,6 +217,7 @@ if(project.hasProperty('release_type')) {
 			required.project 'fzzy-config'
 			required.project 'fabric-api'
 			required.project 'spell-engine'
+			optional.project 'attack-range-attribute'
 			optional.project 'stamina-attributes'
 			optional.project 'mana-attributes'
 			optional.project 'ranged-weapon-api'
