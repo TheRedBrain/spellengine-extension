@@ -1,3 +1,14 @@
+# 2.11.0
+
+- now works with Spell Engine 1.8.2
+- added "prevent_casting_of_all_spells" boolean field to the "spellengineextension:has_conditional_spell_container" item component
+- added "fall_back_spell_ids" list to the "spellengineextension:has_conditional_spell_container" item component
+- added client config options to disable the "show details" tooltip hint for spell containers
+- added optional integration for "Attack Range Attribute"
+- health/mana/stamina spell costs are no longer checked/applied for players in creative mode
+- bumped Mixin Squared version, hopefully fixing crashes when used with Sinytra Connector
+- fixed custom spell cost tooltips
+
 # 2.10.2
 
 - now works with Spell Engine 1.7.3

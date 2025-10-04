@@ -234,13 +234,15 @@ The following attributes add to the respective values defined in the spell.json.
 
 ## Conditional Spell Pools
 
-Items with the "spellengineextension:has_conditional_spell_container" item component can "disable" on existing spell container on the item.
+Items with the "spellengineextension:has_conditional_spell_container" item component can "disable" an existing spell container on the item.
 The component has multiple fields that define when the spell container is enabled/disabled:
-- is_main_hand_valid, a boolean field, valid when the item is in the main hand
-- is_off_hand_valid, a boolean field, valid when the item is in the offhand
-- is_two_handed_valid, a boolean field, valid when the item is in the main hand and the offhand is empty
-- is_dual_wielding_valid, a boolean field, valid when the item is in the main hand and the offhand contains an item that is in the 'dual_wielding_tag'
-- dual_wielding_tag, a string field, describes an identifier for an item tag
+- is_main_hand_valid: a boolean field, valid when the item is in the main hand
+- is_off_hand_valid: a boolean field, valid when the item is in the offhand
+- is_two_handed_valid: a boolean field, valid when the item is in the main hand and the offhand is empty
+- is_dual_wielding_valid: a boolean field, valid when the item is in the main hand and the offhand contains an item that is in the 'dual_wielding_tag'
+- dual_wielding_tag: a string field, describes an identifier for an item tag
+- prevent_casting_of_all_spells: a boolean, if true, all casting with that item is disabled. When false, spells supplied by other sources can still be cast.
+- fall_back_spell_ids: a string list, spells in this list are used instead of the regular spells, when the regular spell container is disabled
 - is_valid, a boolean field, when true the spell container is enabled. If one of the other boolean fields is true and the condition fulfilled, this field is set to true. otherwise to false.
 
 > 'is_two_handed_valid' is checked first. If it's set to false, then 'is_dual_wielding_valid' is checked. If that's also set to false, then 'is_main_hand_valid' is checked.
