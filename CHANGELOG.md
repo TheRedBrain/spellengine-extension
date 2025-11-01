@@ -1,3 +1,7 @@
+# 2.11.1
+
+- now works with Spell Engine 1.8.10
+
 # 2.11.0
 
 - now works with Spell Engine 1.8.2
