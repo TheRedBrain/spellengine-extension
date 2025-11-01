@@ -30,11 +30,11 @@ repositories {
 		url = "https://maven.terraformersmc.com/"
 	}
 
-	// Trinkets, Cardinal Components
-	maven {
-		name = "Ladysnake Libs"
-		url = 'https://maven.ladysnake.org/releases'
-	}
+//	// Trinkets, Cardinal Components
+//	maven {
+//		name = "Ladysnake Libs"
+//		url = 'https://maven.ladysnake.org/releases'
+//	}
 
 	// Spell Power, Spell Engine, Mana Attributes, Attributes Attributes
 	maven {
@@ -88,8 +88,8 @@ dependencies {
 	// Spell Power
 	modImplementation("maven.modrinth:spell-power:${project.spell_power_version}")
 
-	// Trinkets
-	modImplementation "dev.emi:trinkets:${project.trinkets_version}"
+//	// Trinkets
+//	modImplementation "dev.emi:trinkets:${project.trinkets_version}"
 
 	// Tiny Config
 	modImplementation("maven.modrinth:tiny-config:${project.tiny_config_version}")

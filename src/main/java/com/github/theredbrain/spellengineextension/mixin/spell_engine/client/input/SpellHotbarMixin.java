@@ -37,7 +37,7 @@ public class SpellHotbarMixin {
 
 	/**
 	 * @author TheRedBrain
-	 * @reason allow only tier 1 spells to bind to use hotkey
+	 * @reason allow only spells in "can_be_in_use_item_spell_hotbar_slot" tag to be bound to use hotkey
 	 */
 	@Overwrite
 	public boolean update(ClientPlayerEntity player, GameOptions options) {
@@ -51,7 +51,7 @@ public class SpellHotbarMixin {
 		SpellHotbar.Slot onUseKey = null;
 
 		var allBindings = Keybindings.Wrapped.all();
-		var useKey = ((KeybindingAccessor) options.useKey).getBoundKey();
+		var useKey = ((KeybindingAccessor) options.useKey).spellEngine_getBoundKey();
 		var useKeyBinding = new WrappedKeybinding(options.useKey, WrappedKeybinding.VanillaAlternative.USE_KEY);
 
 		if (mergedContainer != null
@@ -101,7 +101,7 @@ public class SpellHotbarMixin {
 				if (keyBinding != null) {
 					var unwrapped = keyBinding.get(options);
 					if (unwrapped != null) {
-						var hotbarKey = ((KeybindingAccessor) unwrapped.keyBinding()).getBoundKey();
+						var hotbarKey = ((KeybindingAccessor) unwrapped.keyBinding()).spellEngine_getBoundKey();
 
 						if (hotbarKey.equals(useKey)) {
 							onUseKey = slot;
