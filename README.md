@@ -214,6 +214,10 @@ They have no "crit_chance" or "crit_damage" traits and also no entity attribute 
 
 This is a small java API that allows status effects to provide a list of spells to players.
 
+This list is selected from a list, where the amplifier of the effect determines which exact list is chosen.
+
+If the amplifier is higher than the amount of configured lists, the last list is used instead.
+
 ## Entity Attributes
 
 - "generic.magic_damage" the damage done by magic attacks. Default value is 0.0.

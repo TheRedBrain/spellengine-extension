@@ -10,16 +10,16 @@ import java.util.List;
 @Mixin(StatusEffect.class)
 public class StatusEffectMixin implements ProvidesSpell {
 	@Unique
-	private List<String> spellengineextension$providedSpells = null;
+	private List<List<String>> spellengineextension$providedSpellsList = null;
 
 	@Override
-	public List<String> spellengineextension$providedSpells() {
-		return this.spellengineextension$providedSpells;
+	public List<List<String>> spellengineextension$providedSpells() {
+		return this.spellengineextension$providedSpellsList;
 	}
 
 	@Override
-	public StatusEffect spellengineextension$setProvidedSpells(List<String> providedSpells) {
-		this.spellengineextension$providedSpells = providedSpells;
+	public StatusEffect spellengineextension$setProvidedSpells(List<List<String>> providedSpellsList) {
+		this.spellengineextension$providedSpellsList = providedSpellsList;
 		return (StatusEffect) ((Object) this);
 	}
 }

@@ -1,3 +1,9 @@
+# 2.12.0
+
+## Changes
+
+- reworked the ProvidesSpell status effect API. It now optionally provides spells based on the effect amplifier.
+
 # 2.11.2
 
 - now works with Spell Engine 1.8.16
