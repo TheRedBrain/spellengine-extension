@@ -68,7 +68,7 @@ Spell modifiers got more options to modify spells:
 
 This is an example spell.json where all added values are present (with their default values)
 
-> Note that this is not a valid spell.json, as several fields added by Spell Engine are not present. It is also normally not possible to have multiple release target fields
+> Note that this is not a valid spell.json, as several fields added by Spell Engine are not present. It is also normally not possible to have multiple target fields
 
 ```json
 {
@@ -235,6 +235,32 @@ The following attributes add to the respective values defined in the spell.json.
 - "generic.extra_pierce"
 - "generic.extra_chain_reaction_size"
 - "generic.extra_chain_reaction_triggers"
+
+## Spell Container Predicate
+
+The "spellengineextension:spell_container_predicate" can be used to check if a item stack contains a specific "spell_engine:spell_container".
+
+All its fields are optional.
+
+> If "exact_spell_ids_match" is true, the spell container has to contain all and only the ids listed in "spell_ids".\
+> If "exact_spell_ids_match" is false (default), the spell container has to contain all the ids listed in "spell_ids".
+
+Example:
+
+````json
+{
+  "content": "ANY",
+  "is_proxy": true,
+  "pool": "",
+  "slot": "",
+  "max_spell_count": 1,
+  "exact_spell_ids_match": true,
+  "spell_ids": [
+    "wizards:fire_blast"
+  ]
+  
+}
+````
 
 ## Conditional Spell Pools
 

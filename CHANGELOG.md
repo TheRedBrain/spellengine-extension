@@ -1,5 +1,9 @@
 # 2.12.0
 
+## Additions
+
+- added "spellengineextension:spell_container_predicate" data component predicate
+
 ## Changes
 
 - reworked the ProvidesSpell status effect API. It now optionally provides spells based on the effect amplifier.
