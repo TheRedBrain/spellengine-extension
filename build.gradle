@@ -101,6 +101,10 @@ dependencies {
 	// Bundle API
 	modImplementation("maven.modrinth:bundle-api:${project.bundle_api_version}")
 
+	// Slot Customization API
+	modImplementation("maven.modrinth:slot-customization-api:${project.slot_customization_api_version}")
+//	modImplementation(files("libs/slot-customization-api-${project.slot_customization_api_version}.jar"))
+
 	// Merged Items
 	modImplementation("maven.modrinth:merged-items:${project.merged_items_version}")
 //	modImplementation(files("libs/merged-items-${project.merged_items_version}.jar"))

@@ -1,5 +1,7 @@
 # 2.12.0
 
+- now works with Spell Engine 1.8.19
+
 ## Additions
 
 - added "spellengineextension:spell_container_predicate" data component predicate
