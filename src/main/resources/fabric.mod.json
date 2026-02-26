@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "spellengineextension",
 	"version": "${version}",
-	"name": "Spell Engine Extension",
+	"name": "Spell Engine Extension (RPG Series Tweaks)",
 	"description": "Extends the mod 'Spell Engine' with additional functionality.",
 	"authors": [
 		"TheRedBrain"
