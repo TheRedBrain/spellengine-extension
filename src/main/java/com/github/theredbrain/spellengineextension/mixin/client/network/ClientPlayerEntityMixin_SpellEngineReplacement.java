@@ -2,7 +2,6 @@ package com.github.theredbrain.spellengineextension.mixin.client.network;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellActiveCastMixin;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -343,7 +342,7 @@ public abstract class ClientPlayerEntityMixin_SpellEngineReplacement implements 
 
 		if (attack.context() != null) {
 			var animationSpeed = attack.speed() * attack.animation().speed;
-			((AnimatablePlayer) this).playSpellAnimation(SpellCast.Animation.RELEASE, attack.animation().id, animationSpeed);
+			((AnimatablePlayer)this).playSpellAnimation(SpellCast.Animation.RELEASE, attack.animation().id, animationSpeed);
 			var packet = new Packets.AttackFxBroadcast(attack.context());
 			ClientPlayNetworking.send(packet);
 		}
@@ -395,7 +394,7 @@ public abstract class ClientPlayerEntityMixin_SpellEngineReplacement implements 
 			ticksLeftToDoubleTapSprint = 0;
 		}
 		if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
-			if (((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().value().active.cast != null && ((DuckSpellActiveCastMixin) process.spell().value().active.cast).spellengineextension$getAfterCastingMovementLockingTicks() > 0)) && !player.hasVehicle()) {
+			if (((((DuckPlayerEntityMixin)player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
 				Input var10000 = player.input;
 				var10000.movementForward = 0.0F;
 				var10000 = player.input;
