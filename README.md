@@ -1,4 +1,4 @@
-# SpellEngine Extension
+# SpellEngine Extension (RPG Series Tweaks)
 
 This is an extension to the [Spell Engine](https://modrinth.com/mod/spell-engine) mod by Daedelus. On its own it changes nothing in the game, but mod and data pack authors have more possibilities when designing spells.
 
@@ -20,7 +20,7 @@ Spell Cost
 
 - health_cost (amount of health casting the spell is costing)
 - check_health_cost (if casting fails when player has not enough health)
-- health_cost_multiplier_applies (whether the health cost should be multiplied with the "generic.health_spell_cost_multiplier" entity attribute)
+- health_cost_multiplier_applies (whether the health cost should be multiplied with the "spellengineextension:generic.health_spell_cost_multiplier" entity attribute)
 
 > Spending health to cast spells inflicts damage with the "spellengineextension:blood_magic_casting_damage_type" damage type.
 
@@ -30,7 +30,7 @@ Spell Cost
 - check_stamina (if casting fails when player has no stamina)
 - check_stamina_cost (if casting fails when player has not enough stamina)
 - add_item_use_stamina_cost_attribute_value (if the value of the "staminaattributes:generic.item_use_stamina_cost" entity attribute should be added to the spell stamina cost)
-- stamina_cost_multiplier_applies (whether the stamina cost should be multiplied with the "generic.stamina_spell_cost_multiplier" entity attribute)
+- stamina_cost_multiplier_applies (whether the stamina cost should be multiplied with the "spellengineextension:generic.stamina_spell_cost_multiplier" entity attribute)
 - apply_channeling_mana_cost (whether the stamina cost should be applied every 'channel_tick')
 
 This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) is installed.
@@ -40,7 +40,7 @@ This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stam
 - mana_cost (amount of mana casting the spell is costing)
 - check_mana (if casting fails when player has no mana)
 - check_mana_cost (if casting fails when player has not enough mana)
-- mana_cost_multiplier_applies (whether the mana cost should be multiplied with the "generic.mana_spell_cost_multiplier" entity attribute)
+- mana_cost_multiplier_applies (whether the mana cost should be multiplied with the "spellengineextension:generic.mana_spell_cost_multiplier" entity attribute)
 - apply_channeling_mana_cost (whether the mana cost should be applied every 'channel_tick')
 
 This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-attributes) is installed.
@@ -220,21 +220,21 @@ If the amplifier is higher than the amount of configured lists, the last list is
 
 ## Entity Attributes
 
-- "generic.magic_damage" the damage done by magic attacks. Default value is 0.0.
-- "generic.health_spell_cost_multiplier" multiplies the health cost of spells. Default value is 1.0.
-- "generic.mana_spell_cost_multiplier" multiplies the mana cost of spells. Default value is 1.0.
-- "generic.stamina_spell_cost_multiplier" multiplies the stamina cost of spells. Default value is 1.0.
+- "spellengineextension:generic.magic_damage" the damage done by magic attacks. Default value is 0.0.
+- "spellengineextension:generic.health_spell_cost_multiplier" multiplies the health cost of spells. Default value is 1.0.
+- "spellengineextension:generic.mana_spell_cost_multiplier" multiplies the mana cost of spells. Default value is 1.0.
+- "spellengineextension:generic.stamina_spell_cost_multiplier" multiplies the stamina cost of spells. Default value is 1.0.
 
 The following attributes add to the respective values defined in the spell.json. This can be disabled for each spell individually or globally in the server config.
-- "generic.extra_launch_count"
-- "generic.extra_launch_delay"
-- "generic.extra_velocity"
-- "generic.extra_ricochet"
-- "generic.extra_ricochet_range"
-- "generic.extra_bounce"
-- "generic.extra_pierce"
-- "generic.extra_chain_reaction_size"
-- "generic.extra_chain_reaction_triggers"
+- "spellengineextension:generic.extra_launch_count"
+- "spellengineextension:generic.extra_launch_delay"
+- "spellengineextension:generic.extra_velocity"
+- "spellengineextension:generic.extra_ricochet"
+- "spellengineextension:generic.extra_ricochet_range"
+- "spellengineextension:generic.extra_bounce"
+- "spellengineextension:generic.extra_pierce"
+- "spellengineextension:generic.extra_chain_reaction_size"
+- "spellengineextension:generic.extra_chain_reaction_triggers"
 
 ## Spell Container Predicate
 
@@ -249,8 +249,8 @@ Example:
 
 ````json
 {
-  "content": "ANY",
-  "is_proxy": true,
+  "access": "ANY",
+  "access_param": "",
   "pool": "",
   "slot": "",
   "max_spell_count": 1,
@@ -277,7 +277,13 @@ The component has multiple fields that define when the spell container is enable
 
 > 'is_two_handed_valid' is checked first. If it's set to false, then 'is_dual_wielding_valid' is checked. If that's also set to false, then 'is_main_hand_valid' is checked.
 
-## Proxy Pools
+## Built-in Data Pack
+
+Spell Engine Extension comes ith a built-in data pack that enables SSE features for the RPG Series mods. This includes:
+
+- weapon skills are added to the "spellengineextension:can_be_in_use_item_spell_hotbar_slot" spell tag
+
+## Proxy Pools (1.20.1 only)
 
 Items can be defined as spell proxies, which means they can cast spells which are added by spell sources.
 
@@ -289,4 +295,4 @@ In old versions 'Spell Engine Extension' adds the 'proxy_pool' field in the spel
 
 ### 1.21.1 +
 
-In modern versions the proxy pool is set via the "spellengineextension:proxy_pool" item component.
+In modern versions the proxy pool feature is implemented in vanilla Spell Engine.

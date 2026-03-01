@@ -1,5 +1,17 @@
 # 2.12.0
 
+- now works with Spell Engine 1.9.0
+
+## Additions
+
+- added a built-in data pack that enables SSE mechanics for the RPG Series content mods
+
+## Changes
+
+- changed default values of some config settings
+
+# 2.12.0
+
 - now works with Spell Engine 1.8.19
 
 ## Additions
