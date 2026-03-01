@@ -30,6 +30,6 @@ public interface ProvidesSpell {
 				}
 			}
 		}
-		return new SpellContainer(SpellContainer.ContentType.ANY, false, "", spellList.size(), spellList);
+		return new SpellContainer(SpellContainer.ContentType.NONE, "", "", spellList.size(), spellList);
 	}
 }

@@ -35,14 +35,14 @@ public class SpellContainerHelperMixin {
 					return null;
 				}
 			}
-			SpellContainer container = (SpellContainer) itemStack.get(SpellDataComponents.SPELL_CONTAINER);
+			SpellContainer container = itemStack.get(SpellDataComponents.SPELL_CONTAINER);
 			if (container == null) {
-				Identifier id = ((RegistryKey) itemStack.getItem().getRegistryEntry().getKey().get()).getValue();
+				Identifier id = itemStack.getItem().getRegistryEntry().getKey().get().getValue();
 				container = SpellAssignments.containerForItem(id);
 			}
 			if (container != null) {
 				if (fall_back_spell_ids != null) {
-					container = new SpellContainer(container.content(), container.is_proxy(), container.pool(), container.max_spell_count(), fall_back_spell_ids);
+					container = new SpellContainer(container.access(), container.access_param(), container.pool(), container.max_spell_count(), fall_back_spell_ids);
 				}
 				container = SpellEngineExtension.addMergedSpellContainer(container, itemStack);
 			}

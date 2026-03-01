@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public record SpellContainersPredicate(
-		Optional<SpellContainer.ContentType> content,
-		Optional<Boolean> is_proxy,
+		Optional<SpellContainer.ContentType> access,
+		Optional<String> access_param,
 		Optional<String> pool,
 		Optional<String> slot,
 		NumberRange.IntRange max_spell_count,
@@ -23,8 +23,8 @@ public record SpellContainersPredicate(
 ) implements ComponentSubPredicate<SpellContainer> {
 	public static final Codec<SpellContainersPredicate> CODEC = RecordCodecBuilder.create(
 			instance -> instance.group(
-							SpellContainer.ContentType.CODEC.optionalFieldOf("content").forGetter(SpellContainersPredicate::content),
-							Codec.BOOL.optionalFieldOf("is_proxy").forGetter(SpellContainersPredicate::is_proxy),
+							SpellContainer.ContentType.CODEC.optionalFieldOf("access").forGetter(SpellContainersPredicate::access),
+							Codec.STRING.optionalFieldOf("access_param").forGetter(SpellContainersPredicate::access_param),
 							Codec.STRING.optionalFieldOf("pool").forGetter(SpellContainersPredicate::pool),
 							Codec.STRING.optionalFieldOf("slot").forGetter(SpellContainersPredicate::slot),
 							NumberRange.IntRange.CODEC
@@ -43,9 +43,9 @@ public record SpellContainersPredicate(
 
 	@Override
 	public boolean test(ItemStack itemStack, SpellContainer spellContainer) {
-		if (this.content.isPresent() && !this.content.get().equals(spellContainer.content())) {
+		if (this.access.isPresent() && !this.access.get().equals(spellContainer.access())) {
 			return false;
-		} else if (this.is_proxy.isPresent() && this.is_proxy.get() != spellContainer.is_proxy()) {
+		} else if (this.access_param.isPresent() && !this.access_param.get().equals(spellContainer.access_param())) {
 			return false;
 		} else if (this.pool.isPresent() && this.pool.get().equals(spellContainer.pool())) {
 			return false;

@@ -22,8 +22,7 @@
     "spell_engine.client.input.AutoSwapHelperMixin",
     "spell_engine.client.input.SpellHotbarMixin",
     "spell_engine.internals.SpellHelperMixin",
-    "spell_engine.internals.arrow.ArrowHelperMixin",
-    "spell_engine.internals.container.SpellContainerSourceMixin"
+    "spell_engine.internals.arrow.ArrowHelperMixin"
   ],
   "injectors": {
     "defaultRequire": 1

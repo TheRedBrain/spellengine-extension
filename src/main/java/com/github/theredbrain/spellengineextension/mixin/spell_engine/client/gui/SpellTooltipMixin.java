@@ -42,8 +42,8 @@ public abstract class SpellTooltipMixin {
         throw new AssertionError();
     }
 
-    @WrapOperation(method = "addSpellLines", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/gui/SpellTooltip;getSpellInfo(Lnet/minecraft/item/ItemStack;Lnet/spell_engine/api/spell/container/SpellContainer;Lnet/minecraft/entity/player/PlayerEntity;ZZ)Lnet/spell_engine/client/gui/SpellTooltip$SpellInfo;"))
-    private static SpellTooltip.SpellInfo spellengineextension$wrap_getSpellInfo(ItemStack itemStack, SpellContainer container, PlayerEntity player, boolean forceHideHeader, boolean allowDetailsHint, Operation<SpellTooltip.SpellInfo> original) {
+    @WrapOperation(method = "addSpellLines", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/gui/SpellTooltip;getSpellInfoExpandedWithKey(Lnet/minecraft/item/ItemStack;Lnet/spell_engine/api/spell/container/SpellContainer;Lnet/minecraft/entity/player/PlayerEntity;ZZ)Lnet/spell_engine/client/gui/SpellTooltip$SpellInfo;"))
+    private static SpellTooltip.SpellInfo spellengineextension$wrap_getSpellInfoExpandedWithKey(ItemStack itemStack, SpellContainer container, PlayerEntity player, boolean forceHideHeader, boolean allowDetailsHint, Operation<SpellTooltip.SpellInfo> original) {
         ClientConfig clientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
         HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
         if (clientConfig.always_hide_details_hint.get() || (clientConfig.hide_details_hint_for_invalid_conditional_spell_container.get() && hasConditionalSpellContainerComponent != null && !hasConditionalSpellContainerComponent.is_valid())) {
