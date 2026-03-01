@@ -21,6 +21,10 @@
 	"hud.cast_attempt_error.missing_status_effect": "Requires %s Effect",
 	"hud.cast_attempt_error.status_effect_amplifier_too_low": "Requires Higher Level of %s Effect",
 
+
+	"resourcepack.spellengineextension.rpg_series_mods.name": "Spell Engine Extension X RPG Series",
+
+
 	"spell.tooltip.health": "Requires: %s Health",
 	"spell.tooltip.mana": "Requires: %s Mana",
 	"spell.tooltip.stamina": "Requires: %s Stamina",

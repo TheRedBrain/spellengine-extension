@@ -1,0 +1,85 @@
+{
+    "replace": false,
+    "values": [
+        {
+            "id": "#paladins:weapon/holy_staff",
+            "required": false
+        },
+        {
+            "id": "#paladins:weapon/holy_wand",
+            "required": false
+        },
+        {
+            "id": "rpg_series:cleave",
+            "required": false
+        },
+        {
+            "id": "rpg_series:fan_of_knives",
+            "required": false
+        },
+        {
+            "id": "rpg_series:flurry",
+            "required": false
+        },
+        {
+            "id": "rpg_series:ground_slam",
+            "required": false
+        },
+        {
+            "id": "rpg_series:impale",
+            "required": false
+        },
+        {
+            "id": "rpg_series:smash",
+            "required": false
+        },
+        {
+            "id": "rpg_series:swift_strikes",
+            "required": false
+        },
+        {
+            "id": "rpg_series:swipe",
+            "required": false
+        },
+        {
+            "id": "rpg_series:thrust",
+            "required": false
+        },
+        {
+            "id": "rpg_series:whirlwind",
+            "required": false
+        },
+        {
+            "id": "wizards:weapon/arcane_staff",
+            "required": false
+        },
+        {
+            "id": "wizards:weapon/fire_staff",
+            "required": false
+        },
+        {
+            "id": "wizards:weapon/frost_staff",
+            "required": false
+        },
+        {
+            "id": "wizards:weapon/wizard_staff",
+            "required": false
+        },
+        {
+            "id": "wizards:arcane_bolt",
+            "required": false
+        },
+        {
+            "id": "wizards:fire_scorch",
+            "required": false
+        },
+        {
+            "id": "wizards:fireball",
+            "required": false
+        },
+        {
+            "id": "wizards:frost_shard",
+            "required": false
+        }
+    ]
+}

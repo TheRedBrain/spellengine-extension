@@ -17,7 +17,10 @@ import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellActiveC
 import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
 import me.fzzyhmstrs.fzzy_config.api.RegisterType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.component.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -28,6 +31,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.predicate.item.ItemSubPredicate;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.api.spell.container.SpellContainer;
@@ -35,6 +39,8 @@ import net.spell_engine.api.spell.event.SpellEvents;
 import net.spell_engine.api.spell.registry.SpellRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 public class SpellEngineExtension implements ModInitializer {
 	public static final String MOD_ID = "spellengineextension";
@@ -162,6 +168,11 @@ public class SpellEngineExtension implements ModInitializer {
 				((DuckPlayerEntityMixin) args.caster()).spellengineextension$setMovementLockingTicks(Math.max(0, ((DuckSpellActiveCastMixin) args.spell().value().active.cast).spellengineextension$getAfterCastingMovementLockingTicks()));
 			}
 		});
+
+		Optional<ModContainer> modContainer = FabricLoader.getInstance().getModContainer(MOD_ID);
+		if (modContainer.isPresent()) {
+			ResourceManagerHelper.registerBuiltinResourcePack(identifier("rpg_series_mods"), modContainer.get(), Text.translatable("resourcepack.spellengineextension.rpg_series_mods.name"), ResourcePackActivationType.DEFAULT_ENABLED);
+		}
 	}
 
 	public static Identifier identifier(String path) {
