@@ -13,10 +13,9 @@ public class ServerConfig extends Config {
 	}
 
 	@Comment("""
-			When set to true, changing the players orientation and position while spell casting is disabled.
-			Use the spell tag "disables_movement_locking_during_casting" and the entity type tag "disables_movement_locking_when_ridden" to control when the movement locking is applied.
+			When set to true, changing the players orientation and position while casting spells whose "after_casting_movement_locking_ticks" has a value greater 0.
 			""")
-	public ValidatedBoolean enable_movement_locking_spell_casting = new ValidatedBoolean(false);
+	public ValidatedBoolean enable_movement_locking_spell_casting = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_attack_range_attribute_integration = new ValidatedBoolean(true);
 	@Comment("When enabled, only spells in the 'spellengineextension:can_be_in_use_item_spell_hotbar_slot' are placed in the use_item hotbar slot.")
 	public ValidatedBoolean enable_spell_hotbar_use_key_restriction = new ValidatedBoolean(true);
@@ -30,22 +29,22 @@ public class ServerConfig extends Config {
 	public ValidatedBoolean spell_cost_stamina_allowed = new ValidatedBoolean(true);
 	@Comment("Spells should require and optionally remove status effects. Set to `false` to remove effect cost from all spells.")
 	public ValidatedBoolean spell_cost_effects_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_launch_count' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_launch_count' entity attribute")
 	public ValidatedBoolean spell_launch_properties_extra_launch_count_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_launch_delay' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_launch_delay' entity attribute")
 	public ValidatedBoolean spell_launch_properties_extra_launch_delay_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_velocity' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_velocity' entity attribute")
 	public ValidatedBoolean spell_launch_properties_extra_velocity_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_ricochet' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_ricochet' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_ricochet_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_ricochet_range' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_ricochet_range' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_ricochet_range_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_bounce' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_bounce' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_bounce_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_pierce' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_pierce' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_pierce_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_chain_reaction_size' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_chain_reaction_size' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_chain_reaction_size_attribute_allowed = new ValidatedBoolean(true);
-	@Comment("Spells can be affected by the 'generic.extra_chain_reaction_triggers' entity attribute")
+	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_chain_reaction_triggers' entity attribute")
 	public ValidatedBoolean spell_projectile_perk_extra_chain_reaction_triggers_attribute_allowed = new ValidatedBoolean(true);
 }
