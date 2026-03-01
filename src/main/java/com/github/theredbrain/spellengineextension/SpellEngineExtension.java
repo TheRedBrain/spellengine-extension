@@ -65,7 +65,6 @@ public class SpellEngineExtension implements ModInitializer {
 	public static RegistryEntry<EntityAttribute> EXTRA_CHAIN_REACTION_TRIGGERS;
 
 	public static ComponentType<HasConditionalSpellContainerComponent> HAS_CONDITIONAL_SPELL_CONTAINER;
-	public static ComponentType<Identifier> PROXY_POOL;
 
 	public static ItemSubPredicate.Type<SpellContainersPredicate> SPELL_CONTAINER_PREDICATE;
 

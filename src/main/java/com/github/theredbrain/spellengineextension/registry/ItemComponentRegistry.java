@@ -5,7 +5,6 @@ import com.github.theredbrain.spellengineextension.component.type.HasConditional
 import net.minecraft.component.ComponentType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
 public class ItemComponentRegistry {
 	static {
@@ -13,11 +12,6 @@ public class ItemComponentRegistry {
 				Registries.DATA_COMPONENT_TYPE,
 				SpellEngineExtension.identifier("has_conditional_spell_container"),
 				ComponentType.<HasConditionalSpellContainerComponent>builder().codec(HasConditionalSpellContainerComponent.CODEC)/*.packetCodec(HasConditionalSpellContainerComponent.PACKET_CODEC)*/.build()
-		);
-		SpellEngineExtension.PROXY_POOL = Registry.register(
-				Registries.DATA_COMPONENT_TYPE,
-				SpellEngineExtension.identifier("proxy_pool"),
-				ComponentType.<Identifier>builder().codec(Identifier.CODEC).packetCodec(Identifier.PACKET_CODEC).build()
 		);
 	}
 
