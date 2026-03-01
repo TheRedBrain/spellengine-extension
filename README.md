@@ -295,4 +295,4 @@ In old versions 'Spell Engine Extension' adds the 'proxy_pool' field in the spel
 
 ### 1.21.1 +
 
-In modern versions the proxy pool feature is implemented in vanilla Spell Engine.
+In modern versions the proxy pool feature is implemented in vanilla Spell Engine via the "spell_engine:spell_container" data component.

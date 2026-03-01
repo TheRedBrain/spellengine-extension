@@ -8,6 +8,7 @@
 
 ## Changes
 
+- removed the "spellengineextension:proxy_pool" data component. This mechanic is now supported by vanilla Spell Engine via the reworked "spell_engine:spell_container" data component.
 - changed default values of some config settings
 
 # 2.12.0
