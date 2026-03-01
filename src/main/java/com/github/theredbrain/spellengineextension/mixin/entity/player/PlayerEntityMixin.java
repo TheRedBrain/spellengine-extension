@@ -53,7 +53,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements DuckPlay
 
 	@Override
 	public void spellengineextension$setMovementLockingTicks(int movementLockingTicks) {
-		this.dataTracker.set(MOVEMENT_LOCKING_TICKS, movementLockingTicks);
+		if (movementLockingTicks >= 0) {
+			this.dataTracker.set(MOVEMENT_LOCKING_TICKS, movementLockingTicks);
+		}
 	}
 
 }

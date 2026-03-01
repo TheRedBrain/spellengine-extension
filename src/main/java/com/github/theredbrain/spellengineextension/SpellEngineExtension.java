@@ -70,7 +70,6 @@ public class SpellEngineExtension implements ModInitializer {
 	public static ItemSubPredicate.Type<SpellContainersPredicate> SPELL_CONTAINER_PREDICATE;
 
 	public static final TagKey<Spell> CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("can_be_in_use_item_spell_hotbar_slot"));
-	public static final TagKey<Spell> ENABLES_MOVEMENT_LOCKING_DURING_CASTING = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("enables_movement_locking_during_casting"));
 
 	public static final boolean isManaAttributesLoaded = FabricLoader.getInstance().isModLoaded("manaattributes");
 	public static final boolean isStaminaAttributesLoaded = FabricLoader.getInstance().isModLoaded("staminaattributes");
@@ -164,7 +163,7 @@ public class SpellEngineExtension implements ModInitializer {
 		SpellSchoolRegistry.init();
 
 		SpellEvents.SPELL_CAST.register((args) -> {
-			if (SERVER_CONFIG.enable_movement_locking_spell_casting.get() && args.spell().isIn(ENABLES_MOVEMENT_LOCKING_DURING_CASTING)) {
+			if (SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
 				((DuckPlayerEntityMixin) args.caster()).spellengineextension$setMovementLockingTicks(Math.max(0, ((DuckSpellActiveCastMixin) args.spell().value().active.cast).spellengineextension$getAfterCastingMovementLockingTicks()));
 			}
 		});
