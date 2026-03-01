@@ -1,4 +1,4 @@
-# 2.12.0
+# 2.13.0
 
 - now works with Spell Engine 1.9.0
 
