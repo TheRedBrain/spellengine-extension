@@ -26,7 +26,7 @@ public abstract class ClientPlayerEntityMixin {
 		var caster = (SpellCasterClient) player;
 		var process = caster.getSpellCastProcess();
 		if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
-			if (((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
+			if (SpellEngineExtension.SERVER_CONFIG.movement_locking_prevents_player_position_changes.get() && ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
 				Input var10000 = this.input;
 				var10000.movementForward = 0.0F;
 				var10000 = this.input;

@@ -13,9 +13,11 @@ public class ServerConfig extends Config {
 	}
 
 	@Comment("""
-			When set to true, changing the players orientation and position while casting spells whose "after_casting_movement_locking_ticks" has a value greater 0.
+			When set to true, changing the players orientation and/or position while casting spells is disabled. Spells have to be in the "" spell tag for this to be active. Those spells can also apply an amount of ticks where movement is locked after casting the spell has ended.
 			""")
 	public ValidatedBoolean enable_movement_locking_spell_casting = new ValidatedBoolean(true);
+	public ValidatedBoolean movement_locking_prevents_player_position_changes = new ValidatedBoolean(true);
+	public ValidatedBoolean movement_locking_prevents_player_orientation_changes = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_attack_range_attribute_integration = new ValidatedBoolean(true);
 	@Comment("When enabled, only spells in the 'spellengineextension:can_be_in_use_item_spell_hotbar_slot' are placed in the use_item hotbar slot.")
 	public ValidatedBoolean enable_spell_hotbar_use_key_restriction = new ValidatedBoolean(true);

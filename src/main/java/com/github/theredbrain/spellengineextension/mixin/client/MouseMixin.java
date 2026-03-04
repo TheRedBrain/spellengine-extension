@@ -26,7 +26,7 @@ public abstract class MouseMixin {
 			ClientPlayerEntity player = client.player;
 			if (player != null) {
 				var process = ((SpellCasterClient) player).getSpellCastProcess();
-				if ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().value().active.cast != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING))) {
+				if (SpellEngineExtension.SERVER_CONFIG.movement_locking_prevents_player_orientation_changes.get() && ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().value().active.cast != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING)))) {
 					return;
 				}
 			}

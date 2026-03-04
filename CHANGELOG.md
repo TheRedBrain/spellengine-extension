@@ -1,3 +1,15 @@
+# 2.14.0
+
+- now works with Spell Engine 1.9.4
+
+## Additions
+
+- added server config options to individually toggle position and orientation locking for movement locking spell casting.
+
+## Technical
+
+- made huge progress in making the mod easier to maintain. Thanks to new events added by Spell Engine, several mixins could be removed. Other mixins were modernized to be much more robust.
+
 # 2.13.0
 
 - now works with Spell Engine 1.9.0
