@@ -58,6 +58,10 @@ public interface DuckSpellCostMixin {
 
 	void spellengineextension$setCheckEffectCost(boolean checkEffectCost);
 
+	String spellengineextension$getCustomEffectId();
+
+	void spellengineextension$setCustomEffectId(String customEffectId);
+
 	int spellengineextension$getDecrementEffectAmount();
 
 	void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount);

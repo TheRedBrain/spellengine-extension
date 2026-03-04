@@ -27,8 +27,8 @@ public class ServerConfig extends Config {
 	public ValidatedBoolean spell_cost_mana_allowed = new ValidatedBoolean(true);
 	@Comment("Spells should cost stamina. Set to `false` to remove stamina cost from all spells.")
 	public ValidatedBoolean spell_cost_stamina_allowed = new ValidatedBoolean(true);
-	@Comment("Spells should require and optionally remove status effects. Set to `false` to remove effect cost from all spells.")
-	public ValidatedBoolean spell_cost_effects_allowed = new ValidatedBoolean(true);
+	@Comment("Spells should require and optionally remove status effects. This cost is different to the effect cost added by vanilla Spell Engine to maintain compatibility. Set to `false` to remove custom effect cost from all spells.")
+	public ValidatedBoolean spell_cost_custom_effects_allowed = new ValidatedBoolean(true);
 	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_launch_count' entity attribute")
 	public ValidatedBoolean spell_launch_properties_extra_launch_count_attribute_allowed = new ValidatedBoolean(true);
 	@Comment("Spells can be affected by the 'spellengineextension:generic.extra_launch_delay' entity attribute")

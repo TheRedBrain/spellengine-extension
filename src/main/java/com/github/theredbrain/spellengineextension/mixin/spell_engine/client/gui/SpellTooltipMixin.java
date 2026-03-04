@@ -5,10 +5,10 @@ import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
 import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
+import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModifiers;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,10 +28,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Mixin(SpellTooltip.class)
@@ -87,27 +85,30 @@ public abstract class SpellTooltipMixin {
             }
         }
 
-        if (spellEngineExtensionConfig.spell_cost_effects_allowed.get() && spell1.cost != null && spell1.cost.effect_id != null && !spell1.cost.effect_id.isEmpty()) {
-            Optional<RegistryEntry.Reference<StatusEffect>> optionalStatusEffectReference = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(spell1.cost.effect_id));
-            if (optionalStatusEffectReference.isPresent()) {
-                RegistryEntry.Reference<StatusEffect> statusEffectReference = optionalStatusEffectReference.get();
-                int decrementEffectAmount = ((DuckSpellCostMixin) spell1.cost).spellengineextension$getDecrementEffectAmount();
-                StatusEffectInstance statusEffectInstance = player.getStatusEffect(statusEffectReference);
-                int currentAmplifier = -1;
-                if (statusEffectInstance != null) {
-                    currentAmplifier = statusEffectInstance.getAmplifier();
+        if (spellEngineExtensionConfig.spell_cost_custom_effects_allowed.get()) {
+            String custom_effect_id = CustomSpellModifiers.getModifiedEffectCostId(player, spellEntry);
+            if (!custom_effect_id.isEmpty()) {
+                Optional<RegistryEntry.Reference<StatusEffect>> optionalStatusEffectReference = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(custom_effect_id));
+                if (optionalStatusEffectReference.isPresent()) {
+                    RegistryEntry.Reference<StatusEffect> statusEffectReference = optionalStatusEffectReference.get();
+                    int decrementEffectAmount = ((DuckSpellCostMixin) spell1.cost).spellengineextension$getDecrementEffectAmount();
+                    StatusEffectInstance statusEffectInstance = player.getStatusEffect(statusEffectReference);
+                    int currentAmplifier = -1;
+                    if (statusEffectInstance != null) {
+                        currentAmplifier = statusEffectInstance.getAmplifier();
+                    }
+                    boolean checkEffectCost = ((DuckSpellCostMixin) spell1.cost).spellengineextension$checkEffectCost();
+                    boolean hasRequiredEffectAndLevel = !checkEffectCost || (player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0));
+                    lines.add(
+                            indentation(indentLevel)
+                                    .append(checkEffectCost ? Text.translatable("spell.tooltip.effect.1") : Text.translatable("spell.tooltip.effect.2"))
+                                    .append(statusEffectReference.value().getName().copy())
+                                    .append(ScreenTexts.SPACE)
+                                    .append(decrementEffectAmount > 1 ? Text.translatable("enchantment.level." + (decrementEffectAmount - 1)).append(ScreenTexts.SPACE) : Text.empty())
+                                    .append(Text.translatable("spell.tooltip.effect.3"))
+                                    .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
+                    );
                 }
-                boolean checkEffectCost = ((DuckSpellCostMixin) spell1.cost).spellengineextension$checkEffectCost();
-                boolean hasRequiredEffectAndLevel = !checkEffectCost || (player.hasStatusEffect(statusEffectReference) && (currentAmplifier + 1 >= decrementEffectAmount || decrementEffectAmount <= 0));
-                lines.add(
-                        indentation(indentLevel)
-                                .append(checkEffectCost ? Text.translatable("spell.tooltip.effect.1") : Text.translatable("spell.tooltip.effect.2"))
-                                .append(statusEffectReference.value().getName().copy())
-                                .append(ScreenTexts.SPACE)
-                                .append(decrementEffectAmount > 1 ? Text.translatable("enchantment.level." + (decrementEffectAmount - 1)).append(ScreenTexts.SPACE) : Text.empty())
-                                .append(Text.translatable("spell.tooltip.effect.3"))
-                                .formatted(hasRequiredEffectAndLevel ? Formatting.GREEN : Formatting.RED)
-                );
             }
         }
     }

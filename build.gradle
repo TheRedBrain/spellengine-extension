@@ -54,9 +54,6 @@ repositories {
 //		}
 //	}
 
-	// Mixin Squared
-	maven { url = "https://maven.bawnorton.com/releases" }
-
 }
 
 dependencies {
@@ -118,9 +115,6 @@ dependencies {
 
 //	// Shoulder Surfing Reloaded // TODO Shoulder Surfing Compat
 //	modImplementation("curse.maven:shoulder-surfing-reloaded-243190:${project.shoulder_surfing_file_id}")
-
-	// Mixin Squared
-	include(implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.3.6-beta.1")))
 
 }
 

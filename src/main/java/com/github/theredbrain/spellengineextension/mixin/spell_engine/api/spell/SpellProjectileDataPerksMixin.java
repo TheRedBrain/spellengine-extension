@@ -1,12 +1,11 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.api.spell;
 
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellProjectileDataPerksMixin;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.spell_engine.api.spell.Spell;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Spell.ProjectileData.Perks.class)
 public class SpellProjectileDataPerksMixin implements DuckSpellProjectileDataPerksMixin {
@@ -83,15 +82,15 @@ public class SpellProjectileDataPerksMixin implements DuckSpellProjectileDataPer
 		this.respect_extra_chain_reaction_triggers_attribute = respect_extra_chain_reaction_triggers_attribute;
 	}
 
-	@Inject(method = "copy", at = @At("RETURN"), cancellable = true, remap = false)
-	public void copy(CallbackInfoReturnable<Spell.ProjectileData.Perks> cir) {
-		Spell.ProjectileData.Perks perks = cir.getReturnValue();
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraRicochetAttribute(this.respect_extra_ricochet_attribute);
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraRicochetRangeAttribute(this.respect_extra_ricochet_range_attribute);
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraBounceAttribute(this.respect_extra_bounce_attribute);
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraPierceAttribute(this.respect_extra_pierce_attribute);
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraChainReactionSizeAttribute(this.respect_extra_chain_reaction_size_attribute);
-		((DuckSpellProjectileDataPerksMixin)perks).spellengineextension$setRespectExtraChainReactionTriggersAttribute(this.respect_extra_chain_reaction_triggers_attribute);
-		cir.setReturnValue(perks);
+	@WrapMethod(method = "copy()Lnet/spell_engine/api/spell/Spell$ProjectileData$Perks;", remap = false)
+	public Spell.ProjectileData.Perks spellengineextension$wrap_copy(Operation<Spell.ProjectileData.Perks> original) {
+		Spell.ProjectileData.Perks perks = original.call();
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraRicochetAttribute(this.respect_extra_ricochet_attribute);
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraRicochetRangeAttribute(this.respect_extra_ricochet_range_attribute);
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraBounceAttribute(this.respect_extra_bounce_attribute);
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraPierceAttribute(this.respect_extra_pierce_attribute);
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraChainReactionSizeAttribute(this.respect_extra_chain_reaction_size_attribute);
+		((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$setRespectExtraChainReactionTriggersAttribute(this.respect_extra_chain_reaction_triggers_attribute);
+		return perks;
 	}
 }

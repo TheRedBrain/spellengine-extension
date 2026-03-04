@@ -29,6 +29,6 @@
   },
   "client": [
     "client.MouseMixin",
-    "client.network.ClientPlayerEntityMixin_SpellEngineReplacement"
+	  "client.network.ClientPlayerEntityMixin"
   ]
 }

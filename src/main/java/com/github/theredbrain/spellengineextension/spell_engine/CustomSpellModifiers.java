@@ -68,7 +68,7 @@ public class CustomSpellModifiers {
 	public static String getModifiedEffectCostId(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
 		List<Spell.Modifier> modifiers = SpellModifiers.of(player, spellEntry);
 		Spell spell = spellEntry.value();
-		String effectId = spell.cost.effect_id;
+		String effectId = ((DuckSpellCostMixin) spell.cost).spellengineextension$getCustomEffectId();
 		for (Spell.Modifier modifier : modifiers) {
 			effectId = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedEffectCostId();
 		}

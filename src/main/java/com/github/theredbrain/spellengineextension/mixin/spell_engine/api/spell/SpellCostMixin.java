@@ -30,6 +30,8 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
     private boolean check_effect_cost = true;
     @Unique
+    private String custom_effect_id = "";
+    @Unique
     private int decrement_effect_amount = -1;
     @Unique
     private float mana_cost = 0.0F;
@@ -182,6 +184,16 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public void spellengineextension$setCheckEffectCost(boolean checkEffectCost) {
         this.check_effect_cost = checkEffectCost;
+    }
+
+    @Override
+    public String spellengineextension$getCustomEffectId() {
+        return this.custom_effect_id;
+    }
+
+    @Override
+    public void spellengineextension$setCustomEffectId(String customEffectId) {
+        this.custom_effect_id = customEffectId;
     }
 
     @Override

@@ -1,12 +1,11 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.api.spell;
 
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellLaunchPropertiesMixin;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.spell_engine.api.spell.Spell;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Spell.LaunchProperties.class)
 public class SpellLaunchPropertiesMixin implements DuckSpellLaunchPropertiesMixin {
@@ -47,12 +46,12 @@ public class SpellLaunchPropertiesMixin implements DuckSpellLaunchPropertiesMixi
 		this.respect_extra_velocity_attribute = respect_extra_velocity_attribute;
 	}
 
-	@Inject(method = "copy", at = @At("RETURN"), cancellable = true, remap = false)
-	public void spellengineextension$copy(CallbackInfoReturnable<Spell.LaunchProperties> cir) {
-		Spell.LaunchProperties launchProperties = cir.getReturnValue();
-		((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$setRespectExtraLaunchCountAttribute(this.respect_extra_launch_count_attribute);
-		((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$setRespectExtraLaunchDelayAttribute(this.respect_extra_launch_delay_attribute);
-		((DuckSpellLaunchPropertiesMixin)launchProperties).spellengineextension$setRespectExtraVelocityAttribute(this.respect_extra_velocity_attribute);
-		cir.setReturnValue(launchProperties);
+	@WrapMethod(method = "copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
+	public Spell.LaunchProperties spellengineextension$wrap_copy(Operation<Spell.LaunchProperties> original) {
+		Spell.LaunchProperties launchProperties = original.call();
+		((DuckSpellLaunchPropertiesMixin) launchProperties).spellengineextension$setRespectExtraLaunchCountAttribute(this.respect_extra_launch_count_attribute);
+		((DuckSpellLaunchPropertiesMixin) launchProperties).spellengineextension$setRespectExtraLaunchDelayAttribute(this.respect_extra_launch_delay_attribute);
+		((DuckSpellLaunchPropertiesMixin) launchProperties).spellengineextension$setRespectExtraVelocityAttribute(this.respect_extra_velocity_attribute);
+		return launchProperties;
 	}
 }

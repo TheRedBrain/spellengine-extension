@@ -131,7 +131,7 @@ public class SpellHotbarMixin {
 	}
 
 	@WrapMethod(method = "expectedUseStack")
-	private static SpellHotbar.ItemUseExpectation spellengineextension$expectedUseStack(PlayerEntity player, Operation<SpellHotbar.ItemUseExpectation> original) {
+	private static SpellHotbar.ItemUseExpectation spellengineextension$wrap_expectedUseStack(PlayerEntity player, Operation<SpellHotbar.ItemUseExpectation> original) {
 		if (SpellEngineExtensionClient.CLIENT_CONFIG.show_items_in_spell_hot_bar.get()) {
 			return original.call(player);
 		} else {

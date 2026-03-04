@@ -1,65 +1,35 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.internals;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
-import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModifiers;
-import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellImpactActionDamageMixin;
 import com.github.theredbrain.spellengineextension.spell_engine.ExtendedSpellHelper;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.spell_engine.SpellEngineMod;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.Ammo;
 import net.spell_engine.internals.SpellHelper;
-import net.spell_engine.internals.casting.SpellBatcher;
 import net.spell_engine.internals.casting.SpellCast;
-import net.spell_engine.internals.container.SpellContainerSource;
 import net.spell_engine.internals.target.SpellTarget;
-import net.spell_engine.utils.WorldScheduler;
 import net.spell_power.mixin.DamageSourcesAccessor;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(SpellHelper.class)
-@SuppressWarnings("UnreachableCode")
 public abstract class SpellHelperMixin {
-
-	/**
-	 * @author TheRedBrain
-	 * @reason check for custom cost
-	 */
-	@WrapOperation(
-			method = "attemptCasting(Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Identifier;Z)Lnet/spell_engine/internals/casting/SpellCast$Attempt;",
-			at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/casting/SpellCast$Attempt;success()Lnet/spell_engine/internals/casting/SpellCast$Attempt;", remap = false)
-	)
-	private static SpellCast.Attempt spellengineextension$attemptCasting(Operation<SpellCast.Attempt> original, @Local(argsOnly = true) PlayerEntity player, @Local RegistryEntry.Reference<Spell> spellEntry) {
-		return ExtendedSpellHelper.checkForCustomSpellCost(player, spellEntry);
-	}
 
 	@Inject(method = "performSpell", at = @At(value = "INVOKE", target = "Lnet/spell_engine/internals/SpellHelper;channelValueMultiplier(Lnet/spell_engine/api/spell/Spell;)F", remap = false))
 	private static void spellengineextension$performSpell_applyChannelingCost(World world, PlayerEntity player, RegistryEntry<Spell> spellEntry, SpellTarget.SearchResult targetResult, SpellCast.Action action, float progress, CallbackInfo ci) {
@@ -93,102 +63,6 @@ public abstract class SpellHelperMixin {
 			return SpellEngineExtension.getAttackRange(instance);
 		} else {
 			return original.call(instance);
-		}
-	}
-
-	/**
-	 * @author TheRedBrain
-	 * @reason integrate health cost, mana cost, stamina cost, reducing amplifier of status effect cost instead of removing them, self consuming of casting item
-	 */
-	@Overwrite
-	private static void consumeSpellCost(PlayerEntity player, float progress, SpellContainerSource.SourcedContainer spellSource, Identifier spellId, RegistryEntry<Spell> spellEntry, ItemStack heldItemStack, Ammo.Result ammoResult, boolean scheduled) {
-		Spell spell = spellEntry.value();
-		boolean batching = spell.cost.batching;
-		if (batching && !scheduled) {
-			if (((SpellBatcher) player).hasBatchedCost(spellId)) {
-				return;
-			}
-			((WorldScheduler) player.getWorld()).schedule(0, () -> {
-				consumeSpellCost(player, progress, spellSource, spellId, spellEntry, heldItemStack, ammoResult, true);
-			});
-			((SpellBatcher) player).batchCost(spellId, true);
-			return;
-		}
-
-		SpellHelper.imposeCooldown(player, spellSource, spellEntry, progress);
-		player.addExhaustion(spell.cost.exhaust * SpellEngineMod.config.spell_cost_exhaust_multiplier);
-
-		var spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
-
-		// health cost
-		if (!player.isCreative() && spellEngineExtensionConfig.spell_cost_health_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingHealthCost()) {
-			float healthCost = CustomSpellModifiers.getModifiedHealthCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$healthCostMultiplierApplies()) {
-				healthCost = healthCost * ((DuckLivingEntityMixin) player).spellengineextension$getHealthSpellCostMultiplier();
-			}
-			if (healthCost > 0.0F) {
-				player.damage(((DuckDamageSourcesMixin) player.getDamageSources()).spellengineextension$bloodMagicCasting(), healthCost);
-			}
-		}
-
-		// mana cost
-		if (!player.isCreative() && SpellEngineExtension.isManaAttributesLoaded && spellEngineExtensionConfig.spell_cost_mana_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingManaCost()) {
-			float manaCost = CustomSpellModifiers.getModifiedManaCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$manaCostMultiplierApplies()) {
-				manaCost = manaCost * ((DuckLivingEntityMixin) player).spellengineextension$getManaSpellCostMultiplier();
-			}
-			if (manaCost > 0.0F) {
-				SpellEngineExtension.addMana(player, -manaCost);
-			}
-		}
-
-		// stamina cost
-		if (!player.isCreative() && SpellEngineExtension.isStaminaAttributesLoaded && spellEngineExtensionConfig.spell_cost_stamina_allowed.get() && !((DuckSpellCostMixin) spell.cost).spellengineextension$applyChannelingStaminaCost()) {
-			float staminaCost = CustomSpellModifiers.getModifiedStaminaCost(player, spellEntry);
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$addItemUseStaminaCostAttributeValue()) {
-				staminaCost = staminaCost + SpellEngineExtension.getItemUseStaminaCost(player);
-			}
-			if (((DuckSpellCostMixin) spell.cost).spellengineextension$staminaCostMultiplierApplies()) {
-				staminaCost = staminaCost * ((DuckLivingEntityMixin) player).spellengineextension$getStaminaSpellCostMultiplier();
-			}
-			if (staminaCost > 0.0F) {
-				SpellEngineExtension.addStamina(player, -staminaCost);
-			}
-		}
-
-		// consume spell casting item
-		if (((DuckSpellCostMixin) spell.cost).spellengineextension$consumeSelf()) {
-			player.incrementStat(Stats.USED.getOrCreateStat(heldItemStack.getItem()));
-			if (!player.isCreative()) {
-				heldItemStack.decrement(1);
-			}
-		}
-
-		if (SpellEngineMod.config.spell_cost_durability_allowed && spell.cost.durability > 0) {
-			ItemStack stackToDamage = spellSource.itemStack() != null && spellSource.itemStack().isDamageable() ? spellSource.itemStack() : heldItemStack;
-			stackToDamage.damage(spell.cost.durability, player, EquipmentSlot.MAINHAND);
-		}
-
-		Ammo.consume(ammoResult, player);
-		if (spell.cost.effect_id != null) {
-			Optional<RegistryEntry.Reference<StatusEffect>> effect = Registries.STATUS_EFFECT.getEntry(Identifier.of(spell.cost.effect_id));
-			if (effect.isPresent()) {
-				int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
-				if (decrementEffectAmount < 0) {
-					player.removeStatusEffect(effect.get());
-				} else if (decrementEffectAmount > 0) {
-					int newAmplifier = -1;
-					StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
-					if (statusEffectInstance != null) {
-						int oldAmplifier = statusEffectInstance.getAmplifier();
-						newAmplifier = oldAmplifier - decrementEffectAmount;
-					}
-					player.removeStatusEffect(effect.get());
-					if (newAmplifier >= 0) {
-						player.addStatusEffect(new StatusEffectInstance(effect.get(), statusEffectInstance.getDuration(), newAmplifier, statusEffectInstance.isAmbient(), statusEffectInstance.shouldShowParticles(), statusEffectInstance.shouldShowIcon()));
-					}
-				}
-			}
 		}
 	}
 
