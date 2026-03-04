@@ -5,6 +5,7 @@
 ## Additions
 
 - added server config options to individually toggle position and orientation locking for movement locking spell casting.
+- added client config option 'should_spell_hotbar_use_key_replace_first_number_slot'. If set to 'false' all 9 number slots of the spell hotbar are used, even if the 'use key' is also present.
 
 ## Technical
 

@@ -1,6 +1,7 @@
 package com.github.theredbrain.spellengineextension.config;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
+import me.fzzyhmstrs.fzzy_config.annotations.Comment;
 import me.fzzyhmstrs.fzzy_config.config.Config;
 import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedBoolean;
 import me.fzzyhmstrs.fzzy_config.validation.misc.ValidatedColor;
@@ -19,6 +20,8 @@ public class ClientConfig extends Config {
 	public ValidatedBoolean enable_spell_hotbar_cooldown_overlay = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_spell_hotkey_icons = new ValidatedBoolean(true);
 	public ValidatedBoolean show_items_in_spell_hot_bar = new ValidatedBoolean(true);
+	@Comment("When enabled, the use key replaces the first 'number slot' on the spell hotbar.")
+	public ValidatedBoolean should_spell_hotbar_use_key_replace_first_number_slot = new ValidatedBoolean(false);
 	public ValidatedBoolean disable_use_key_spell_hotbar_slot_rendering = new ValidatedBoolean(false);
 	public ValidatedBoolean enable_cooldown_icons = new ValidatedBoolean(false);
 	public ValidatedBoolean enable_spell_hotbar_cooldown_number = new ValidatedBoolean(true);

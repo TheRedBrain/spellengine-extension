@@ -19,6 +19,10 @@ public class ServerConfig extends Config {
 	public ValidatedBoolean movement_locking_prevents_player_position_changes = new ValidatedBoolean(true);
 	public ValidatedBoolean movement_locking_prevents_player_orientation_changes = new ValidatedBoolean(true);
 	public ValidatedBoolean enable_attack_range_attribute_integration = new ValidatedBoolean(true);
+	@Comment("""
+			Enables 'conditional spell containers' and (if the 'Merged Items' mod is installed) 'merged spell containers'.
+			""")
+	public ValidatedBoolean enable_spell_container_extensions = new ValidatedBoolean(true);
 	@Comment("When enabled, only spells in the 'spellengineextension:can_be_in_use_item_spell_hotbar_slot' are placed in the use_item hotbar slot.")
 	public ValidatedBoolean enable_spell_hotbar_use_key_restriction = new ValidatedBoolean(true);
 	@Comment("Disables the client side auto swap feature for all connected clients.")

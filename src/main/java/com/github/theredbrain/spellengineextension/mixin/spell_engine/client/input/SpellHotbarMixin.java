@@ -4,130 +4,29 @@ import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.GameOptions;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.api.spell.registry.SpellRegistry;
 import net.spell_engine.client.SpellEngineClient;
-import net.spell_engine.client.input.Keybindings;
 import net.spell_engine.client.input.SpellHotbar;
-import net.spell_engine.client.input.WrappedKeybinding;
-import net.spell_engine.internals.casting.SpellCast;
-import net.spell_engine.internals.container.SpellContainerSource;
-import net.spell_engine.mixin.client.control.KeybindingAccessor;
+import net.spell_engine.config.ClientConfig;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(SpellHotbar.class)
 public class SpellHotbarMixin {
 
-	@Shadow(remap = false)
-	public List<SpellHotbar.Slot> slots;
+	@WrapOperation(method = "update", at = @At(value = "FIELD", target = "Lnet/spell_engine/config/ClientConfig;spellHotbarUseKey:Z", remap = false))
+	private boolean spellengineextension$wrap_spellHotbarUseKey(ClientConfig instance, Operation<Boolean> original, @Local(name = "spellEntry") RegistryEntry<Spell> spellEntry) {
+		return original.call(instance) && (!SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || spellEntry.isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
+	}
 
-	@Shadow(remap = false)
-	public SpellHotbar.StructuredSlots structuredSlots;
-
-	/**
-	 * @author TheRedBrain
-	 * @reason allow only spells in "can_be_in_use_item_spell_hotbar_slot" tag to be bound to use hotkey
-	 */
-	@Overwrite
-	public boolean update(ClientPlayerEntity player, GameOptions options) {
-		var changed = false;
-		var initialSlotCount = slots.size();
-		var mergedContainer = SpellContainerSource.activeContainerOf(player);
-		//SpellContainerHelper.getAvailable(player);
-
-		var slots = new ArrayList<SpellHotbar.Slot>();
-		var otherSlots = new ArrayList<SpellHotbar.Slot>();
-		SpellHotbar.Slot onUseKey = null;
-
-		var allBindings = Keybindings.Wrapped.all();
-		var useKey = ((KeybindingAccessor) options.useKey).spellEngine_getBoundKey();
-		var useKeyBinding = new WrappedKeybinding(options.useKey, WrappedKeybinding.VanillaAlternative.USE_KEY);
-
-		if (mergedContainer != null
-				&& !mergedContainer.spell_ids().isEmpty()) {
-			var itemUseExpectation = SpellHotbar.expectedUseStack(player);
-			if (itemUseExpectation != null) {
-				onUseKey = new SpellHotbar.Slot(null, SpellCast.Mode.ITEM_USE, itemUseExpectation.itemStack(), useKeyBinding, null);
-			}
-
-			var spellIds = mergedContainer.spell_ids();
-			var spellEntryList = spellIds.stream()
-					.map(idString -> {
-						var id = Identifier.of(idString);
-						return SpellRegistry.from(player.getWorld()).getEntry(id).orElse(null);
-					})
-					.filter(Objects::nonNull)
-					.toList();
-
-			int keyBindingIndex = 0;
-			for (RegistryEntry<Spell> spellEntry : spellEntryList) {
-				var spell = spellEntry.value();
-				if (spell == null) {
-					continue;
-				}
-
-				WrappedKeybinding keyBinding = null;
-				if (keyBindingIndex < allBindings.size()) {
-					keyBinding = allBindings.get(keyBindingIndex);
-					keyBindingIndex += 1;
-				} else {
-					continue;
-				}
-
-				// Override keybinding with UseKey if available
-				if (SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEntry.isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT) && SpellEngineClient.config.spellHotbarUseKey) {
-					if (onUseKey == null) {
-						keyBinding = useKeyBinding;
-						// makes sure all 9 regular keybindings can still be used
-						keyBindingIndex--;
-					}
-				}
-
-				// Create slot
-				var slot = new SpellHotbar.Slot(spellEntry, SpellCast.Mode.from(spell), null, keyBinding, null);
-
-				// Try to categorize slot based on keybinding
-				if (keyBinding != null) {
-					var unwrapped = keyBinding.get(options);
-					if (unwrapped != null) {
-						var hotbarKey = ((KeybindingAccessor) unwrapped.keyBinding()).spellEngine_getBoundKey();
-
-						if (hotbarKey.equals(useKey)) {
-							onUseKey = slot;
-						} else {
-							otherSlots.add(slot);
-						}
-					}
-				}
-
-				// Save to all slots
-				slots.add(slot);
-			}
-
-			if (itemUseExpectation != null) {
-				if (itemUseExpectation.isMainHand()) {
-					slots.addFirst(onUseKey);
-				} else {
-					slots.addLast(onUseKey);
-				}
-			}
-		}
-
-		changed = initialSlotCount != slots.size();
-		this.structuredSlots = new SpellHotbar.StructuredSlots(onUseKey, otherSlots);
-		this.slots = slots;
-		return changed;
+	@ModifyVariable(method = "update", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/input/WrappedKeybinding;get(Lnet/minecraft/client/option/GameOptions;)Lnet/spell_engine/client/input/WrappedKeybinding$Unwrapped;"/*, shift = At.Shift.AFTER*/, args = ""), name = "keyBindingIndex")
+	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int value, @Local(name = "onUseKey") SpellHotbar.Slot onUseKey) {
+		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && onUseKey == null) ? value - 1 : value;
 	}
 
 	@WrapMethod(method = "expectedUseStack")
