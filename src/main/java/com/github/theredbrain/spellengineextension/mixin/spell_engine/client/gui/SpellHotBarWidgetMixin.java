@@ -59,6 +59,8 @@ public abstract class SpellHotBarWidgetMixin {
 		MinecraftClient client = MinecraftClient.getInstance();
 		TextRenderer textRenderer = client.inGameHud.getTextRenderer();
 		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
+
+		// inject
 		if (client.world != null && SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
 			for (int ix = 0; ix < viewModel.spells().size(); ix++) {
 				HudRenderHelper.SpellHotBarWidget.SpellViewModel spell = viewModel.spells().get(ix);
@@ -71,6 +73,7 @@ public abstract class SpellHotBarWidgetMixin {
 				}
 			}
 		}
+
 		if (viewModel.spells().isEmpty()) {
 			return;
 		}
@@ -80,6 +83,8 @@ public abstract class SpellHotBarWidgetMixin {
 		lastRendered = new Rect(origin, origin.add(new Vec2f(estimatedWidth, estimatedHeight)));
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
+
+		// no solution yet -> easy to implement by vanilla
 		if (spellEngineExtensionClientConfig.enable_spell_hotbar_background_rendering.get()) {
 			float barOpacity = 1.0F;
 			context.setShaderColor(1.0F, 1.0F, 1.0F, barOpacity);
@@ -92,6 +97,7 @@ public abstract class SpellHotBarWidgetMixin {
 
 			context.drawTexture(HOTBAR.id(), (int) origin.x + 10 + middleElements * 20, (int) origin.y, 170.0F, 0.0F, 12, 22, HOTBAR.width(), HOTBAR.height());
 		}
+
 		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		Vec2f iconsOffset = new Vec2f(3.0F, 3.0F);
 		int iconSize = 16;
@@ -102,34 +108,43 @@ public abstract class SpellHotBarWidgetMixin {
 			int y = (int) (origin.y + iconsOffset.y);
 			RenderSystem.enableBlend();
 			if (spell.iconId() != null) {
+
+				// WrapOperation
 				if (spell.cooldown() > 0.0F && spellEngineExtensionClientConfig.enable_cooldown_icons.get()) {
 					context.drawTexture(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace(".png", "_cooldown.png")), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
 				} else {
 					context.drawTexture(spell.iconId(), x, y, 0.0F, 0.0F, iconSize, iconSize, iconSize, iconSize);
 				}
+
 			} else if (spell.itemStack() != null) {
 				context.drawItem(spell.itemStack(), x, y);
 			}
 
+			// WrapOperation
 			if (spell.cooldown() > 0.0F && spellEngineExtensionClientConfig.enable_spell_hotbar_cooldown_overlay.get()) {
 				renderCooldown(context, spell.cooldown(), x, y);
 			}
 
-			int remainingCooldown = 0;
-			if (spell.iconId() != null) {
-				ClientPlayerEntity player = client.player;
-				Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
-				if (optionalSpellReference.isPresent() && player != null && !player.isSpectator()) {
-					SpellCasterClient caster = (SpellCasterClient) player;
-					SpellCooldownManager cooldownManager = caster.getCooldownManager();
-					remainingCooldown = cooldownManager.getCooldownDuration(optionalSpellReference.get());
+			// Inject
+			if (spellEngineExtensionClientConfig.enable_spell_hotbar_cooldown_number.get()) {
+				int remainingCooldown = 0;
+				if (spell.iconId() != null) {
+					ClientPlayerEntity player = client.player;
+					Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
+					if (optionalSpellReference.isPresent() && player != null && !player.isSpectator()) {
+						SpellCasterClient caster = (SpellCasterClient) player;
+						SpellCooldownManager cooldownManager = caster.getCooldownManager();
+						remainingCooldown = cooldownManager.getCooldownDuration(optionalSpellReference.get());
+					}
+				}
+
+				if (remainingCooldown > 0) {
+					renderCooldownNumber(context, textRenderer, remainingCooldown, x + spellEngineExtensionClientConfig.spell_cooldown_number_offset_x.get(), y + spellEngineExtensionClientConfig.spell_cooldown_number_offset_y.get(), spellEngineExtensionClientConfig.spell_cooldown_number_color.get().toInt());
 				}
 			}
 
-			if (remainingCooldown > 0 && spellEngineExtensionClientConfig.enable_spell_hotbar_cooldown_number.get()) {
-				renderCooldownNumber(context, textRenderer, remainingCooldown, x + spellEngineExtensionClientConfig.spell_cooldown_number_offset_x.get(), y + spellEngineExtensionClientConfig.spell_cooldown_number_offset_y.get(), spellEngineExtensionClientConfig.spell_cooldown_number_color.get().toInt());
-			}
 
+			// ModifyExpressionValue
 			if (spell.keybinding() != null && spellEngineExtensionClientConfig.enable_spell_hotkey_icons.get()) {
 				int keybindingX = x + iconSize / 2;
 				int keybindingY = (int) origin.y + 2;
