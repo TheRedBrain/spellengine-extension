@@ -218,6 +218,47 @@ This list is selected from a list, where the amplifier of the effect determines 
 
 If the amplifier is higher than the amount of configured lists, the last list is used instead.
 
+## "Provide Spells" Enchantment Effect
+
+The "spellengineextension:provide_spells" enchantment effect allows item enchantments to provide spells.
+
+### Example:
+
+```json
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.spellengineextension.test"
+  },
+  "effects": {
+    "minecraft:tick": [
+      {
+        "effect": {
+          "type": "spellengineextension:provide_spells",
+          "provided_spells_list": [
+            "wizards:fireball"
+          ]
+        }
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 25,
+    "per_level_above_first": 8
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 5,
+    "per_level_above_first": 8
+  },
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#minecraft:swords",
+  "weight": 5
+}
+```
+
 ## Entity Attributes
 
 - "spellengineextension:generic.magic_damage" the damage done by magic attacks. Default value is 0.0.
