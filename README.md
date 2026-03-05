@@ -15,8 +15,12 @@ Heal Impact
 
 Spell Cost
 - consume_self (consumes the item used to cast the spell)
-- decrement_effect_amount (allows better control over what happens with status effects defined as spell cost. When < 0, the effect is removed (the normal behaviour), when > 0 the effects amplifier (also known as effect level) is reduced (0 is the lowest amplifier possible)). When the decrement amount is 0, nothing happens to the effect.
-- check_effect_cost (if the caster has to have the effect applied)
+
+
+- custom_effect_cost is a more customizable status effect cost. The vanilla 'effect_cost' field is unaffected and works as expected.
+- decrement_effect_amount (defines what happens with status effects defined as 'custom_effect_cost'. When < 0, the effect is removed (same as the 'effect_cost' behaviour), when > 0 the effects amplifier (also known as effect level) is reduced (0 is the lowest amplifier possible)). When the decrement amount is 0, nothing happens to the effect.
+- check_effect_cost (if the caster has to have the effect defined by 'custom_effect_cost' applied)
+
 
 - health_cost (amount of health casting the spell is costing)
 - check_health_cost (if casting fails when player has not enough health)
@@ -50,7 +54,9 @@ This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-at
 While casting spells in the "spellengineextension:enables_movement_locking_during_casting" spell tag, all player movements and rotations are disabled.
 The movement locking is extended by x amount of ticks, where x is defined by the "after_casting_movement_locking_ticks" int field, located in the spell.json under 'spell.active.cast'.
 
-This feature can be disabled in the server config.
+By default, movement locking prevents both position and orientation changes. These can be individually disabled in the server config.
+
+Additionally, the entire feature can be disabled in the server config.
 
 ## Spell Modifiers
 
@@ -61,7 +67,7 @@ Spell modifiers got more options to modify spells:
 - additional_stamina_cost
 - additional_direct_damage
 - additional_direct_healing
-- replaced_effect_cost_id
+- replaced_effect_cost_id replaces the 'custom_effect_cost'
 - replaced_decrement_effect_cost_amount
 
 ## Example
@@ -196,6 +202,7 @@ These include:
 - enabling alternative spell icons when spell is on cooldown
   - the textures are expected to be located under the same namespace and on the same path as the regular spell texture, with "_cooldown" appended to the file name
 - disabling the rendering of the use_key spell hot bar slot. This does not prevent casting of spells in that slot.
+- disabling the replacement of the first 'number key' spell hotbar slot with the 'use_key' spell hotbar slot. This allows consistent spell hotkeys, regardless of eventual spells/items in the 'use_key' slot.
 
 Additional server side settings:
 - only spells in the "spellengineextension:can_be_in_use_item_spell_hotbar_slot" spell tag can be in the use_key spell hot bar slot. This restriction can be disabled in the server config.
