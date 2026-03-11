@@ -28,8 +28,8 @@ public interface DuckSpellModifierMixin {
 
 	void spellengineextension$setReplacedEffectCostId(String replacedEffectCostId);
 
-	int spellengineextension$getReplacedDecrementEffectCostAmount();
-
-	void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount);
+//	int spellengineextension$getReplacedDecrementEffectCostAmount();
+//
+//	void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount);
 
 }

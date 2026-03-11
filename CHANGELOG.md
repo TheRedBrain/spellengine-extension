@@ -1,3 +1,10 @@
+# 2.15.1
+
+## Fixes
+
+- fixed crash when casting modified spells
+- temporarily disabled the "replaced_decrement_effect_cost_amount" Spell.Modifier field. This feature is currently not working as intended and needs a complete redesign, which requires more time than I have right now.
+
 # 2.15.0
 
 - now works with Spell Engine 1.9.8
