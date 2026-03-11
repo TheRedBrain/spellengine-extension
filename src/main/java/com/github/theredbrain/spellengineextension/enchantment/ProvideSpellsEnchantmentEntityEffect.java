@@ -13,15 +13,17 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
-public record ProvideSpellsEnchantmentEntityEffect(List<String> providedSpellsList) implements EnchantmentEntityEffect {
+public record ProvideSpellsEnchantmentEntityEffect(List<List<String>> providedSpellsList) implements EnchantmentEntityEffect {
 	public static final MapCodec<ProvideSpellsEnchantmentEntityEffect> CODEC = RecordCodecBuilder.mapCodec(
-			instance -> instance.group(Codec.STRING.listOf().fieldOf("provided_spells_list").forGetter(ProvideSpellsEnchantmentEntityEffect::providedSpellsList)).apply(instance, ProvideSpellsEnchantmentEntityEffect::new)
+			instance -> instance.group(Codec.STRING.listOf().listOf().fieldOf("provided_spells_list").forGetter(ProvideSpellsEnchantmentEntityEffect::providedSpellsList)).apply(instance, ProvideSpellsEnchantmentEntityEffect::new)
 	);
 
 	@Override
 	public void apply(ServerWorld world, int level, EnchantmentEffectContext context, Entity user, Vec3d pos) {
 		if (user instanceof ServerPlayerEntity serverPlayerEntity) {
-			((DuckServerPlayerEntityMixin) serverPlayerEntity).spellengineextension$addEnchantmentProvidedSpells(this.providedSpellsList);
+			((DuckServerPlayerEntityMixin) serverPlayerEntity).spellengineextension$addEnchantmentProvidedSpells(
+					this.providedSpellsList.get(Math.max(0, Math.min(level - 1, providedSpellsList.size() - 1)))
+			);
 		}
 	}
 

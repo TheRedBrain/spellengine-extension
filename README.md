@@ -227,7 +227,7 @@ If the amplifier is higher than the amount of configured lists, the last list is
 
 ## "Provide Spells" Enchantment Effect
 
-The "spellengineextension:provide_spells" enchantment effect allows item enchantments to provide spells.
+The "spellengineextension:provide_spells" enchantment effect allows item enchantments to provide a list of spells. Multiple lists can be defined, the enchantment level defines which list is used. If the enchantment level is higher than the amount of lists defined, the last list is used.
 
 ### Example:
 
@@ -243,7 +243,16 @@ The "spellengineextension:provide_spells" enchantment effect allows item enchant
         "effect": {
           "type": "spellengineextension:provide_spells",
           "provided_spells_list": [
-            "wizards:fireball"
+            [
+              "wizards:fire_breath",
+              "wizards:frost_nova"
+            ],
+            [
+              "wizards:fire_meteor"
+            ],
+            [
+              "wizards:fire_wall"
+            ]
           ]
         }
       }
@@ -253,7 +262,7 @@ The "spellengineextension:provide_spells" enchantment effect allows item enchant
     "base": 25,
     "per_level_above_first": 8
   },
-  "max_level": 1,
+  "max_level": 4,
   "min_cost": {
     "base": 5,
     "per_level_above_first": 8
