@@ -1,5 +1,7 @@
 # 2.15.0
 
+- now works with Spell Engine 1.9.7
+
 ## Changes
 
 - changed "spellengineextension:provide_spells" enchantment effect to apply different spell lists depending on the enchantment level. If the level is higher than the amount of lists defined, the last list is used.
