@@ -60,7 +60,7 @@ public abstract class SpellHotBarWidgetMixin {
 		TextRenderer textRenderer = client.inGameHud.getTextRenderer();
 		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
 
-		// inject
+		// move the injection point to where the method is called, modifying the "viewModel" argument
 		if (client.world != null && SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
 			for (int ix = 0; ix < viewModel.spells().size(); ix++) {
 				HudRenderHelper.SpellHotBarWidget.SpellViewModel spell = viewModel.spells().get(ix);

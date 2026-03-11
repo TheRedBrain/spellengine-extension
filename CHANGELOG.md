@@ -1,6 +1,6 @@
 # 2.15.0
 
-- now works with Spell Engine 1.9.7
+- now works with Spell Engine 1.9.8
 
 ## Changes
 
