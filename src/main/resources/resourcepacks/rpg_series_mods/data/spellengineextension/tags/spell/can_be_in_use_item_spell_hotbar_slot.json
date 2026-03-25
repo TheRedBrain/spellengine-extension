@@ -2,11 +2,11 @@
     "replace": false,
     "values": [
         {
-            "id": "#paladins:weapon/holy_staff",
+            "id": "paladins:holy_shock",
             "required": false
         },
         {
-            "id": "#paladins:weapon/holy_wand",
+            "id": "paladins:heal",
             "required": false
         },
         {
@@ -50,19 +50,15 @@
             "required": false
         },
         {
-            "id": "wizards:weapon/arcane_staff",
+            "id": "wizards:arcane_blast",
             "required": false
         },
         {
-            "id": "wizards:weapon/fire_staff",
+            "id": "wizards:fire_blast",
             "required": false
         },
         {
-            "id": "wizards:weapon/frost_staff",
-            "required": false
-        },
-        {
-            "id": "wizards:weapon/wizard_staff",
+            "id": "wizards:frostbolt",
             "required": false
         },
         {

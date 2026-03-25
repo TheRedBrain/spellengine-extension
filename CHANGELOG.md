@@ -9,6 +9,7 @@
 ## Fixes
 
 - fixed issues with some spell hotbar display options
+- fixed an issue where the built-in compat data pack for the RPG Series mods did not recognise staff/wand weapon skills
 
 # 2.15.1
 
