@@ -21,6 +21,7 @@ import net.spell_engine.client.util.Rect;
 import net.spell_engine.client.util.TextureFile;
 import net.spell_engine.internals.SpellCooldownManager;
 import net.spell_engine.internals.casting.SpellCasterClient;
+import net.spell_engine.mixin.client.control.KeybindingAccessor;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -61,15 +62,20 @@ public abstract class SpellHotBarWidgetMixin {
 		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
 
 		// move the injection point to where the method is called, modifying the "viewModel" argument
-		if (client.world != null && SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
+		if (client.world != null && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
 			for (int ix = 0; ix < viewModel.spells().size(); ix++) {
 				HudRenderHelper.SpellHotBarWidget.SpellViewModel spell = viewModel.spells().get(ix);
+				boolean removeSpellViewModel = spell.itemStack() != null;
+
 				if (spell.iconId() != null) {
 					Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
-					if (optionalSpellReference.isPresent() && optionalSpellReference.get().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT)) {
-						viewModel.spells().remove(ix);
-						ix--;
+					if (SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && optionalSpellReference.isPresent() && optionalSpellReference.get().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT)) {
+						removeSpellViewModel = true;
 					}
+				}
+				if (removeSpellViewModel) {
+					viewModel.spells().remove(ix);
+					ix--;
 				}
 			}
 		}

@@ -6,12 +6,15 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.spell_engine.api.spell.Spell;
 import net.spell_engine.client.SpellEngineClient;
 import net.spell_engine.client.input.SpellHotbar;
+import net.spell_engine.client.input.WrappedKeybinding;
 import net.spell_engine.config.ClientConfig;
+import net.spell_engine.mixin.client.control.KeybindingAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -24,9 +27,11 @@ public class SpellHotbarMixin {
 		return original.call(instance) && (!SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || spellEntry.isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
 	}
 
-	@ModifyVariable(method = "update", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/input/WrappedKeybinding;get(Lnet/minecraft/client/option/GameOptions;)Lnet/spell_engine/client/input/WrappedKeybinding$Unwrapped;"/*, shift = At.Shift.AFTER*/, args = ""), name = "keyBindingIndex")
-	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int value, @Local(name = "onUseKey") SpellHotbar.Slot onUseKey) {
-		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && onUseKey == null) ? value - 1 : value;
+	@ModifyVariable(method = "update", at = @At(value = "INVOKE", target = "Lnet/spell_engine/mixin/client/control/KeybindingAccessor;spellEngine_getBoundKey()Lnet/minecraft/client/util/InputUtil$Key;", ordinal = 1, shift = At.Shift.AFTER), name = "keyBindingIndex")
+//	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int value, @Local(name = "onUseKey") SpellHotbar.Slot onUseKey) {
+	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int value, @Local(name = "useKey") InputUtil.Key useKey, @Local(name = "unwrapped") WrappedKeybinding.Unwrapped unwrapped) {
+//		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && onUseKey != null) ? value - 1 : value;
+		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && ((KeybindingAccessor)unwrapped.keyBinding()).spellEngine_getBoundKey().equals(useKey)) ? value - 1 : value;
 	}
 
 	@WrapMethod(method = "expectedUseStack")
