@@ -1,3 +1,15 @@
+# 2.16.0
+
+- now works with Spell Engine 1.9.9
+
+## Changes
+
+- removed the server config option to disable the auto swap feature (this feature was removed from Spell Engine)
+
+## Fixes
+
+- fixed issues with some spell hotbar display options
+
 # 2.15.1
 
 ## Fixes
