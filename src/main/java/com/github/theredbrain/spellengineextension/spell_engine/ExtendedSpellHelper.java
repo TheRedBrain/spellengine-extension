@@ -70,8 +70,7 @@ public class ExtendedSpellHelper {
 					} else {
 						StatusEffectInstance statusEffectInstance = player.getStatusEffect(effect.get());
 						if (statusEffectInstance != null) {
-							int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
-//							int decrementEffectAmount = CustomSpellModifiers.getModifiedDecrementEffectCostAmount(player, spellEntry);
+							int decrementEffectAmount = CustomSpellModifiers.getModifiedDecrementEffectCostAmount(player, spellEntry);
 							if (decrementEffectAmount > 0 && statusEffectInstance.getAmplifier() + 1 < decrementEffectAmount) {
 								player.sendMessage(Text.translatable("hud.cast_attempt_error.status_effect_amplifier_too_low", Text.translatable(effect.get().value().getTranslationKey()).getString()), true);
 								return SpellCast.Attempt.none();
@@ -139,7 +138,7 @@ public class ExtendedSpellHelper {
 			if (!custom_effect_id.isEmpty()) {
 				Optional<RegistryEntry.Reference<StatusEffect>> optionalStatusEffectReference = Registries.STATUS_EFFECT.getEntry(Identifier.tryParse(custom_effect_id));
 				if (optionalStatusEffectReference.isPresent()) {
-					int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
+					int decrementEffectAmount = CustomSpellModifiers.getModifiedDecrementEffectCostAmount(player, spellEntry);
 					if (decrementEffectAmount < 0) {
 						player.removeStatusEffect(optionalStatusEffectReference.get());
 					} else if (decrementEffectAmount > 0) {

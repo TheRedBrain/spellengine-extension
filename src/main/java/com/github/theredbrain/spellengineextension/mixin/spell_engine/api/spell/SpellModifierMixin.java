@@ -28,8 +28,8 @@ public class SpellModifierMixin implements DuckSpellModifierMixin {
 	@Nullable
 	private String replaced_effect_cost_id = null;
 
-//	@Unique
-//	private int replaced_decrement_effect_cost_amount = -1;
+	@Unique
+	private int replaced_decrement_effect_cost_amount = -2;
 
 	@Override
 	public float spellengineextension$getAdditionalHealthCost() {
@@ -92,14 +92,14 @@ public class SpellModifierMixin implements DuckSpellModifierMixin {
 		this.replaced_effect_cost_id = replacedEffectCostId;
 	}
 
-//	@Override
-//	public int spellengineextension$getReplacedDecrementEffectCostAmount() {
-//		return this.replaced_decrement_effect_cost_amount;
-//	}
-//
-//	@Override
-//	public void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount) {
-//		this.replaced_decrement_effect_cost_amount = replacedDecrementEffectCostAmount;
-//	}
+	@Override
+	public int spellengineextension$getReplacedDecrementEffectCostAmount() {
+		return this.replaced_decrement_effect_cost_amount;
+	}
+
+	@Override
+	public void spellengineextension$setReplacedDecrementEffectCostAmount(int replacedDecrementEffectCostAmount) {
+		this.replaced_decrement_effect_cost_amount = replacedDecrementEffectCostAmount;
+	}
 
 }

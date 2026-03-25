@@ -91,7 +91,7 @@ This is an example spell.json where all added values are present (with their def
       "additional_direct_damage": 0.0,
       "additional_direct_healing": 0.0,
       "replaced_effect_cost_id": null,
-      "replaced_decrement_effect_cost_amount": -1
+      "replaced_decrement_effect_cost_amount": -2
     }
   ],
   "deliver": {
@@ -177,6 +177,7 @@ This is an example spell.json where all added values are present (with their def
     "add_item_use_stamina_cost_attribute_value": false,
     "consume_self": false,
     "check_effect_cost": true,
+    "custom_effect_id": "",
     "decrement_effect_amount": -1,
     "mana_cost": 0.0,
     "health_cost": 0.0,

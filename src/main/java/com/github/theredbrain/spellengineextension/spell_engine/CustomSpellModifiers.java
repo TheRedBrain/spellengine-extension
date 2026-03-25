@@ -71,20 +71,23 @@ public class CustomSpellModifiers {
 		String effectId = ((DuckSpellCostMixin) spell.cost).spellengineextension$getCustomEffectId();
 		for (Spell.Modifier modifier : modifiers) {
 			String newEffectId = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedEffectCostId();
-			if (newEffectId != null && !newEffectId.isEmpty()) {
+			if (newEffectId != null) {
 				effectId = newEffectId;
 			}
 		}
 		return effectId;
 	}
 
-//	public static int getModifiedDecrementEffectCostAmount(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
-//		List<Spell.Modifier> modifiers = SpellModifiers.of(player, spellEntry);
-//		Spell spell = spellEntry.value();
-//		int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
-//		for (Spell.Modifier modifier : modifiers) {
-//			decrementEffectAmount = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedDecrementEffectCostAmount();
-//		}
-//		return decrementEffectAmount;
-//	}
+	public static int getModifiedDecrementEffectCostAmount(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
+		List<Spell.Modifier> modifiers = SpellModifiers.of(player, spellEntry);
+		Spell spell = spellEntry.value();
+		int decrementEffectAmount = ((DuckSpellCostMixin) spell.cost).spellengineextension$getDecrementEffectAmount();
+		for (Spell.Modifier modifier : modifiers) {
+			int newDecrementEffectAmount = ((DuckSpellModifierMixin) modifier).spellengineextension$getReplacedDecrementEffectCostAmount();
+			if (newDecrementEffectAmount > -2) {
+				decrementEffectAmount = newDecrementEffectAmount;
+			}
+		}
+		return decrementEffectAmount;
+	}
 }

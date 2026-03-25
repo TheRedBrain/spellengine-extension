@@ -5,6 +5,8 @@
 ## Changes
 
 - removed the server config option to disable the auto swap feature (this feature was removed from Spell Engine)
+- spell modifiers can now remove the "custom_effect_cost" of a spell, if the "replaced_effect_cost_id" field is set to an empty string.
+- re-enabled the "replaced_decrement_effect_cost_amount" Spell.Modifier field. It's default is now -2, which means the modifier is ignored. Values of -1 and above replace the "decrement_effect_cost_amount" of the modified spell. If multiple modifiers are applied, only the last one counts.
 
 ## Fixes
 
