@@ -19,7 +19,6 @@
     "spell_engine.api.spell.container.SpellContainerHelperMixin",
     "spell_engine.client.gui.SpellHotBarWidgetMixin",
     "spell_engine.client.gui.SpellTooltipMixin",
-    "spell_engine.client.input.AutoSwapHelperMixin",
     "spell_engine.client.input.SpellHotbarMixin",
     "spell_engine.internals.SpellHelperMixin",
     "spell_engine.internals.arrow.ArrowHelperMixin"

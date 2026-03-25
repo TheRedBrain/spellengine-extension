@@ -25,8 +25,6 @@ public class ServerConfig extends Config {
 	public ValidatedBoolean enable_spell_container_extensions = new ValidatedBoolean(true);
 	@Comment("When enabled, only spells in the 'spellengineextension:can_be_in_use_item_spell_hotbar_slot' are placed in the use_item hotbar slot.")
 	public ValidatedBoolean enable_spell_hotbar_use_key_restriction = new ValidatedBoolean(true);
-	@Comment("Disables the client side auto swap feature for all connected clients.")
-	public ValidatedBoolean disable_auto_swap = new ValidatedBoolean(true);
 	@Comment("Spells should cost health. Set to `false` to remove health cost from all spells.")
 	public ValidatedBoolean spell_cost_health_allowed = new ValidatedBoolean(true);
 	@Comment("Spells should cost mana. Set to `false` to remove mana cost from all spells.")
