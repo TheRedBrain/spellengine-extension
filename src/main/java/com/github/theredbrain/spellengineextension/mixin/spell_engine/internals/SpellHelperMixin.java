@@ -55,7 +55,7 @@ public abstract class SpellHelperMixin {
 //	}
 
 	@WrapOperation(
-			method = "getRange",
+			method = "getRange(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/api/spell/Spell$Modifier;)F",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;getEntityInteractionRange()D")
 	)
 	private static double spellengineextension$getRange(PlayerEntity instance, Operation<Double> original) {
