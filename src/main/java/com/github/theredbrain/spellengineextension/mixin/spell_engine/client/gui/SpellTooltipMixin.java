@@ -9,6 +9,8 @@ import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModif
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Environment(EnvType.CLIENT)
 @Mixin(SpellTooltip.class)
 public abstract class SpellTooltipMixin {
 

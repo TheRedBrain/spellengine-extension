@@ -4,6 +4,8 @@ import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -30,6 +32,7 @@ import org.spongepowered.asm.mixin.Unique;
 
 import java.util.Optional;
 
+@Environment(EnvType.CLIENT)
 @Mixin(HudRenderHelper.SpellHotBarWidget.class)
 public abstract class SpellHotBarWidgetMixin {
 
