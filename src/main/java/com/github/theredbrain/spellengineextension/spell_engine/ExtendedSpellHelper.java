@@ -80,7 +80,7 @@ public class ExtendedSpellHelper {
 				}
 			}
 		}
-		return SpellCast.Attempt.success();
+		return null;
 	}
 
 	public static SpellCast.Attempt consumeCustomSpellCost(PlayerEntity player, RegistryEntry<Spell> spellEntry, ItemStack spellCastingItem) {
@@ -148,7 +148,7 @@ public class ExtendedSpellHelper {
 				}
 			}
 		}
-		return SpellCast.Attempt.success();
+		return null;
 	}
 
 	public static void consumeCustomAfterCastingSpellCost(PlayerEntity player, RegistryEntry<Spell> spellEntry, ItemStack spellCastingItem) {
