@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.LivingEntity;
 import net.spell_engine.api.spell.Spell;
-import net.spell_engine.internals.arrow.ArrowHelper;
+import net.spell_engine.internals.delivery.arrow.ArrowHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public class ArrowHelperMixin {
 
 	@WrapOperation(
-			method = "shootArrow(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellHelper$ImpactContext;I)V",
+			method = "shootArrow(Lnet/minecraft/world/World;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/registry/entry/RegistryEntry;Lnet/spell_engine/internals/SpellExecution$ImpactContext;I)V",
 			at = @At(value = "INVOKE", target = "Lnet/spell_engine/api/spell/Spell$LaunchProperties;copy()Lnet/spell_engine/api/spell/Spell$LaunchProperties;", remap = false)
 	)
 	private static Spell.LaunchProperties spellengineextension$wrap_shootArrow_mutableLaunchProperties(

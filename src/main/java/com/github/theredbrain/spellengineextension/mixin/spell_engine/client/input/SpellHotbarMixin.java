@@ -10,12 +10,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.spell_engine.api.spell.Spell;
 import net.spell_engine.client.SpellEngineClient;
 import net.spell_engine.client.input.SpellHotbar;
 import net.spell_engine.client.input.WrappedKeybinding;
 import net.spell_engine.config.ClientConfig;
+import net.spell_engine.internals.casting.SpellCast;
 import net.spell_engine.mixin.client.control.KeybindingAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,15 +24,28 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(SpellHotbar.class)
 public class SpellHotbarMixin {
 
-	@WrapOperation(method = "update(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/option/GameOptions;)Z", at = @At(value = "FIELD", target = "Lnet/spell_engine/config/ClientConfig;spellHotbarUseKey:Z"))
-	private boolean spellengineextension$wrap_spellHotbarUseKey(ClientConfig instance, Operation<Boolean> original, @Local(name = "spellEntry") RegistryEntry<Spell> spellEntry) {
-		return original.call(instance) && (!SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || spellEntry.isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
+	@WrapOperation(
+			method = "update(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/option/GameOptions;)Z",
+			at = @At(
+					value = "FIELD",
+					target = "Lnet/spell_engine/config/ClientConfig;spellHotbarUseKey:Z"
+			)
+	)
+	private boolean spellengineextension$wrap_spellHotbarUseKey(ClientConfig instance, Operation<Boolean> original, @Local(name = "option") SpellCast.Option option) {
+		return original.call(instance) && (!SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || option.spell().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
 	}
 
-	@ModifyVariable(method = "update(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/option/GameOptions;)Z", at = @At(value = "INVOKE", target = "Lnet/spell_engine/mixin/client/control/KeybindingAccessor;spellEngine_getBoundKey()Lnet/minecraft/client/util/InputUtil$Key;", ordinal = 1, shift = At.Shift.AFTER), name = "keyBindingIndex")
-//	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int value, @Local(name = "onUseKey") SpellHotbar.Slot onUseKey) {
+	@ModifyVariable(
+			method = "update(Lnet/minecraft/client/network/ClientPlayerEntity;Lnet/minecraft/client/option/GameOptions;)Z",
+			at = @At(
+					value = "INVOKE",
+					target = "Lnet/spell_engine/mixin/client/control/KeybindingAccessor;spellEngine_getBoundKey()Lnet/minecraft/client/util/InputUtil$Key;",
+					ordinal = 1,
+					shift = At.Shift.AFTER
+			),
+			name = "keyBindingIndex"
+	)
 	private int spellengineextension$giveUseKeyADedicatedSpellHotbarSlot(int keyBindingIndex, @Local(name = "useKey") InputUtil.Key useKey, @Local(name = "unwrapped") WrappedKeybinding.Unwrapped unwrapped) {
-//		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && onUseKey != null) ? value - 1 : value;
 		return (!SpellEngineExtensionClient.CLIENT_CONFIG.should_spell_hotbar_use_key_replace_first_number_slot.get() && SpellEngineClient.config.spellHotbarUseKey && ((KeybindingAccessor)unwrapped.keyBinding()).spellEngine_getBoundKey().equals(useKey)) ? keyBindingIndex - 1 : keyBindingIndex;
 	}
 

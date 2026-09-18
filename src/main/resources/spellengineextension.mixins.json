@@ -17,8 +17,10 @@
     "spell_engine.api.spell.SpellModifierMixin",
     "spell_engine.api.spell.SpellProjectileDataPerksMixin",
     "spell_engine.api.spell.container.SpellContainerHelperMixin",
-    "spell_engine.internals.SpellHelperMixin",
-    "spell_engine.internals.arrow.ArrowHelperMixin"
+    "spell_engine.internals.SpellParametersMixin",
+    "spell_engine.internals.arrow.ArrowHelperMixin",
+    "spell_engine.internals.delivery.ProjectileLauncherMixin",
+    "spell_engine.internals.impact.SpellImpactsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

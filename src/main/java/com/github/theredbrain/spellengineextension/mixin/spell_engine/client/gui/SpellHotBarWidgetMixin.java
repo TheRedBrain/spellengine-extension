@@ -21,9 +21,8 @@ import net.spell_engine.client.gui.HudElement;
 import net.spell_engine.client.gui.HudRenderHelper;
 import net.spell_engine.client.util.Rect;
 import net.spell_engine.client.util.TextureFile;
-import net.spell_engine.internals.SpellCooldownManager;
-import net.spell_engine.internals.casting.SpellCasterClient;
-import net.spell_engine.mixin.client.control.KeybindingAccessor;
+import net.spell_engine.internals.casting.SpellCaster;
+import net.spell_engine.internals.cost.SpellCooldownManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -141,7 +140,7 @@ public abstract class SpellHotBarWidgetMixin {
 					ClientPlayerEntity player = client.player;
 					Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
 					if (optionalSpellReference.isPresent() && player != null && !player.isSpectator()) {
-						SpellCasterClient caster = (SpellCasterClient) player;
+						SpellCaster.Player caster = (SpellCaster.Player) player;
 						SpellCooldownManager cooldownManager = caster.getCooldownManager();
 						remainingCooldown = cooldownManager.getCooldownDuration(optionalSpellReference.get());
 					}
