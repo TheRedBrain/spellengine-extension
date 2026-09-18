@@ -40,6 +40,8 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Unique
     private float stamina_cost = 0.0F;
     @Unique
+    private boolean apply_channeling_effect_cost = false;
+    @Unique
     private boolean apply_channeling_health_cost = false;
     @Unique
     private boolean apply_channeling_mana_cost = false;
@@ -204,6 +206,16 @@ public class SpellCostMixin implements DuckSpellCostMixin {
     @Override
     public void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount) {
         this.decrement_effect_amount = decrementEffectAmount;
+    }
+
+    @Override
+    public boolean spellengineextension$applyChannelingEffectCost() {
+        return this.apply_channeling_effect_cost;
+    }
+
+    @Override
+    public void spellengineextension$setApplyChannelingEffectCost(boolean applyChannelingEffectCost) {
+        this.apply_channeling_effect_cost = applyChannelingEffectCost;
     }
 
     @Override

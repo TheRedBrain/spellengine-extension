@@ -66,6 +66,10 @@ public interface DuckSpellCostMixin {
 
 	void spellengineextension$setDecrementEffectAmount(int decrementEffectAmount);
 
+	boolean spellengineextension$applyChannelingEffectCost();
+
+	void spellengineextension$setApplyChannelingEffectCost(boolean applyChannelingEffectCost);
+
 	boolean spellengineextension$applyChannelingHealthCost();
 
 	void spellengineextension$setApplyChannelingHealthCost(boolean applyChannelingHealthCost);
