@@ -6,31 +6,24 @@ import com.github.theredbrain.spellengineextension.compat.AttackRangeAttributeCo
 import com.github.theredbrain.spellengineextension.compat.RPGInventoryCompatibility;
 import com.github.theredbrain.spellengineextension.compat.RangedWeaponAPICompatibility;
 import com.github.theredbrain.spellengineextension.compat.StaminaAttributesCompatibility;
-import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
-import com.github.theredbrain.spellengineextension.config.ServerConfig;
-import com.github.theredbrain.spellengineextension.enchantment.ProvideSpellsEnchantmentEntityEffect;
-import com.github.theredbrain.spellengineextension.predicate.item.SpellContainersPredicate;
-import com.github.theredbrain.spellengineextension.registry.DataComponentPredicateRegistry;
-import com.github.theredbrain.spellengineextension.registry.EnchantmentEntityEffectRegistry;
-import com.github.theredbrain.spellengineextension.registry.ItemComponentRegistry;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDamageTypes;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDataComponentPredicates;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionEnchantmentEntityEffects;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDataComponents;
 import com.github.theredbrain.spellengineextension.registry.ServerEventRegistry;
-import com.github.theredbrain.spellengineextension.registry.SpellSchoolRegistry;
-import com.mojang.serialization.MapCodec;
-import me.fzzyhmstrs.fzzy_config.api.ConfigApiJava;
-import me.fzzyhmstrs.fzzy_config.api.RegisterType;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionSpellSchools;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.component.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.predicate.item.ItemSubPredicate;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
@@ -46,7 +39,6 @@ import java.util.Optional;
 public class SpellEngineExtension implements ModInitializer {
 	public static final String MOD_ID = "spellengineextension";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public static ServerConfig SERVER_CONFIG;
 
 	public static RegistryEntry<EntityAttribute> GENERIC_MAGIC_DAMAGE;
 
@@ -64,12 +56,6 @@ public class SpellEngineExtension implements ModInitializer {
 	public static RegistryEntry<EntityAttribute> EXTRA_PIERCE;
 	public static RegistryEntry<EntityAttribute> EXTRA_CHAIN_REACTION_SIZE;
 	public static RegistryEntry<EntityAttribute> EXTRA_CHAIN_REACTION_TRIGGERS;
-
-	public static ComponentType<HasConditionalSpellContainerComponent> HAS_CONDITIONAL_SPELL_CONTAINER;
-
-	public static ItemSubPredicate.Type<SpellContainersPredicate> SPELL_CONTAINER_PREDICATE;
-
-	public static MapCodec<ProvideSpellsEnchantmentEntityEffect> PROVIDE_SPELLS;
 
 	public static final TagKey<Spell> CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("can_be_in_use_item_spell_hotbar_slot"));
 	public static final TagKey<Spell> ENABLES_MOVEMENT_LOCKING_DURING_CASTING = TagKey.of(SpellRegistry.KEY, SpellEngineExtension.identifier("enables_movement_locking_during_casting"));
@@ -159,13 +145,15 @@ public class SpellEngineExtension implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Spell Engine was extended!");
-		SERVER_CONFIG = ConfigApiJava.registerAndLoadConfig(ServerConfig::new, RegisterType.BOTH);
 
-		DataComponentPredicateRegistry.init();
-		ItemComponentRegistry.init();
-		EnchantmentEntityEffectRegistry.init();
+		SpellEngineExtensionConfigs.bootstrap();
+		SpellEngineExtensionDamageTypes.bootstrap();
+		SpellEngineExtensionDataComponentPredicates.bootstrap();
+		SpellEngineExtensionDataComponents.bootstrap();
+		SpellEngineExtensionEnchantmentEntityEffects.bootstrap();
+		SpellEngineExtensionSpellSchools.bootstrap();
+
 		ServerEventRegistry.init();
-		SpellSchoolRegistry.init();
 
 		Optional<ModContainer> modContainer = FabricLoader.getInstance().getModContainer(MOD_ID);
 		if (modContainer.isPresent()) {

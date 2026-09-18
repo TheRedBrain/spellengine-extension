@@ -2,6 +2,7 @@ package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.in
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -32,7 +33,7 @@ public class SpellHotbarMixin {
 			)
 	)
 	private boolean spellengineextension$wrap_spellHotbarUseKey(ClientConfig instance, Operation<Boolean> original, @Local(name = "option") SpellCast.Option option) {
-		return original.call(instance) && (!SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || option.spell().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
+		return original.call(instance) && (!SpellEngineExtensionConfigs.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() || option.spell().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT));
 	}
 
 	@ModifyVariable(

@@ -8,9 +8,11 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
-public class EnchantmentEntityEffectRegistry {
+public class SpellEngineExtensionEnchantmentEntityEffects {
 
-	public static void init() {
+	public static MapCodec<ProvideSpellsEnchantmentEntityEffect> PROVIDE_SPELLS;
+
+	public static void bootstrap() {
 	}
 
 	private static <T extends EnchantmentEntityEffect> MapCodec<T> register(Identifier id, MapCodec<T> codec) {
@@ -18,7 +20,7 @@ public class EnchantmentEntityEffectRegistry {
 	}
 
 	static {
-		SpellEngineExtension.PROVIDE_SPELLS = register(SpellEngineExtension.identifier("provide_spells"), ProvideSpellsEnchantmentEntityEffect.CODEC);
+		PROVIDE_SPELLS = register(SpellEngineExtension.identifier("provide_spells"), ProvideSpellsEnchantmentEntityEffect.CODEC);
 	}
 
 }

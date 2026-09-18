@@ -1,7 +1,7 @@
 package com.github.theredbrain.spellengineextension.mixin.entity.damage;
 
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
-import com.github.theredbrain.spellengineextension.registry.DamageTypesRegistry;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDamageTypes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageType;
@@ -16,6 +16,6 @@ public abstract class DamageSourcesMixin implements DuckDamageSourcesMixin {
 
     @Override
     public DamageSource spellengineextension$bloodMagicCasting() {
-        return this.create(DamageTypesRegistry.BLOOD_MAGIC_CASTING_DAMAGE_TYPE);
+        return this.create(SpellEngineExtensionDamageTypes.BLOOD_MAGIC_CASTING_DAMAGE_TYPE);
     }
 }

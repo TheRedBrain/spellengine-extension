@@ -1,10 +1,11 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
 import com.github.theredbrain.spellengineextension.config.ClientConfig;
 import com.github.theredbrain.spellengineextension.config.ServerConfig;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDataComponents;
 import com.github.theredbrain.spellengineextension.spell_engine.CustomSpellModifiers;
 import com.github.theredbrain.spellengineextension.spell_engine.DuckSpellCostMixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -45,8 +46,8 @@ public abstract class SpellTooltipMixin {
 
     @WrapOperation(method = "addSpellLines", at = @At(value = "INVOKE", target = "Lnet/spell_engine/client/gui/SpellTooltip;getSpellInfoExpandedWithKey(Lnet/minecraft/item/ItemStack;Lnet/spell_engine/api/spell/container/SpellContainer;Lnet/minecraft/entity/player/PlayerEntity;ZZ)Lnet/spell_engine/client/gui/SpellTooltip$SpellInfo;"))
     private static SpellTooltip.SpellInfo spellengineextension$wrap_getSpellInfoExpandedWithKey(ItemStack itemStack, SpellContainer container, PlayerEntity player, boolean forceHideHeader, boolean allowDetailsHint, Operation<SpellTooltip.SpellInfo> original) {
-        ClientConfig clientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
-        HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
+        ClientConfig clientConfig = SpellEngineExtensionConfigs.CLIENT_CONFIG;
+        HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtensionDataComponents.HAS_CONDITIONAL_SPELL_CONTAINER);
         if (clientConfig.always_hide_details_hint.get() || (clientConfig.hide_details_hint_for_invalid_conditional_spell_container.get() && hasConditionalSpellContainerComponent != null && !hasConditionalSpellContainerComponent.is_valid())) {
             return SpellTooltip.getSpellInfo(itemStack, container, player, forceHideHeader, false);
         } else {
@@ -57,7 +58,7 @@ public abstract class SpellTooltipMixin {
     @Inject(method = "addSpellDetails", at = @At("TAIL"))
     private static void spellengineextension$addSpellDetails(RegistryEntry<Spell> spellEntry, PlayerEntity player, ItemStack itemStack, int indentLevel, ArrayList<Text> lines, CallbackInfo ci) {
 
-        ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
+        ServerConfig spellEngineExtensionConfig = SpellEngineExtensionConfigs.SERVER_CONFIG;
 
         // called spell1 to avoid potential problems with spell field in original method
         Spell spell1 = spellEntry.value();

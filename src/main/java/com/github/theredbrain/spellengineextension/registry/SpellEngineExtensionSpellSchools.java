@@ -7,13 +7,16 @@ import net.spell_power.api.SpellPowerMechanics;
 import net.spell_power.api.SpellSchool;
 import net.spell_power.api.SpellSchools;
 
-public class SpellSchoolRegistry {
+public class SpellEngineExtensionSpellSchools {
 
 	public static final SpellSchool GENERIC_MELEE = new SpellSchool(SpellSchool.Archetype.MELEE, SpellEngineExtension.identifier("generic_melee"), 10066363, DamageTypes.GENERIC, null, null);
 	public static final SpellSchool GENERIC_RANGED = new SpellSchool(SpellSchool.Archetype.ARCHERY, SpellEngineExtension.identifier("generic_ranged"), 10066363, DamageTypes.ARROW, null, null);
 	public static final SpellSchool GENERIC_MAGIC = new SpellSchool(SpellSchool.Archetype.MAGIC, SpellEngineExtension.identifier("generic_magic"), 10066363, DamageTypes.MAGIC, null, null);
 
-	public static void init() {
+	public static void bootstrap() {
+	}
+
+	static {
 		GENERIC_MELEE.addSource(SpellSchool.Trait.POWER, new SpellSchool.Source(SpellSchool.Apply.ADD, (query) -> {
 			return query.entity().getAttributeValue(EntityAttributes.GENERIC_ATTACK_DAMAGE);
 		}));

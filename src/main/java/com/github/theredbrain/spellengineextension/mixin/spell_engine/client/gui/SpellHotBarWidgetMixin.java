@@ -1,8 +1,8 @@
 package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
-import com.github.theredbrain.spellengineextension.SpellEngineExtensionClient;
 import com.github.theredbrain.spellengineextension.config.ClientConfig;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -61,7 +61,7 @@ public abstract class SpellHotBarWidgetMixin {
 		HudElement config = SpellEngineClient.hudConfig.value.hotbar;
 		MinecraftClient client = MinecraftClient.getInstance();
 		TextRenderer textRenderer = client.inGameHud.getTextRenderer();
-		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionClient.CLIENT_CONFIG;
+		ClientConfig spellEngineExtensionClientConfig = SpellEngineExtensionConfigs.CLIENT_CONFIG;
 
 		// move the injection point to where the method is called, modifying the "viewModel" argument
 		if (client.world != null && spellEngineExtensionClientConfig.disable_use_key_spell_hotbar_slot_rendering.get() && SpellEngineClient.config.spellHotbarUseKey) {
@@ -71,7 +71,7 @@ public abstract class SpellHotBarWidgetMixin {
 
 				if (spell.iconId() != null) {
 					Optional<RegistryEntry.Reference<Spell>> optionalSpellReference = SpellRegistry.from(client.world).getEntry(Identifier.of(spell.iconId().getNamespace(), spell.iconId().getPath().replace("textures/spell/", "").replace(".png", "")));
-					if (SpellEngineExtension.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && optionalSpellReference.isPresent() && optionalSpellReference.get().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT)) {
+					if (SpellEngineExtensionConfigs.SERVER_CONFIG.enable_spell_hotbar_use_key_restriction.get() && optionalSpellReference.isPresent() && optionalSpellReference.get().isIn(SpellEngineExtension.CAN_BE_IN_USE_ITEM_SPELL_HOTBAR_SLOT)) {
 						removeSpellViewModel = true;
 					}
 				}

@@ -5,6 +5,7 @@ import com.github.theredbrain.spellengineextension.config.ServerConfig;
 import com.github.theredbrain.spellengineextension.entity.DuckLivingEntityMixin;
 import com.github.theredbrain.spellengineextension.entity.damage.DuckDamageSourcesMixin;
 import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -24,7 +25,7 @@ public class ExtendedSpellHelper {
 
 	public static SpellCast.Attempt checkForCustomSpellCost(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
 
-		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
+		ServerConfig spellEngineExtensionConfig = SpellEngineExtensionConfigs.SERVER_CONFIG;
 		Spell spell = spellEntry.value();
 
 		if (!player.isCreative() && spellEngineExtensionConfig.spell_cost_health_allowed.get()) {
@@ -85,7 +86,7 @@ public class ExtendedSpellHelper {
 
 	public static SpellCast.Attempt consumeCustomSpellCost(PlayerEntity player, RegistryEntry<Spell> spellEntry, ItemStack spellCastingItem) {
 
-		ServerConfig spellEngineExtensionConfig = SpellEngineExtension.SERVER_CONFIG;
+		ServerConfig spellEngineExtensionConfig = SpellEngineExtensionConfigs.SERVER_CONFIG;
 		Spell spell = spellEntry.value();
 
 		// health cost
@@ -166,7 +167,7 @@ public class ExtendedSpellHelper {
 
 	public static void applyAfterCastingMovementLockingTicks(PlayerEntity player, RegistryEntry<Spell> spellEntry) {
 
-		if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get() && spellEntry.isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING)) {
+		if (SpellEngineExtensionConfigs.SERVER_CONFIG.enable_movement_locking_spell_casting.get() && spellEntry.isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING)) {
 			((DuckPlayerEntityMixin) player).spellengineextension$setMovementLockingTicks(Math.max(0, ((DuckSpellActiveCastMixin) spellEntry.value().active.cast).spellengineextension$getAfterCastingMovementLockingTicks()));
 		}
 
@@ -174,7 +175,7 @@ public class ExtendedSpellHelper {
 
 	public static Spell.LaunchProperties applySpellLaunchPropertiesAttributes(Spell.LaunchProperties launchProperties, LivingEntity caster) {
 
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
+		ServerConfig serverConfig = SpellEngineExtensionConfigs.SERVER_CONFIG;
 
 		if (serverConfig.spell_launch_properties_extra_launch_count_attribute_allowed.get()
 				&& ((DuckSpellLaunchPropertiesMixin) launchProperties).spellengineextension$respectExtraLaunchCountAttribute()) {
@@ -194,7 +195,7 @@ public class ExtendedSpellHelper {
 
 	public static Spell.ProjectileData.Perks applySpellProjectileDataPerkAttributes(Spell.ProjectileData.Perks perks, LivingEntity caster) {
 
-		ServerConfig serverConfig = SpellEngineExtension.SERVER_CONFIG;
+		ServerConfig serverConfig = SpellEngineExtensionConfigs.SERVER_CONFIG;
 
 		if (serverConfig.spell_projectile_perk_extra_ricochet_attribute_allowed.get()
 				&& ((DuckSpellProjectileDataPerksMixin) perks).spellengineextension$respectExtraRicochetAttribute()) {

@@ -2,6 +2,8 @@ package com.github.theredbrain.spellengineextension.mixin.spell_engine.api.spell
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionDataComponents;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.item.ItemStack;
@@ -20,12 +22,12 @@ public class SpellContainerHelperMixin {
 
 	@WrapMethod(method = "containerFromItemStack")
 	private static SpellContainer spellengineextension$wrap_containerFromItemStack(ItemStack itemStack, Operation<SpellContainer> original) {
-		if (SpellEngineExtension.SERVER_CONFIG.enable_spell_container_extensions.get()) {
+		if (SpellEngineExtensionConfigs.SERVER_CONFIG.enable_spell_container_extensions.get()) {
 
 			if (itemStack.isEmpty()) {
 				return null;
 			} else {
-				HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtension.HAS_CONDITIONAL_SPELL_CONTAINER);
+				HasConditionalSpellContainerComponent hasConditionalSpellContainerComponent = itemStack.get(SpellEngineExtensionDataComponents.HAS_CONDITIONAL_SPELL_CONTAINER);
 				List<String> fall_back_spell_ids = null;
 
 				if (hasConditionalSpellContainerComponent != null && !hasConditionalSpellContainerComponent.is_valid()) {

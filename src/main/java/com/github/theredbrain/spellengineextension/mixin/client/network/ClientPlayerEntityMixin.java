@@ -2,6 +2,7 @@ package com.github.theredbrain.spellengineextension.mixin.client.network;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.entity.player.DuckPlayerEntityMixin;
+import com.github.theredbrain.spellengineextension.registry.SpellEngineExtensionConfigs;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.spell_engine.internals.casting.SpellCaster;
@@ -25,8 +26,8 @@ public abstract class ClientPlayerEntityMixin {
 		var player = (ClientPlayerEntity) (Object) this;
 		var caster = (SpellCaster.Player) player;
 		var process = caster.getSpellCastProcess();
-		if (SpellEngineExtension.SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
-			if (SpellEngineExtension.SERVER_CONFIG.movement_locking_prevents_player_position_changes.get() && ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
+		if (SpellEngineExtensionConfigs.SERVER_CONFIG.enable_movement_locking_spell_casting.get()) {
+			if (SpellEngineExtensionConfigs.SERVER_CONFIG.movement_locking_prevents_player_position_changes.get() && ((((DuckPlayerEntityMixin) player).spellengineextension$getMovementLockingTicks() > 0) || (process != null && process.spell().isIn(SpellEngineExtension.ENABLES_MOVEMENT_LOCKING_DURING_CASTING) && process.spell().value().active.cast != null)) && !player.hasVehicle()) {
 				Input var10000 = this.input;
 				var10000.movementForward = 0.0F;
 				var10000 = this.input;
