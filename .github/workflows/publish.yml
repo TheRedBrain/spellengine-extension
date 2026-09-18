@@ -89,21 +89,22 @@ jobs:
         with:
           java-version: '21'
           distribution: 'microsoft'
-      - name: Resolve Gradle tasks
-        id: targets
-        # `build` is explicit: the publish tasks depend on shadowJar, not on build/check.
-        run: |
-          set -euo pipefail
-          tasks=":${{ matrix.loader }}:build"
-          for d in ${{ needs.plan.outputs.destinations }}; do
-            tasks="$tasks :${{ matrix.loader }}:$d"
-          done
-          echo "tasks=$tasks" >> "$GITHUB_OUTPUT"
-          echo "Publishing ${{ matrix.loader }} via: $tasks"
+#      - name: Resolve Gradle tasks
+#        id: targets
+#        # `build` is explicit: the publish tasks depend on shadowJar, not on build/check.
+#        run: |
+#          set -euo pipefail
+#          tasks=":${{ matrix.loader }}:build"
+#          for d in ${{ needs.plan.outputs.destinations }}; do
+#            tasks="$tasks :${{ matrix.loader }}:$d"
+#          done
+#          echo "tasks=$tasks" >> "$GITHUB_OUTPUT"
+#          echo "Publishing ${{ matrix.loader }} via: $tasks"
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
-          arguments: ${{ steps.targets.outputs.tasks }} -Prelease_type=${{ inputs.release_type }}
+#          arguments: ${{ steps.targets.outputs.tasks }} -Prelease_type=${{ inputs.release_type }}
+          arguments: publishMods -Prelease_type=${{ inputs.release_type }}
         env:
           CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
           CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
