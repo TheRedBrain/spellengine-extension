@@ -18,8 +18,7 @@ public class StatusEffectMixin implements ProvidesSpell {
 	}
 
 	@Override
-	public StatusEffect spellengineextension$setProvidedSpells(List<List<String>> providedSpellsList) {
+	public void spellengineextension$setProvidedSpells(List<List<String>> providedSpellsList) {
 		this.spellengineextension$providedSpellsList = providedSpellsList;
-		return (StatusEffect) ((Object) this);
 	}
 }

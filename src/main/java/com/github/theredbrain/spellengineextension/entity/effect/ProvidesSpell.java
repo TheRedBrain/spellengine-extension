@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProvidesSpell {
 	List<List<String>> spellengineextension$providedSpells();
 
-	StatusEffect spellengineextension$setProvidedSpells(List<List<String>> providedSpellsList);
+	void spellengineextension$setProvidedSpells(List<List<String>> providedSpellsList);
 
 	static void configure(StatusEffect effect, List<List<String>> providedSpellsList) {
 		((ProvidesSpell) effect).spellengineextension$setProvidedSpells(providedSpellsList);
