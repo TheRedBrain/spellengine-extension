@@ -1,3 +1,18 @@
+# 2.17.0
+
+- now works with Spell Engine 1.10.6
+
+## Changes
+
+  - changed custom status effect spell cost to be consumed each channeling tick
+
+## Technical
+
+- moved several registered features out of the main class, including:
+  - "spellengineextension:provide_spells" enchantment entity effect
+  - "spellengineextension:spell_container_predicate" data component predicate
+  - "spellengineextension:has_conditional_spell_container" data component
+
 # 2.16.2
 
 - now works with Spell Engine 1.9.16
