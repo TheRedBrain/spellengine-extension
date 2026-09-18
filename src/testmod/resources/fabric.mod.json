@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "spellengineextension_test",
+  "version": "${version}",
+  "name": "Test Mod",
+  "description": "Test Mod for Spell Engine Extension",
+  "authors": [],
+  "contact": {},
+  "license": "None",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.github.theredbrain.spellengineextension_test.SpellEngineExtensionTest"
+    ],
+    "client": [
+      "com.github.theredbrain.spellengineextension_test.client.SpellEngineExtensionTestClient"
+    ]
+  },
+  "mixins": [],
+  "depends": {}
+}
