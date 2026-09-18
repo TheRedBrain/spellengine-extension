@@ -28,8 +28,8 @@
   "client": [
     "client.MouseMixin",
     "client.network.ClientPlayerEntityMixin",
-    "spell_engine.client.gui.SpellHotBarWidgetMixin",
-    "spell_engine.client.gui.SpellTooltipMixin",
-    "spell_engine.client.input.SpellHotbarMixin"
+    "client.spell_engine.gui.SpellHotBarWidgetMixin",
+    "client.spell_engine.gui.SpellTooltipMixin",
+    "client.spell_engine.input.SpellHotbarMixin"
   ]
 }

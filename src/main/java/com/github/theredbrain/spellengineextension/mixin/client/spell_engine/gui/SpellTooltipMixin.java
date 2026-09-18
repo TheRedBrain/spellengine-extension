@@ -1,4 +1,4 @@
-package com.github.theredbrain.spellengineextension.mixin.spell_engine.client.gui;
+package com.github.theredbrain.spellengineextension.mixin.client.spell_engine.gui;
 
 import com.github.theredbrain.spellengineextension.SpellEngineExtension;
 import com.github.theredbrain.spellengineextension.component.type.HasConditionalSpellContainerComponent;
