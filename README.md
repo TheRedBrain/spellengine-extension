@@ -20,11 +20,13 @@ Spell Cost
 - custom_effect_cost is a more customizable status effect cost. The vanilla 'effect_cost' field is unaffected and works as expected.
 - decrement_effect_amount (defines what happens with status effects defined as 'custom_effect_cost'. When < 0, the effect is removed (same as the 'effect_cost' behaviour), when > 0 the effects amplifier (also known as effect level) is reduced (0 is the lowest amplifier possible)). When the decrement amount is 0, nothing happens to the effect.
 - check_effect_cost (if the caster has to have the effect defined by 'custom_effect_cost' applied)
+- apply_channeling_effect_cost (whether the effect cost is consumed every channeling tick or after casting)
 
 
 - health_cost (amount of health casting the spell is costing)
 - check_health_cost (if casting fails when player has not enough health)
 - health_cost_multiplier_applies (whether the health cost should be multiplied with the "spellengineextension:generic.health_spell_cost_multiplier" entity attribute)
+- apply_channeling_health_cost (whether the health cost is consumed every channeling tick or after casting)
 
 > Spending health to cast spells inflicts damage with the "spellengineextension:blood_magic_casting_damage_type" damage type.
 
@@ -35,7 +37,7 @@ Spell Cost
 - check_stamina_cost (if casting fails when player has not enough stamina)
 - add_item_use_stamina_cost_attribute_value (if the value of the "staminaattributes:generic.item_use_stamina_cost" entity attribute should be added to the spell stamina cost)
 - stamina_cost_multiplier_applies (whether the stamina cost should be multiplied with the "spellengineextension:generic.stamina_spell_cost_multiplier" entity attribute)
-- apply_channeling_mana_cost (whether the stamina cost should be applied every 'channel_tick')
+- apply_channeling_health_cost (whether the stamina cost is consumed every channeling tick or after casting)
 
 This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stamina-attributes) is installed.
 
@@ -45,7 +47,7 @@ This only has an effect, when [Stamina Attributes](https://modrinth.com/mod/stam
 - check_mana (if casting fails when player has no mana)
 - check_mana_cost (if casting fails when player has not enough mana)
 - mana_cost_multiplier_applies (whether the mana cost should be multiplied with the "spellengineextension:generic.mana_spell_cost_multiplier" entity attribute)
-- apply_channeling_mana_cost (whether the mana cost should be applied every 'channel_tick')
+- apply_channeling_health_cost (whether the mana cost is consumed every channeling tick or after casting)
 
 This only has an effect, when [Mana Attributes](https://modrinth.com/mod/mana-attributes) is installed.
 
@@ -97,12 +99,12 @@ This is an example spell.json where all added values are present (with their def
   "deliver": {
     "type": "PROJECTILE",
     "projectile": {
+      "launch_properties": {
+        "respect_extra_launch_count_attribute": true,
+        "respect_extra_launch_delay_attribute": true,
+        "respect_extra_velocity_attribute": true
+      },
       "projectile": {
-        "launch_properties": {
-          "respect_extra_launch_count_attribute": true,
-          "respect_extra_launch_delay_attribute": true,
-          "respect_extra_velocity_attribute": true
-        },
         "perks": {
           "respect_extra_ricochet_attribute": true,
           "respect_extra_ricochet_range_attribute": true,
@@ -114,27 +116,25 @@ This is an example spell.json where all added values are present (with their def
       }
     }
   },
-  "target": {
+  "deliver": {
     "type": "SHOOT_ARROW",
     "projectile": {
-      "projectile": {
-        "launch_properties": {
-          "respect_extra_launch_count_attribute": true,
-          "respect_extra_launch_delay_attribute": true,
-          "respect_extra_velocity_attribute": true
-        }
+      "launch_properties": {
+        "respect_extra_launch_count_attribute": true,
+        "respect_extra_launch_delay_attribute": true,
+        "respect_extra_velocity_attribute": true
       }
     }
   },
-  "target": {
+  "deliver": {
     "type": "METEOR",
     "projectile": {
+      "launch_properties": {
+        "respect_extra_launch_count_attribute": true,
+        "respect_extra_launch_delay_attribute": true,
+        "respect_extra_velocity_attribute": true
+      },
       "projectile": {
-        "launch_properties": {
-          "respect_extra_launch_count_attribute": true,
-          "respect_extra_launch_delay_attribute": true,
-          "respect_extra_velocity_attribute": true
-        },
         "perks": {
           "respect_extra_ricochet_attribute": true,
           "respect_extra_ricochet_range_attribute": true,
@@ -182,6 +182,7 @@ This is an example spell.json where all added values are present (with their def
     "mana_cost": 0.0,
     "health_cost": 0.0,
     "stamina_cost": 0.0,
+    "apply_channeling_effect_cost": false,
     "apply_channeling_health_cost": false,
     "apply_channeling_mana_cost": false,
     "apply_channeling_stamina_cost": false

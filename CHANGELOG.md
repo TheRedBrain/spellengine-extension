@@ -2,9 +2,9 @@
 
 - now works with Spell Engine 1.10.6
 
-## Changes
+## Additions
 
-  - changed custom status effect spell cost to be consumed each channeling tick
+  - added channeling status effect cost, using the existing custom status effect cost and the new boolean field "apply_channeling_effect_cost" added to 'spell.cost'
 
 ## Technical
 
