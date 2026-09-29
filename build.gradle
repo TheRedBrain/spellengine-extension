@@ -202,7 +202,7 @@ publishMods {
             : me.modmuss50.mpp.ReleaseType.BETA
     version = "${project.version}"
 //    version = "${project.version}-${platform}"   // per-loader suffix → unique Modrinth version
-    displayName = "${project.version}"
+//    displayName = "${project.version}"
     modLoaders.add("fabric")
 
     curseforge {
