@@ -1,3 +1,9 @@
+# 2.17.2
+
+- now works with Spell Engine 1.10.9+
+
+This version is marked as compatible with future versions of Spell Engine. SEE has become much more stable in recent updates, so I feel confident in doing this. Larger SE updates will certainly require a SEE update, but this should reduce the amount of "version bump updates" :D
+
 # 2.17.1
 
 - now works with Spell Engine 1.10.8
